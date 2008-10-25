@@ -265,6 +265,10 @@
 #include <winbase.h>		/* needed for memory mapping of file functions */
 #endif
 
+#ifdef SCP_WII
+#undef SCP_UNIX
+#endif
+
 #ifdef SCP_UNIX
 #include <glob.h>
 #include <sys/types.h>

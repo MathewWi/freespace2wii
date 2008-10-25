@@ -37,6 +37,9 @@
 #include <errno.h>
 #include <time.h>
 #include <sys/time.h>
+#ifdef SCP_WII
+#include <time.h>
+#endif
 #endif
 
 #include "graphics/gropengl.h"

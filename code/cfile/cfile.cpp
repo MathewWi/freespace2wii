@@ -370,10 +370,15 @@
 #include <winbase.h>		/* needed for memory mapping of file functions */
 #endif
 
+#ifdef SCP_WII
+#undef SCP_UNIX
+#endif
+
 #ifdef SCP_UNIX
 #include <sys/stat.h>
 #include <glob.h>
 #include <sys/mman.h>
+#include <unistd.h>
 #endif
 
 #include "cfile/cfile.h"
@@ -1407,6 +1412,8 @@ CFILE *cf_open_packed_cfblock(FILE *fp, int type, int offset, int size)
 CFILE *cf_open_mapped_fill_cfblock(HANDLE hFile, int type)
 #elif defined SCP_UNIX
 CFILE *cf_open_mapped_fill_cfblock(FILE *fp, int type)
+#elif defined SCP_WII
+CFILE *cf_open_mapped_fill_cfblock(FILE *fp, int type)
 #endif
 {
 	int cfile_block_index;
@@ -1451,6 +1458,8 @@ CFILE *cf_open_mapped_fill_cfblock(FILE *fp, int type)
 								fileno(fp),				// fd
 								0);						// offset
 		Assert( cfbp->data != NULL );		
+#elif defined SCP_WII
+		return 0;
 #endif
 
 		return cfp;

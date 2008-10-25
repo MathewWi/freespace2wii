@@ -35,10 +35,14 @@ static int os_pushresult (lua_State *L, int i, const char *filename) {
 }
 
 
-static int os_execute (lua_State *L) {
+/*static int os_execute (lua_State *L) {
+#ifdef SCP_WII
+  return 0;
+#else
   lua_pushinteger(L, system(luaL_optstring(L, 1, NULL)));
   return 1;
-}
+#endif
+}*/
 
 
 static int os_remove (lua_State *L) {
@@ -71,10 +75,10 @@ static int os_getenv (lua_State *L) {
 }
 
 
-static int os_clock (lua_State *L) {
+/*static int os_clock (lua_State *L) {
   lua_pushnumber(L, ((lua_Number)clock())/(lua_Number)CLOCKS_PER_SEC);
   return 1;
-}
+}*/
 
 
 /*
@@ -218,10 +222,9 @@ static int os_exit (lua_State *L) {
 }
 
 static const luaL_Reg syslib[] = {
-  {"clock",     os_clock},
+//  {"clock",     os_clock},
   {"date",      os_date},
   {"difftime",  os_difftime},
-  {"execute",   os_execute},
   {"exit",      os_exit},
   {"getenv",    os_getenv},
   {"remove",    os_remove},

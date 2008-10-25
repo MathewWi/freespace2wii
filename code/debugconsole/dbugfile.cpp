@@ -36,6 +36,8 @@ void dbugfile_output(char *buffer)
 	fclose(fp);
 }
 
+#include <time.h>
+
 void dbugfile_init()
 {
 	// Clear the counters
@@ -79,10 +81,11 @@ void dbugfile_init()
 	}
 #endif
 
-    _tzset();
+#pragma message fix me
+    //_tzset();
 
     // Display operating system-style date and time.
-	_strdate( temp_buff);
+	//_strdate( temp_buff);
 	strcat(dbugfile_filename, "D(");
 	strcat(dbugfile_filename,temp_buff);
 	strcat(big_buffer,temp_buff);
@@ -90,7 +93,7 @@ void dbugfile_init()
 	strcat(dbugfile_filename, ") T(");
 	strcat(big_buffer, " ");
 
-    _strtime( temp_buff);
+    //_strtime( temp_buff);
 	strcat(dbugfile_filename,temp_buff);
 	strcat(big_buffer,temp_buff);
 

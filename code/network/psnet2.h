@@ -88,6 +88,7 @@
 #include <winsock.h>
 #else
 #include <errno.h>
+#include <sys/select.h>
 #endif
 
 #include "globalincs/pstypes.h"

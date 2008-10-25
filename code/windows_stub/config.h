@@ -144,6 +144,8 @@
 
  #if defined _M_IX86 || defined _X86_
   #define BYTE_ORDER   LITTLE_ENDIAN
+ #elseif defined SCP_WII
+  #define BYTE_ORDER   BIG_ENDIAN
  #else
   #error unknown byte order
  #endif
@@ -157,8 +159,8 @@
 
 
 #include <unistd.h>
-#include "SDL.h"
-#include "SDL_thread.h"
+#include <SDL.h>
+#include <SDL_thread.h>
 
 
 // don't verbose stub funtions unless we're debugging
@@ -175,7 +177,8 @@
 #define FAR
 
 // Standard data types
-typedef int BOOL;
+#include <gctypes.h>
+#include <inttypes.h>
 typedef unsigned short WORD;
 typedef unsigned int UINT;
 #ifdef IAM_64BIT
@@ -310,6 +313,7 @@ int MessageBox(HWND h, const char *s1, const char *s2, int i);
 typedef SDL_mutex* CRITICAL_SECTION;
 
 // timer stuff
+#include <sys/time.h>
 typedef timeval TIMEVAL;
 bool QueryPerformanceCounter(LARGE_INTEGER *pcount);
 
@@ -355,7 +359,7 @@ typedef MMIOINFO *LPMMIOINFO;
 HMMIO mmioOpen(LPSTR szFilename, LPMMIOINFO lpmmioinfo, DWORD dwOpenFlags);
 long mmioSeek(HMMIO hmmio, long lOffset, int iOrigin);
 long mmioRead(HMMIO hmmio, HPSTR pch, long cch);
-MMRESULT mmioClose(HMMIO hmmio, uint wFlags);
+MMRESULT mmioClose(HMMIO hmmio, uint32_t wFlags);
 
 
 int filelength(int fd);
@@ -365,12 +369,16 @@ int _mkdir(const char *path);
 void _splitpath(char *path, char *drive, char *dir, char *fname, char *ext);
 
 // string related
+#ifndef stricmp
 #define stricmp(s1, s2)			strcasecmp((s1), (s2))
+#endif
+#ifndef strnicmp
 #define strnicmp(s1, s2, n)		strncasecmp((s1), (s2), (n))
+#endif
 #define _strnicmp(s1, s2, n)	strncasecmp((s1), (s2), (n))
 #define _strlwr(s)				strlwr(s)
 
-void strlwr(char *s);
+//void strlwr(char *s);
 char *strnset( char *string, int fill, size_t count);
 
 // other stuff

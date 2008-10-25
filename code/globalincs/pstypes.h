@@ -433,6 +433,9 @@
  * $NoKeywords: $
  *
  */
+ 
+
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 
 #ifndef _PSTYPES_H
 #define _PSTYPES_H
@@ -457,9 +460,10 @@
 //  	#define GAME_CD_CHECK
 //  #endif
 
+#include <stdint.h>
 #include <stdio.h>	// For NULL, etc
 #include <stdlib.h>
-#include <memory.h>
+//#include <memory.h>
 #include <string.h>
 
 #if defined( __x86_64__ ) || defined( _WIN64 )
@@ -634,7 +638,8 @@ extern void _cdecl Warning( char * filename, int line, const char * format, ... 
 #define Assert(x) do {} while (0)
 #else
 void gr_activate(int);
-#define Assert(x) do { if (!(x)){ WinAssert(#x,__FILE__,__LINE__); } } while (0)
+#include <assert.h>
+#define Assert(x) do { if (!(x)){ assert(x); } } while (0)
 #endif
 /*******************NEVER UNCOMMENT Assert ************************************************/
 

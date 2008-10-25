@@ -81,6 +81,7 @@
 #include <string.h>
 #include <setjmp.h>
 
+typedef int boolean;
 #include "../../libjpeg/jpeglib.h"
 
 #undef LOCAL // fix from a jpeg header, pstypes.h will define it again
@@ -92,6 +93,8 @@
 #include "palman/palman.h"
 #include "graphics/2d.h"
 
+#undef boolean
+typedef int boolean;
 
 // forward declarations
 void jpeg_cfile_src(j_decompress_ptr cinfo, CFILE *cfp);
