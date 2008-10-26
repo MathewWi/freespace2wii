@@ -313,6 +313,8 @@ void stars_get_sun_pos(int sun_n, vec3d *pos);
 void stars_preload_sun_bitmap(char *fname);
 void stars_preload_background_bitmap(char *fname);
 
+bool stars_sun_has_glare(int index);
+
 void stars_set_nebula(bool activate);
 
 // Starfield functions that should be used only by FRED ...
