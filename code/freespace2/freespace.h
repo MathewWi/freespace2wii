@@ -203,7 +203,6 @@
 #include "globalincs/pstypes.h"
 #include "globalincs/systemvars.h"
 #include "graphics/2d.h"
-#include "ship/ship.h"
 
 // --------------------------------------------------------------------------------------------------------
 // FREESPACE DEFINES/VARS
@@ -234,6 +233,76 @@
 	// #define FS_CDROM_VOLUME_3					NOX("FREESPACE_3")
 #endif
 
+// frametime/missiontime variables
+extern fix Frametime;
+extern float flRealframetime;
+extern float flFrametime;
+extern fix Missiontime;
+
+// 0 - 4
+extern int Game_skill_level;
+
+// see GM_* defines in systemvars.h
+extern int Game_mode;
+
+// if this value is set anywhere within the game_do_state_common() function, the normal do_state() will not be called
+// for this frame. Useful for getting out of sticky sequencing situations.
+extern int Game_do_state_should_skip;
+
+// time compression
+extern bool Time_compression_locked;
+extern fix Game_time_compression;
+
+// Set if subspace is active this level
+extern int Game_subspace_effect;		
+
+// The current mission being played.
+extern char Game_current_mission_filename[MAX_FILENAME_LEN];
+
+// game's CDROM directory
+extern char Game_CDROM_dir[MAX_PATH_LEN];
+
+// if the ships.tbl the player has is valid
+extern int Game_ships_tbl_valid;
+
+// if the weapons.tbl the player has is valid
+extern int Game_weapons_tbl_valid;
+
+// to disable networking at runtime
+extern int Networking_disabled;
+
+extern int Multi_ping_timestamp;
+
+extern int	Show_framerate;
+
+extern int	Show_target_debug_info;
+extern int	Show_target_weapons;
+
+extern float frametotal;
+extern float Framerate;
+
+extern float FreeSpace_gamma;
+
+extern int game_single_step;
+extern int last_single_step;
+
+extern float Warpout_time;
+extern int Warpout_forced;		// Set if this is a forced warpout that cannot be cancelled.
+
+extern vec3d Dead_player_last_vel;
+
+extern int Sun_drew;
+
+extern int	Framerate_delay;
+
+extern int	Show_cpu;
+
+extern int Debug_octant;
+
+extern int Test_begin;
+
+extern int tst;
+
 // this is a mission actually designed at Volition
 #define MAX_BUILTIN_MISSIONS					100
 #define FSB_FROM_VOLITION						(1<<0)			// we made it in-house
@@ -249,112 +318,6 @@ typedef struct fs_builtin_mission {
 } fs_builtin_mission;
 
 
-// function to read keyboard stuff
-extern void game_process_keys();
-
-#define ctx Freespace_base::_this
-
-struct Freespace_base
-{
-	static Freespace_base * _this;
-	
-// frametime/missiontime variables
- fix Frametime;
-#ifndef BUILD_CONTEXT
-#define Frametime ctx->Frametime
-#endif
- float flRealframetime;
-#ifndef BUILD_CONTEXT
-#define flRealframetime ctx->flRealframetime
-#endif
- float flFrametime;
-#ifndef BUILD_CONTEXT
-#define flFrametime ctx->flFrametime
-#endif
- fix Missiontime;
-#ifndef BUILD_CONTEXT
-#define Missiontime ctx->Missiontime
-#endif
-
-// 0 - 4
- int Game_skill_level;
-#ifndef BUILD_CONTEXT
-#define Game_skill_level ctx->Game_skill_level
-#endif
-
-// see GM_* defines in systemvars.h
- int Game_mode;
-#ifndef BUILD_CONTEXT
-#define Game_mode ctx->Game_mode
-#endif
- 
-
-// if this value is set anywhere within the game_do_state_common() function, the normal do_state() will not be called
-// for this frame. Useful for getting out of sticky sequencing situations.
- int Game_do_state_should_skip;
-#ifndef BUILD_CONTEXT
-#define Game_do_state_should_skip ctx->Game_do_state_should_skip
-#endif
- 
-
-// time compression
- bool Time_compression_locked;
-#ifndef BUILD_CONTEXT
-#define Time_compression_locked ctx->Time_compression_locked
-#endif
- 
- 
- fix Game_time_compression;
-#ifndef BUILD_CONTEXT
-#define Game_time_compression ctx->Game_time_compression
-#endif
-
-
-// Set if subspace is active this level
- int Game_subspace_effect;		
-#ifndef BUILD_CONTEXT
-#define Game_subspace_effect ctx->Game_subspace_effect
-#endif
-
-
-// The current mission being played.
- char Game_current_mission_filename[MAX_FILENAME_LEN];
-#ifndef BUILD_CONTEXT
-#define Game_current_mission_filename ctx->Game_current_mission_filename
-#endif
-
-// game's CDROM directory
- char Game_CDROM_dir[MAX_PATH_LEN];
-#ifndef BUILD_CONTEXT
-#define Game_CDROM_dir ctx->Game_CDROM_dir
-#endif
-
-// if the ships.tbl the player has is valid
- int Game_ships_tbl_valid;
-#ifndef BUILD_CONTEXT
-#define Game_ships_tbl_valid ctx->Game_ships_tbl_valid
-#endif
-
-
-// if the weapons.tbl the player has is valid
- int Game_weapons_tbl_valid;
-#ifndef BUILD_CONTEXT
-#define Game_weapons_tbl_valid ctx->Game_weapons_tbl_valid
-#endif
-
-
-// to disable networking at runtime
- int Networking_disabled;
-#ifndef BUILD_CONTEXT
-#define Networking_disabled ctx->Networking_disabled
-#endif
-
-int	Fred_running ;// 0;
-#ifndef BUILD_CONTEXT
-#define Fred_running ctx->Fred_running
-#endif
-
-
 // --------------------------------------------------------------------------------------------------------
 // FREESPACE FUNCTIONS
 //
@@ -362,122 +325,80 @@ int	Fred_running ;// 0;
 // mission management -------------------------------------------------
 
 // loads in the currently selected mission
-virtual int game_start_mission();
-#ifndef BUILD_CONTEXT
-#define game_start_mission ctx->game_start_mission
-#endif
+int game_start_mission();		
 
 // shutdown a mission
-virtual void game_level_close();
-#ifndef BUILD_CONTEXT
-#define game_level_close ctx->game_level_close
-#endif
+void game_level_close();
 
 
 // gameplay stuff -----------------------------------------------------
 
 // stop the game (mission) timer
-virtual void game_stop_time();
-#ifndef BUILD_CONTEXT
-#define game_stop_time ctx->game_stop_time
-#endif
+void game_stop_time();
 
 // start the game (mission) timer
-virtual void game_start_time();
-#ifndef BUILD_CONTEXT
-#define game_start_time ctx->game_start_time
-#endif
-
+void game_start_time();
 
 // call whenever in a loop or if you need to get a keypress
-virtual int game_check_key();
-#ifndef BUILD_CONTEXT
-#define game_check_key ctx->game_check_key
-#endif
+int game_check_key();
 
 // poll for keypresses
-virtual int game_poll();
-#ifndef BUILD_CONTEXT
-#define game_poll ctx->game_poll
-#endif
+int game_poll();
+
+// function to read keyboard stuff
+void game_process_keys();
 
 // call this when you don't want the user changing time compression
-virtual void lock_time_compression(bool is_locked);
-#ifndef BUILD_CONTEXT
-#define lock_time_compression ctx->lock_time_compression
-#endif
-
+void lock_time_compression(bool is_locked);
 
 // call this to set time compression properly
-virtual void set_time_compression(float multiplier, float change_time = 0);
-#ifndef BUILD_CONTEXT
-#define set_time_compression ctx->set_time_compression
-#endif
+void set_time_compression(float multiplier, float change_time = 0);
 
 //call this to change the relative time compression (ie double it)
-virtual void change_time_compression(float multiplier);
-#ifndef BUILD_CONTEXT
-#define change_time_compression ctx->change_time_compression
-#endif
+void change_time_compression(float multiplier);
 
 // call this to set frametime properly (once per frame)
-virtual void game_set_frametime(int state);
-#ifndef BUILD_CONTEXT
-#define game_set_frametime ctx->game_set_frametime
-#endif
+void game_set_frametime(int state);
 
 // overall frametime of game, indepedent of mission timer
-virtual fix game_get_overall_frametime();
-#ifndef BUILD_CONTEXT
-#define game_get_overall_frametime ctx->game_get_overall_frametime
-#endif
+fix game_get_overall_frametime();
 
 // Used to halt all looping game sounds
-virtual void game_stop_looped_sounds();
-#ifndef BUILD_CONTEXT
-#define game_stop_looped_sounds ctx->game_stop_looped_sounds
-#endif
+void game_stop_looped_sounds();
 
 // do stuff that may need to be done regardless of state
-virtual void game_do_state_common(int state,int no_networking = 0);
-#ifndef BUILD_CONTEXT
-#define game_do_state_common ctx->game_do_state_common
-#endif
+void game_do_state_common(int state,int no_networking = 0);
 
 
 // skill level --------------------------------------------------------
 
 // increase the skill level (will wrap around to min skill level)
-virtual void game_increase_skill_level();
-#ifndef BUILD_CONTEXT
-#define game_increase_skill_level ctx->game_increase_skill_level
-#endif
+void game_increase_skill_level();
 
 // get the default game skill level
-virtual int game_get_default_skill_level();
-#ifndef BUILD_CONTEXT
-#define game_get_default_skill_level ctx->game_get_default_skill_level
-#endif
+int game_get_default_skill_level();
 
 // a keypress.  See CPP file for more info.
-virtual void game_flush();
-#ifndef BUILD_CONTEXT
-#define game_flush ctx->game_flush
-#endif
+void game_flush();
 
 // running with low-memory (less than 48MB)
-virtual bool game_using_low_mem();
-#ifndef BUILD_CONTEXT
-#define game_using_low_mem ctx->game_using_low_mem
-#endif
+bool game_using_low_mem();
+
+void game_leave_state( int old_state, int new_state );
+void game_enter_state( int old_state, int new_state );
+void game_do_state(int state);
+
+void game_process_event( int current_state, int event );
+
+void game_get_framerate();
+
+class ship;
+void game_tst_mark(object *objp, ship *shipp);
 
 // misc ---------------------------------------------------------------
 
 // lookup the specified filename. return an fs_builtin_mission* if found, NULL otherwise
-virtual fs_builtin_mission *game_find_builtin_mission(char *filename);
-#ifndef BUILD_CONTEXT
-#define game_find_builtin_mission ctx->game_find_builtin_mission
-#endif
+fs_builtin_mission *game_find_builtin_mission(char *filename);
 
 
 
@@ -485,285 +406,78 @@ virtual fs_builtin_mission *game_find_builtin_mission(char *filename);
 // GAME FLASH STUFF  - code in FreeSpace.cpp
 
 // Resets the flash
-virtual void game_flash_reset();
-#ifndef BUILD_CONTEXT
-#define game_flash_reset ctx->game_flash_reset
-#endif
+void game_flash_reset();
 
 // Adds a flash effect.  These can be positive or negative.
 // The range will get capped at around -1 to 1, so stick 
 // with a range like that.
-virtual void game_flash( float r, float g, float b );
-#ifndef BUILD_CONTEXT
-#define game_flash ctx->game_flash
-#endif
+void game_flash( float r, float g, float b );
 
 // Adds a flash for Big Ship explosions
 // cap range from 0 to 1
-virtual void big_explosion_flash(float flash);
-#ifndef BUILD_CONTEXT
-#define big_explosion_flash ctx->big_explosion_flash
-#endif
+void big_explosion_flash(float flash);
 
 // Call once a frame to diminish the
 // flash effect to 0.
-virtual void game_flash_diminish();
-#ifndef BUILD_CONTEXT
-#define game_flash_diminish ctx->game_flash_diminish
-#endif
+void game_flash_diminish();
 
 // Loads the best palette for this level, based
 // on nebula color and hud color.  You could just call palette_load_table with
 // the appropriate filename, but who wants to do that.
-virtual void game_load_palette();
-#ifndef BUILD_CONTEXT
-#define game_load_palette ctx->game_load_palette
-#endif
+void game_load_palette();
 
 //================================================================
 
 // Call at the beginning of each frame
-virtual void game_whack_reset();
-#ifndef BUILD_CONTEXT
-#define game_whack_reset ctx->game_whack_reset
-#endif
+void game_whack_reset();
 
 // Call to apply a whack to a the ship. Used for force feedback
-virtual void game_whack_apply( float x, float y );
-#ifndef BUILD_CONTEXT
-#define game_whack_apply ctx->game_whack_apply
-#endif
+void game_whack_apply( float x, float y );
 
 // call to apply a "shudder"
-virtual void game_shudder_apply(int time, float intensity);
-#ifndef BUILD_CONTEXT
-#define game_shudder_apply ctx->game_shudder_apply
-#endif
+void game_shudder_apply(int time, float intensity);
 
 //===================================================================
 
 // make sure a CD is in the drive before continuing (returns 1 to continue, otherwise 0).
-virtual int game_do_cd_check(char *volume_name=NULL);
-#ifndef BUILD_CONTEXT
-#define game_do_cd_check ctx->game_do_cd_check
-#endif
-virtual int game_do_cd_check_specific(char *volume_name, int cdnum);
-#ifndef BUILD_CONTEXT
-#define game_do_cd_check_specific ctx->game_do_cd_check_specific
-#endif
-virtual int find_freespace_cd(char *volume_name=NULL);
-#ifndef BUILD_CONTEXT
-#define find_freespace_cd ctx->find_freespace_cd
-#endif
-virtual int set_cdrom_path(int drive_num);
-#ifndef BUILD_CONTEXT
-#define set_cdrom_path ctx->set_cdrom_path
-#endif
-virtual int game_do_cd_mission_check(char *filename);
-#ifndef BUILD_CONTEXT
-#define game_do_cd_mission_check ctx->game_do_cd_mission_check
-#endif
+int game_do_cd_check(char *volume_name=NULL);
+int game_do_cd_check_specific(char *volume_name, int cdnum);
+int find_freespace_cd(char *volume_name=NULL);
+int set_cdrom_path(int drive_num);
+int game_do_cd_mission_check(char *filename);
 
 // Used to tell the player that a feature isn't available in the demo version of FreeSpace
-virtual void game_feature_not_in_demo_popup();
-#ifndef BUILD_CONTEXT
-#define game_feature_not_in_demo_popup ctx->game_feature_not_in_demo_popup
-#endif
+void game_feature_not_in_demo_popup();
 
 // Used to tell the player that a feature is disabled by build settings
-virtual void game_feature_disabled_popup();
-#ifndef BUILD_CONTEXT
-#define game_feature_disabled_popup ctx->game_feature_disabled_popup
-#endif
+void game_feature_disabled_popup();
 
 //	Return version string for demo or full version, depending on build.
-virtual void get_version_string(char *str, int max_size);
-#ifndef BUILD_CONTEXT
-#define get_version_string ctx->get_version_string
-#endif
+void get_version_string(char *str, int max_size);
 
 // format the specified time (fixed point) into a nice string
-virtual void game_format_time(fix m_time,char *time_str);
-#ifndef BUILD_CONTEXT
-#define game_format_time ctx->game_format_time
-#endif
+void game_format_time(fix m_time,char *time_str);
 
 // if the game is running using hacked data
-virtual int game_hacked_data();
-#ifndef BUILD_CONTEXT
-#define game_hacked_data ctx->game_hacked_data
-#endif
+int game_hacked_data();
 
 // show the oem upsell screens (end of campaign, or close of game
-virtual void oem_upsell_show_screens();
-#ifndef BUILD_CONTEXT
-#define oem_upsell_show_screens ctx->oem_upsell_show_screens
-#endif
+void oem_upsell_show_screens();
 
 // calls to be executed when the game is put in or restored from minimized or inactive state
-virtual void game_pause();
-#ifndef BUILD_CONTEXT
-#define game_pause ctx->game_pause
-#endif
-virtual void game_unpause();
-#ifndef BUILD_CONTEXT
-#define game_unpause ctx->game_unpause
-#endif
+void game_pause();
+void game_unpause();
 
 //WMC - Stuff for scripting, these make the game go
-camid Main_camera;
-#ifndef BUILD_CONTEXT
-#define Main_camera ctx->Main_camera
-#endif
+extern camid Main_camera;
 
- virtual void game_level_init(int seed = -1);
-#ifndef BUILD_CONTEXT
-#define game_level_init ctx->game_level_init
-#endif
-virtual  void game_post_level_init();
-#ifndef BUILD_CONTEXT
-#define game_post_level_init ctx->game_post_level_init
-#endif
- virtual camid game_render_frame_setup();
-#ifndef BUILD_CONTEXT
-#define game_render_frame_setup ctx->game_render_frame_setup
-#endif
- virtual void game_render_frame(camid cid);
-#ifndef BUILD_CONTEXT
-#define game_render_frame ctx->game_render_frame
-#endif
- virtual void game_simulation_frame();
-#ifndef BUILD_CONTEXT
-#define game_simulation_frame ctx->game_simulation_frame
-#endif
- virtual void game_update_missiontime();
-#ifndef BUILD_CONTEXT
-#define game_update_missiontime ctx->game_update_missiontime
-#endif
- virtual void game_render_post_frame();
-#ifndef BUILD_CONTEXT
-#define game_render_post_frame ctx->game_render_post_frame
-#endif
+extern void game_level_init(int seed = -1);
+extern void game_post_level_init();
+extern camid game_render_frame_setup();
+extern void game_render_frame(camid cid);
+extern void game_simulation_frame();
+extern void game_update_missiontime();
+extern void game_render_post_frame();
 
-
- virtual void game_leave_state( int old_state, int new_state );
-#ifndef BUILD_CONTEXT
-#define game_leave_state ctx->game_leave_state
-#endif
- virtual void game_enter_state( int old_state, int new_state );
-#ifndef BUILD_CONTEXT
-#define game_enter_state ctx->game_enter_state
-#endif
-
- virtual void game_do_state(int state);
-#ifndef BUILD_CONTEXT
-#define game_do_state ctx->game_do_state
-#endif
-
- virtual void game_process_event( int current_state, int event );
-#ifndef BUILD_CONTEXT
-#define game_process_event ctx->game_process_event
-#endif
-
-int game_single_step ;// 0;
-#ifndef BUILD_CONTEXT
-#define game_single_step ctx->game_single_step
-#endif
-int last_single_step;//0;
-#ifndef BUILD_CONTEXT
-#define last_single_step ctx->last_single_step
-#endif
-
-float Warpout_time ;// 0.0f;
-#ifndef BUILD_CONTEXT
-#define Warpout_time ctx->Warpout_time
-#endif
-int Warpout_forced ;// 0;		// Set if this is a forced warpout that cannot be cancelled.
-#ifndef BUILD_CONTEXT
-#define Warpout_forced ctx->Warpout_forced
-#endif
-
-int Debug_octant ;// -1;
-#ifndef BUILD_CONTEXT
-#define Debug_octant ctx->Debug_octant
-#endif
-
-int Test_begin ;// 0;
-#ifndef BUILD_CONTEXT
-#define Test_begin ctx->Test_begin
-#endif
-
-float frametotal ;// 0.0f;
-#ifndef BUILD_CONTEXT
-#define frametotal ctx->frametotal
-#endif
-
-int	Framerate_delay ;// 0;
-#ifndef BUILD_CONTEXT
-#define Framerate_delay ctx->Framerate_delay
-#endif
-
-float FreeSpace_gamma ;// 1.0f;
-#ifndef BUILD_CONTEXT
-#define FreeSpace_gamma ctx->FreeSpace_gamma
-#endif
-
-float Framerate ;// 0.0f;
-#ifndef BUILD_CONTEXT
-#define Framerate ctx->Framerate
-#endif
-
-virtual void game_get_framerate();
-#ifndef BUILD_CONTEXT
-#define game_get_framerate ctx->game_get_framerate
-#endif
-
-int Multi_ping_timestamp ;// -1;
-#ifndef BUILD_CONTEXT
-#define Multi_ping_timestamp ctx->Multi_ping_timestamp
-#endif
-
-int tst ;// 0;
-#ifndef BUILD_CONTEXT
-#define tst ctx->tst
-#endif
-
-int	Show_cpu ;// 0;
-#ifndef BUILD_CONTEXT
-#define Show_cpu ctx->Show_cpu
-#endif
-
-//	Player's velocity just before he blew up.  Used to keep camera target moving.
-vec3d	Dead_player_last_vel ;// { { { 1.0f, 1.0f, 1.0f } } };
-#ifndef BUILD_CONTEXT
-#define Dead_player_last_vel ctx->Dead_player_last_vel
-#endif
-
-	int	Show_framerate ;// 1;
-#ifndef BUILD_CONTEXT
-#define Show_framerate ctx->Show_framerate
-#endif
-
-int	Show_target_debug_info ;// 0;
-#ifndef BUILD_CONTEXT
-#define Show_target_debug_info ctx->Show_target_debug_info
-#endif
-
-int	Show_target_weapons ;// 0;
-#ifndef BUILD_CONTEXT
-#define Show_target_weapons ctx->Show_target_weapons
-#endif
-
-virtual void game_tst_mark(object *objp, ship *shipp);
-#ifndef BUILD_CONTEXT
-#define game_tst_mark ctx->game_tst_mark
-#endif
-
-int Sun_drew ;// 0;
-#ifndef BUILD_CONTEXT
-#define Sun_drew ctx->Sun_drew
-#endif
-
-};
 #endif			// endif of #ifndef STAMPER_PROGRAM
 #endif 
