@@ -11,6 +11,9 @@
 #define _OUTWND_H
 
 
+#include "globalincs/pstypes.h"
+
+
 #ifndef NDEBUG
 void load_filter_info(void);
 void outwnd_init(int display_under_freespace_window = 0);

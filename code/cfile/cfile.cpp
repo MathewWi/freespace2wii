@@ -982,7 +982,7 @@ extern int game_cd_changed();
 //					error   ==> NULL
 //
 
-CFILE *cfopen(char *file_path, char *mode, int type, int dir_type, bool localize)
+CFILE *cfopen(const char *file_path, char *mode, int type, int dir_type, bool localize)
 {
 	/* Bobboau, what is this doing here? 31 is way too short... - Goober5000
 	if( strlen(file_path) > 31 )

@@ -10,6 +10,12 @@
 #ifndef _AIINTERNAL_H
 #define _AIINTERNAL_H
 
+struct object;
+struct ship;
+struct vec3d;
+struct ship_subsys;
+struct weapon_info;
+
 //Returns true if the specified object is a stealth ship, false if not
 bool is_object_stealth_ship(object* objp);
 

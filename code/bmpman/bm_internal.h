@@ -168,7 +168,7 @@ typedef struct bitmap_entry	{
 #endif
 } bitmap_entry;
 
-extern bitmap_entry bm_bitmaps[MAX_BITMAPS];
+extern bitmap_entry *bm_bitmaps;
 
 
 // image specific lock functions

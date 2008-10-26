@@ -2148,7 +2148,6 @@ void ship_hit_kill(object *ship_obj, object *other_obj, float percent_killed, in
 	}
 
 	// hehe
-	extern void game_tst_mark(object *objp, ship *shipp);
 	game_tst_mark(ship_obj, sp);
 
 	// single player and multiplayer masters evaluate the scoring and kill stuff

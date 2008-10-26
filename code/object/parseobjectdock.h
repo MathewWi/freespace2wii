@@ -27,6 +27,7 @@
 #define _PARSE_OBJECT_DOCK_H
 
 #include "globalincs/globals.h"
+#include <string.h>
 
 struct p_object;
 

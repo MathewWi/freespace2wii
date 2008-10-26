@@ -1110,15 +1110,12 @@ void debug_change_song(int delta)
 //extern void set_global_ignore_object(int objnum);
 
 extern void hud_target_asteroid();
-extern int Framerate_delay;
 
 extern void snd_stop_any_sound();
 
 extern vec3d Eye_position;
 extern matrix Eye_matrix;
 extern void g3_set_view_matrix(vec3d *view_pos,matrix *view_matrix,float zoom);
-
-extern int Show_cpu;
 
 int get_prev_weapon_looped(int current_weapon, int subtype)
 {
@@ -1424,7 +1421,6 @@ void process_debug_keys(int k)
 			break;				
 
 		case KEY_DEBUGGED + KEY_SHIFTED + KEY_O:
-			extern int Debug_octant;
 			if(Debug_octant == 7){
 				Debug_octant = -1;
 			} else {
@@ -1592,8 +1588,6 @@ void process_debug_keys(int k)
 
 #ifndef NDEBUG
 		case KEY_DEBUGGED + KEY_SHIFTED + KEY_T:	{
-			extern int Test_begin;
-
 			if ( Test_begin == 1 )
 				break;
 
@@ -1767,7 +1761,6 @@ void process_debug_keys(int k)
 			vm_vec_scale_add(&strike, &start, &Player_obj->orient.rvec, 600.0f);
 			nebl_bolt(DEBUG_BOLT, &start, &strike);
 			*/
-			extern int tst;
 			tst = 2;
 			break;
 

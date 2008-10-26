@@ -566,11 +566,11 @@
 #include "network/multimsgs.h"
 #include "parse/scripting.h"
 #include "asteroid/asteroid.h"
+#include "freespace2/freespace.h"
 
 
 
 #ifndef NDEBUG
-extern float flFrametime;
 extern int Framecount;
 #endif
 
@@ -3059,7 +3059,6 @@ static void maybe_fireball_wipe(clip_ship* half_ship, int* sound_handle)
 	}
 }
 
-void big_explosion_flash(float);
 // Returns 1 when explosion is done
 int shipfx_large_blowup_do_frame(ship *shipp, float frametime)
 {

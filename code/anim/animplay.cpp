@@ -998,7 +998,7 @@ void anim_read_header(anim *ptr, CFILE *fp)
 //	returns:	pointer to anim that is loaded	=> sucess
 //				NULL										=>	failure
 //
-anim *anim_load(char *real_filename, int cf_dir_type, int file_mapped)
+anim *anim_load(const char *real_filename, int cf_dir_type, int file_mapped)
 {
 	anim			*ptr;
 	CFILE			*fp;

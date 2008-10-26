@@ -361,6 +361,7 @@ extern int HUD_contrast;
 
 //Current HUD to use for info -C
 #ifndef NEW_HUD
+struct hud_info;
 extern hud_info* current_hud;
 #endif
 

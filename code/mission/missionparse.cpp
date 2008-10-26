@@ -1265,6 +1265,7 @@
 #include "missionui/fictionviewer.h"
 #include "cmdline/cmdline.h"
 #include "popup/popup.h"
+#include "freespace2/freespace.h"
 
 LOCAL struct {
 	char docker[NAME_LENGTH];
@@ -1532,8 +1533,6 @@ static int Arrival_message_delay_timestamp;
 static int Allow_arrival_music_timestamp_m[2];
 static int Allow_arrival_message_timestamp_m[2];
 static int Arrival_message_delay_timestamp_m[2];
-
-extern fix game_get_overall_frametime();	// for texture animation
 
 // local prototypes
 void parse_player_info2(mission *pm);
@@ -4134,7 +4133,6 @@ void parse_common_object_data(p_object	*objp)
 	}
 }
 
-extern int Multi_ping_timestamp;
 void parse_objects(mission *pm, int flag)
 {	
 	Assert(pm != NULL);

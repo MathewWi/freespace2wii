@@ -1669,8 +1669,6 @@ void stars_camera_cut()
 
 //#define TIME_STAR_CODE		// enable to time star code
 
-extern int Sun_drew;
-
 // get the world coords of the sun pos on the unit sphere.
 void stars_get_sun_pos(int sun_n, vec3d *pos)
 {

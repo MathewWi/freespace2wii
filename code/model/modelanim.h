@@ -23,6 +23,8 @@
 #ifndef _MODELANIM_H
 #define _MODELANIM_H
 
+#include "physics/physics.h"
+
 
 #define MAX_TRIGGERED_ANIMATIONS 15
 

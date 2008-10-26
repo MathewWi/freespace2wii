@@ -128,6 +128,9 @@
 #ifndef _LIGHTING_H
 #define _LIGHTING_H
 
+#include "math/vecmat.h"
+#include "render/3d.h"
+
 // Light stuff works like this:
 // At the start of the frame, call light_reset.
 // For each light source, call light_add_??? functions.
@@ -141,6 +144,7 @@
 #define LT_DIRECTIONAL	0		// A light like a sun
 #define LT_POINT		1		// A point light, like an explosion
 #define LT_TUBE			2		// A tube light, like a fluorescent light
+
 
 
 typedef struct light {

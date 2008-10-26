@@ -41,7 +41,7 @@
 #ifndef _FIX_H
 #define _FIX_H
 
-//#include "pstypes.h"
+#include "globalincs/pstypes.h"
 
 #define F1_0 65536
 #define f1_0 65536

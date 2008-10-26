@@ -726,6 +726,10 @@ reticle_list	Reticle_save_list;
 #define			MAX_RETICLE_TARGETS	50
 reticle_list	Reticle_list[MAX_RETICLE_TARGETS];
 
+// required for hudtarget... kinda dumb, but meh
+char Fred_alt_names[MAX_SHIPS][NAME_LENGTH+1];
+char Fred_callsigns[MAX_SHIPS][NAME_LENGTH+1];
+
 //////////////////////////////////////////////////////////////////////////
 // used for closest target cycling
 //////////////////////////////////////////////////////////////////////////

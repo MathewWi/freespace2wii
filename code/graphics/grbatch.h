@@ -9,6 +9,8 @@
 #ifndef	__GRBATCH_H__
 #define	__GRBATCH_H__
 
+#include "physics/physics.h"
+
 
 class geometry_batcher
 {

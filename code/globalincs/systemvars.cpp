@@ -402,7 +402,7 @@ void game_busy(char *filename)
 
 //======================== CODE TO MONITOR EVENTS ======================
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(SCP_WII)
 
 #define MAX_MONITORS 64
 

@@ -942,6 +942,7 @@
 #include "cfile/cfile.h"
 #include "jpgutils/jpgutils.h"
 #include "parse/parselo.h"
+#include "freespace2/freespace.h"
 
 #define BMPMAN_INTERNAL
 #include "bmpman/bm_internal.h"
@@ -960,7 +961,7 @@ int ENVMAP = -1;
 int NORMMAP = -1;
 int HEIGHTMAP = -1;
 
-bitmap_entry bm_bitmaps[MAX_BITMAPS];
+bitmap_entry *bm_bitmaps = NULL;
 
 int bm_texture_ram = 0;
 int bm_inited = 0;
@@ -1168,6 +1169,8 @@ void bm_close()
 void bm_init()
 {
 	int i;
+	
+	bm_bitmaps = (bitmap_entry*)vm_malloc(sizeof(bitmap_entry)*MAX_BITMAPS);
 
 	mprintf(( "Size of bitmap info = %d KB\n", sizeof( bm_bitmaps )/1024 ));
 	mprintf(( "Size of bitmap extra info = %d bytes\n", sizeof( bm_extra_info ) ));
@@ -1301,7 +1304,7 @@ int bm_create( int bpp, int w, int h, void *data, int flags )
 // that isn't already loaded and may exist somewhere on the disk
 // returns  -1 if it could not be found
 //          index into ext_list[] if it was found as a file, fills img_cfg if available
-int bm_load_sub_slow(char *real_filename, const int num_ext, const char **ext_list, CFILE **img_cfp = NULL, int dir_type = CF_TYPE_ANY)
+int bm_load_sub_slow(const  char *real_filename, const int num_ext, const char **ext_list, CFILE **img_cfp = NULL, int dir_type = CF_TYPE_ANY)
 {	
 	char full_path[MAX_PATH];
 	int size = 0, offset = 0;
@@ -1330,7 +1333,7 @@ int bm_load_sub_slow(char *real_filename, const int num_ext, const char **ext_li
 // that's already loaded
 // returns  0 if it could not be found
 //          1 if it already exists, fills in handle
-int bm_load_sub_fast(char *real_filename, int *handle, int dir_type = CF_TYPE_ANY, bool animated_type = false)
+int bm_load_sub_fast(const char *real_filename, int *handle, int dir_type = CF_TYPE_ANY, bool animated_type = false)
 {
 	if (Bm_ignore_duplicates)
 		return 0;
@@ -1368,7 +1371,7 @@ int bm_load_sub_fast(char *real_filename, int *handle, int dir_type = CF_TYPE_AN
 // the bitmap.   On success, it returns the bitmap
 // number.  Function doesn't actually load the data, only
 // width, height, and possibly flags.
-int bm_load( char *real_filename )
+int bm_load( const char *real_filename )
 {
 	int i, free_slot = -1;
 	int w, h, bpp = 8;
@@ -1493,7 +1496,7 @@ Done:
 // special load function. basically allows you to load a bitmap which already exists (by filename). 
 // this is useful because in some cases we need to have a bitmap which is locked in screen format
 // _and_ texture format, such as pilot pics and squad logos
-int bm_load_duplicate(char *filename)
+int bm_load_duplicate(const char *filename)
 {
 	int ret;
 
@@ -1577,7 +1580,7 @@ static int find_block_of(int n)
 	return -1;
 }
 
-int bm_load_and_parse_eff(char *filename, int dir_type, int *nframes, int *nfps, ubyte *type)
+int bm_load_and_parse_eff(const char *filename, int dir_type, int *nframes, int *nfps, ubyte *type)
 {
 	int frames = 0, fps = 30, rval;
 	char ext[8];
@@ -1654,7 +1657,7 @@ int bm_load_and_parse_eff(char *filename, int dir_type, int *nframes, int *nfps,
 //
 // returns:		bitmap number of first frame in the animation
 //
-int bm_load_animation( char *real_filename, int *nframes, int *fps, int can_drop_frames, int dir_type)
+int bm_load_animation( const char *real_filename, int *nframes, int *fps, int can_drop_frames, int dir_type)
 {
 	int	i, n;
 	anim	the_anim;
@@ -1880,7 +1883,7 @@ int bm_load_animation( char *real_filename, int *nframes, int *fps, int can_drop
 	return bm_bitmaps[n].handle;
 }
 
-int bm_load_either(char *filename, int *nframes, int *fps, int can_drop_frames, int dir_type)
+int bm_load_either(const char *filename, int *nframes, int *fps, int can_drop_frames, int dir_type)
 {
 	if(nframes != NULL)
 		*nframes = 0;
@@ -2565,7 +2568,7 @@ void bm_update()
 {
 }
 
-char *bm_get_filename(int handle)
+const char *bm_get_filename(int handle)
 {
 	int n;
 
@@ -3019,7 +3022,7 @@ void bm_page_in_start()
 	gr_bm_page_in_start();
 }
 
-extern int Multi_ping_timestamp;
+//extern int Multi_ping_timestamp;
 extern void multi_ping_send_all();
 
 void bm_page_in_stop()

@@ -2398,9 +2398,9 @@ extern void render_path_points(object *objp);
 // mwa -- removed 11/24/97 int	num_ships = 0;
 int	Num_wings = 0;
 int	Num_reinforcements = 0;
-ship	Ships[MAX_SHIPS];
+ship	*Ships;
 ship	*Player_ship;
-wing	Wings[MAX_WINGS];
+wing	*Wings;
 int	ships_inited = 0;
 int armor_inited = 0;
 
@@ -2434,10 +2434,10 @@ int	Player_ship_class;	// needs to be player specific, move to player structure
 
 #define		SHIP_OBJ_USED	(1<<0)				// flag used in ship_obj struct
 #define		MAX_SHIP_OBJS	MAX_SHIPS			// max number of ships tracked in ship list
-ship_obj		Ship_objs[MAX_SHIP_OBJS];		// array used to store ship object indexes
+ship_obj		*Ship_objs;		// array used to store ship object indexes
 ship_obj		Ship_obj_list;							// head of linked list of ship_obj structs
 
-ship_info		Ship_info[MAX_SHIP_CLASSES];
+ship_info		*Ship_info;
 reinforcements	Reinforcements[MAX_REINFORCEMENTS];
 std::vector<ship_info> Ship_templates;
 
@@ -5380,6 +5380,11 @@ void ship_parse_post_cleanup()
 // structure
 void ship_init()
 {
+	Ship_objs = (ship_obj*)vm_malloc(sizeof(ship_obj)*MAX_SHIP_OBJS);		// array used to store ship object indexes
+	Ship_info = (ship_info*)vm_malloc(sizeof(ship_info)*MAX_SHIP_CLASSES);
+	Ships	  = (ship*)vm_malloc(sizeof(ship)*MAX_SHIPS);
+	Wings     = (wing*)vm_malloc(sizeof(wing)*MAX_WINGS);
+	
 	if ( !ships_inited )
 	{
 		//Parse main TBL first

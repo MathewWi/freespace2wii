@@ -89,6 +89,8 @@
 #define	OS_DS3D	(1<<1)
 #define  OS_MAIN	(1<<2)		// "main" sound. attentuation does not apply until outside the radius of the object
 
+#include "globalincs/pstypes.h"
+
 struct vec3d;
 
 extern int Obj_snd_enabled;

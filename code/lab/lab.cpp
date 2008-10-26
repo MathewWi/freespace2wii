@@ -1056,10 +1056,6 @@ void labviewer_do_render(float frametime)
 	}
 
 	// print FPS at bottom left, might be helpful
-	extern void game_get_framerate();
-	extern float frametotal;
-	extern float Framerate;
-
 	game_get_framerate();
 
 	gr_set_color_fast(&Color_white);

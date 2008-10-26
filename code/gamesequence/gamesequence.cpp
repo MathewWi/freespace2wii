@@ -282,7 +282,7 @@
 #include "gamesequence/gamesequence.h"
 #include "globalincs/pstypes.h"
 #include "parse/scripting.h"
-
+#include "freespace2/freespace.h"
 
 
 // local defines

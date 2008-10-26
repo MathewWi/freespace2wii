@@ -168,8 +168,7 @@ extern int Ai_render_debug_flag;
 extern int Ai_firing_enabled;
 extern int physics_paused;
 extern int ai_paused;
-extern int last_single_step;
-extern int game_single_step;
+
 
 // ----------------------------------------------------------------------------------------------------------------
 // PAUSE FUNCTIONS

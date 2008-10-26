@@ -111,9 +111,7 @@
 
 #include "globalincs/pstypes.h"
 
-#ifdef _WIN32
 struct fd_set;
-#endif
 struct timeval;
 
 // initialize multiplayer lagloss. in non-debug situations, this call does nothing

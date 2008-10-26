@@ -1168,6 +1168,7 @@
 #include "graphics/gropengldraw.h"
 #include "graphics/gropenglshader.h"
 #include "graphics/gropenglstate.h"
+#include "freespace2/freespace.h"
 
 
 #if defined(_WIN32)
@@ -1241,10 +1242,6 @@ extern char *Osreg_title;
 
 extern GLfloat GL_anisotropy;
 
-extern float FreeSpace_gamma;
-void gr_opengl_set_gamma(float gamma);
-
-extern float FreeSpace_gamma;
 void gr_opengl_set_gamma(float gamma);
 
 static int GL_fullscreen = 0;

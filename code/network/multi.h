@@ -1056,7 +1056,7 @@ extern int Multi_connection_speed;
 //
 
 // netplayer vars
-extern net_player Net_players[MAX_PLAYERS];						// array of all netplayers in the game
+extern net_player *Net_players;						// array of all netplayers in the game
 extern net_player *Net_player;										// pointer to console's net_player entry
 
 // network object management

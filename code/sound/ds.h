@@ -180,6 +180,8 @@
 #ifndef __DS_H__
 #define __DS_H__
 
+#include "globalincs/pstypes.h"
+
 #ifdef _WIN32
 #define VC_EXTRALEAN
 

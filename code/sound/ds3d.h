@@ -64,6 +64,8 @@
 #ifndef __DS3D_H__
 #define __DS3D_H__
 
+#include "physics/physics.h"
+
 int	ds3d_init(int voice_manager_required);
 void	ds3d_close();
 int	ds3d_update_listener(vec3d *pos, vec3d *vel, matrix *orient);

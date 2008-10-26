@@ -552,8 +552,6 @@ char Options_notify_string[200];
 void options_accept();
 void options_force_button_frame(int n, int frame_num);
 
-extern float FreeSpace_gamma;
-
 void options_add_notify(char *str);
 void options_notify_do_frame();
 

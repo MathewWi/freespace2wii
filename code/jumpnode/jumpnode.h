@@ -86,6 +86,7 @@
 #include "globalincs/globals.h"
 #include "globalincs/linklist.h"
 #include "graphics/2d.h"
+#include "object/object.h"
 
 struct vec3d;
 struct object;

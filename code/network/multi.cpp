@@ -429,7 +429,7 @@ int Multi_display_netinfo = 1;
 //
 
 // net player vars		
-net_player Net_players[MAX_PLAYERS];							// array of all netplayers in the game
+net_player *Net_players;							// array of all netplayers in the game
 net_player *Net_player;												// pointer to console's net_player entry
 
 // netgame vars
@@ -499,6 +499,7 @@ int Multi_current_file_length = -1;
 void multi_init()
 {
 	int idx;
+	Net_players = (net_player *) vm_malloc(sizeof(net_player )*MAX_PLAYERS);
 
 	// read in config file
 	multi_options_read_config();

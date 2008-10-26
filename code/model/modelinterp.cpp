@@ -1053,6 +1053,7 @@
 #include "globalincs/linklist.h"
 #include "weapon/shockwave.h"
 #include "parse/parselo.h"	//strextcmp
+#include "freespace2/freespace.h"
 
 #include <limits.h>
 
@@ -1067,8 +1068,6 @@ int modelstats_num_verts = 0;
 int modelstats_num_sortnorms = 0;
 int modelstats_num_boxes = 0;
 #endif
-
-extern fix game_get_overall_frametime();	// for texture animation
 
 typedef struct model_light {
 	ubyte r, g, b;

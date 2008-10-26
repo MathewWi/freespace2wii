@@ -538,7 +538,7 @@ int cf_get_dir_type(CFILE *cfile);
 
 // Opens the file.  If no path is given, use the extension to look into the
 // default path.  If mode is NULL, delete the file.  
-CFILE *cfopen(char *filename, char *mode, int type = CFILE_NORMAL, int dir_type = CF_TYPE_ANY, bool localize = false);
+CFILE *cfopen(const char *filename, char *mode, int type = CFILE_NORMAL, int dir_type = CF_TYPE_ANY, bool localize = false);
 
 // like cfopen(), but it accepts a fully qualified path only (ie, the result of a cf_find_file_location() call)
 // NOTE: only supports reading files!!
@@ -709,7 +709,7 @@ void cf_sort_filenames( int n, char **list, int sort, file_list_info *info = NUL
 //         size        - File size
 //         offset      - Offset into pack file.  0 if not a packfile.
 // Returns: If not found returns 0.
-int cf_find_file_location( char *filespec, int pathtype, int max_out, char *pack_filename, int *size, int *offset, bool localize = false);
+int cf_find_file_location(const char *filespec, int pathtype, int max_out, char *pack_filename, int *size, int *offset, bool localize = false);
 
 // Searches for a file.   Follows all rules and precedence and searches
 // CD's and pack files.  Searches all locations in order for first filename using ext filter list.
@@ -723,7 +723,7 @@ int cf_find_file_location( char *filespec, int pathtype, int max_out, char *pack
 //         offset      - Offset into pack file.  0 if not a packfile.
 // Returns: If not found returns -1, else returns offset into ext_list.
 // (NOTE: This function is exponentially slow, so don't use it unless truely needed!!)
-int cf_find_file_location_ext(char *filename, const int ext_num, const char **ext_list, int pathtype, int max_out = 0, char *pack_filename = NULL, int *size = NULL, int *offset = NULL, bool localize = false);
+int cf_find_file_location_ext(const char *filename, const int ext_num, const char **ext_list, int pathtype, int max_out = 0, char *pack_filename = NULL, int *size = NULL, int *offset = NULL, bool localize = false);
 
 // Functions to change directories
 int cfile_chdir(char *dir);

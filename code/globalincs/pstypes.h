@@ -727,10 +727,15 @@ class debug_command {
 	debug_command(char *name,char *help,void (*func)());	// constructor
 };
 
+#ifdef SCP_WII
+#define DCF(function_name,help_text)			\
+		void dcf_##function_name()
+#else
 #define DCF(function_name,help_text)			\
 		void dcf_##function_name();	\
 		debug_command dc_##function_name(#function_name,help_text,dcf_##function_name);	\
 		void dcf_##function_name()		
+#endif	
 
 // Starts the debug console
 extern void debug_console( void (*func)() = NULL );
@@ -786,6 +791,19 @@ void dc_printf( char *format, ... );
 // Example:  
 // DCF_BOOL( lighting, Show_lighting )
 //
+#ifdef SCP_WII
+#define DCF_BOOL( function_name, bool_variable )	\
+	void dcf_##function_name()	{	\
+	if ( Dc_command )	{	\
+		dc_get_arg(ARG_TRUE|ARG_FALSE|ARG_NONE);		\
+		if ( Dc_arg_type & ARG_TRUE )	bool_variable = 1;	\
+		else if ( Dc_arg_type & ARG_FALSE ) bool_variable = 0;	\
+		else if ( Dc_arg_type & ARG_NONE ) bool_variable ^= 1;	\
+	}	\
+	if ( Dc_help )	dc_printf( "Usage: %s [bool]\nSets %s to true or false.  If nothing passed, then toggles it.\n", #function_name, #bool_variable );	\
+	if ( Dc_status )	dc_printf( "%s is %s\n", #function_name, (bool_variable?"TRUE":"FALSE") );	\
+}
+#else
 #define DCF_BOOL( function_name, bool_variable )	\
 	void dcf_##function_name();	\
 	debug_command dc_##function_name(#function_name,"Toggles "#bool_variable,dcf_##function_name );	\
@@ -799,7 +817,7 @@ void dc_printf( char *format, ... );
 	if ( Dc_help )	dc_printf( "Usage: %s [bool]\nSets %s to true or false.  If nothing passed, then toggles it.\n", #function_name, #bool_variable );	\
 	if ( Dc_status )	dc_printf( "%s is %s\n", #function_name, (bool_variable?"TRUE":"FALSE") );	\
 }
-
+#endif
 
 //======================================================================================
 //======================================================================================
@@ -935,7 +953,7 @@ extern void game_busy(char *filename = NULL);
 
 //=========================================================
 // Functions to monitor performance
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(SCP_WII)
 
 class monitor {
 	public:

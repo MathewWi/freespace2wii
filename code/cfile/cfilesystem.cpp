@@ -1079,7 +1079,7 @@ void cf_free_secondary_filelist()
 //         size        - File size
 //         offset      - Offset into pack file.  0 if not a packfile.
 // Returns: If not found returns 0.
-int cf_find_file_location( char *filespec, int pathtype, int max_out, char *pack_filename, int *size, int *offset, bool localize )
+int cf_find_file_location(const char *filespec, int pathtype, int max_out, char *pack_filename, int *size, int *offset, bool localize )
 {
 	int i;
 	int cfs_slow_search = 0;
@@ -1286,7 +1286,7 @@ extern char *stristr(const char *str, const char *substr);
 //         offset      - Offset into pack file.  0 if not a packfile.
 // Returns: If not found returns -1, else returns offset into ext_list.
 // (NOTE: This function is exponentially slow, so don't use it unless truely needed!!)
-int cf_find_file_location_ext( char *filename, const int ext_num, const char **ext_list, int pathtype, int max_out, char *pack_filename, int *size, int *offset, bool localize )
+int cf_find_file_location_ext(const char *filename, const int ext_num, const char **ext_list, int pathtype, int max_out, char *pack_filename, int *size, int *offset, bool localize )
 {
 	int i, cur_ext;
 	int cfs_slow_search = 0;
@@ -2019,7 +2019,7 @@ int cf_get_file_list_preallocated( int max, char arr[][MAX_FILENAME_LEN], char *
 //          filename  - optional, if set, tacks the filename onto end of path.
 // Output:  path      - Fully qualified pathname.
 //Returns 0 if the result would be too long (invalid result)
-int cf_create_default_path_string( char *path, uint path_max, int pathtype, char *filename, bool localize )
+int cf_create_default_path_string( char *path, uint path_max, int pathtype, const char *filename, bool localize )
 {
 #ifdef SCP_UNIX
 	if ( filename && strpbrk(filename,"/")  ) {

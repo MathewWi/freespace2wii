@@ -518,12 +518,12 @@ extern int bm_texture_ram;
 // It returns a negative number if it couldn't load
 // the bitmap.   On success, it returns the bitmap
 // number.
-int bm_load(char * filename);
+int bm_load(const char * filename);
 
 // special load function. basically allows you to load a bitmap which already exists (by filename). 
 // this is useful because in some cases we need to have a bitmap which is locked in screen format
 // _and_ texture format, such as pilot pics and squad logos
-int bm_load_duplicate(char *filename);
+int bm_load_duplicate(const char *filename);
 
 // Creates a bitmap that exists in RAM somewhere, instead
 // of coming from a disk file.  You pass in a pointer to a
@@ -553,10 +553,10 @@ int bm_release( int n, int clear_render_targets = 0 );
 // It returns a negative number if it couldn't load
 // the bitmap.   On success, it returns the bitmap
 // number of the first frame and nframes is set.
-extern int bm_load_animation( char * filename, int * nframes = NULL, int *fps = NULL, int can_drop_frames = 0, int dir_type = CF_TYPE_ANY );
+extern int bm_load_animation(const char * filename, int * nframes = NULL, int *fps = NULL, int can_drop_frames = 0, int dir_type = CF_TYPE_ANY );
 
 //Loads either animation (bm_load_animation) or still image (bm_load)
-extern int bm_load_either(char *filename, int *nframes = NULL, int *fps = NULL, int can_drop_frames = 0, int dir_type = CF_TYPE_ANY);
+extern int bm_load_either(const char *filename, int *nframes = NULL, int *fps = NULL, int can_drop_frames = 0, int dir_type = CF_TYPE_ANY);
 
 // This locks down a bitmap and returns a pointer to a bitmap
 // that can be accessed until you call bm_unlock.   Only lock
@@ -674,7 +674,7 @@ int bm_page_out( int handle );
 //       2 = Debug low memory ( only use first frame of each ani )
 void bm_set_low_mem( int mode );
 
-char *bm_get_filename(int handle);
+const char *bm_get_filename(int handle);
 
 void BM_SELECT_SCREEN_FORMAT();
 void BM_SELECT_TEX_FORMAT();

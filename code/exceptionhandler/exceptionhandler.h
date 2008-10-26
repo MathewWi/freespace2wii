@@ -49,7 +49,7 @@
 #ifndef __EXCEPTION_HANDLER_H
 #define __EXCEPTION_HANDLER_H
 
-
+#include "windows_stub/config.h"
 
 // --------------------
 //

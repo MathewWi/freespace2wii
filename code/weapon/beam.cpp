@@ -690,7 +690,7 @@ typedef struct beam {
 	int firingpoint;
 } beam;
 
-beam Beams[MAX_BEAMS];				// all beams
+beam *Beams;				// all beams
 beam Beam_free_list;					// free beams
 beam Beam_used_list;					// used beams
 int Beam_count = 0;					// how many beams are in use
@@ -883,6 +883,7 @@ int beam_will_tool_target(beam *b, object *objp);
 // init at game startup
 void beam_init()
 {
+	Beams =(beam *) vm_malloc(sizeof(beam)*MAX_BEAMS);				// all beams
 	// clear the beams
 	list_init( &Beam_free_list );
 	list_init( &Beam_used_list );

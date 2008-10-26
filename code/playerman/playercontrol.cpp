@@ -2552,7 +2552,7 @@ void player_display_packlock_view()
 // get the player's eye position and orient
 // NOTE : this is mostly just copied from game_render_frame_setup()
 extern vec3d Dead_camera_pos;
-extern vec3d Dead_player_last_vel;
+
 
 #define	MIN_DIST_TO_DEAD_CAMERA			50.0f
 camid player_get_cam()

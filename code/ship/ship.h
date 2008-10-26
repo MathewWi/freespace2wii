@@ -1997,7 +1997,7 @@ typedef struct ship_info {
 } ship_info;
 
 extern int Num_wings;
-extern ship Ships[MAX_SHIPS];
+extern ship *Ships;
 extern ship	*Player_ship;
 
 // Data structure to track the active missiles
@@ -2090,7 +2090,7 @@ typedef struct wing {
 	int wing_insignia_texture;
 } wing;
 
-extern wing Wings[MAX_WINGS];
+extern wing *Wings;
 
 extern int Starting_wings[MAX_STARTING_WINGS];
 extern int Squadron_wings[MAX_SQUADRON_WINGS];
@@ -2105,7 +2105,7 @@ extern int CLOAKMAP;
 
 extern int Num_reinforcements;
 extern int Num_ship_classes;
-extern ship_info Ship_info[MAX_SHIP_CLASSES];
+extern ship_info *Ship_info;
 extern reinforcements Reinforcements[MAX_REINFORCEMENTS];
 
 // structure definition for ship type counts.  Used to give a count of the number of ships

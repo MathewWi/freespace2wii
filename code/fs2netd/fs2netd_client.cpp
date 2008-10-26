@@ -69,14 +69,13 @@
 #define FS2NETD_DEFAULT_CHAT_SERVER		"fs2netd.game-warden.com"
 #define FS2NETD_DEFAULT_BANNER_URL		"http://fs2netd.game-warden.com/files/banners"
 
+#include "hud/hudmessage.h"
+#include "freespace2/freespace.h"
+#include "network/multiui.h"
 
-extern int Om_tracker_flag; // needed to know whether or not to use FS2OpenPXO
-extern int Multi_debrief_stats_accept_code;
-extern void HUD_printf(char *format, ...);
-extern int game_hacked_data();
 void multi_update_valid_tables(); // from multiutil
 extern int Multi_create_force_heartbeat;			// to force a master heardbeat packet be sent (rather than waiting for timeout)
-extern void send_udp_hole_punch(char *ip, short port, short state);
+extern int Multi_debrief_stats_accept_code;
 
 static int PXO_SID = -1; // FS2 Open PXO Session ID
 static char PXO_Server[64] = { 0 };

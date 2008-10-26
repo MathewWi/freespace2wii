@@ -891,6 +891,7 @@
 #include "parse/sexp.h"
 #include "globalincs/version.h"
 #include "globalincs/pstypes.h"
+#include "freespace2/freespace.h"
 
 #ifdef _WIN32
 #include <direct.h>
@@ -928,9 +929,6 @@ public:
 
 static cmdline_parm Parm_list(NULL, NULL);
 static int Parm_list_inited = 0;
-
-extern int Show_framerate;	// from freespace.cpp
-
 
 enum
 {

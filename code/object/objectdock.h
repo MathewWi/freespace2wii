@@ -52,6 +52,7 @@
 #define _OBJECT_DOCK_H
 
 #include "globalincs/globals.h"
+#include "physics/physics.h"
 
 struct object;
 

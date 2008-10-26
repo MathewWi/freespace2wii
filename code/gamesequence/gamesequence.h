@@ -536,13 +536,6 @@ int gameseq_get_depth();
 int gameseq_get_previous_state();
 void gameseq_pop_and_discard_state(void);
 
-
-// Called by the sequencing code when things happen.
-void game_process_event(int current_state, int event);
-void game_leave_state(int old_state,int new_state);
-void game_enter_state(int old_state,int new_state);
-void game_do_state(int current_state);
-
 // Kazan
 bool GameState_Stack_Valid();
 

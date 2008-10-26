@@ -33,9 +33,7 @@
 #include "io/timer.h"
 #include "globalincs/linklist.h"
 #include "network/multi.h"
-
-
-extern float flFrametime;
+#include "freespace2/freespace.h"
 
 // the "lazy" macro
 #define SUBTYPE_CHECK	((subtype == ANIMATION_SUBTYPE_ALL) || (psub->triggers[i].subtype == ANIMATION_SUBTYPE_ALL) || (psub->triggers[i].subtype == subtype))

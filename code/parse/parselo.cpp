@@ -1853,7 +1853,7 @@ int parse_get_line(char *lineout, int max_line_len, char *start, int max_size, c
 //	When a comment is found, it is removed.  If an entire line
 //	consisted of a comment, a blank line is left in the input file.
 // Goober5000 - added ability to read somewhere other than Mission_text
-void read_file_text(char *filename, int mode, char *processed_text, char *raw_text)
+void read_file_text(const char *filename, int mode, char *processed_text, char *raw_text)
 {
 	// copy the filename
 	if (!filename)
@@ -1879,7 +1879,7 @@ void read_file_text(char *filename, int mode, char *processed_text, char *raw_te
 }
 
 // Goober5000
-void read_file_text_from_array(char *array, char *processed_text, char *raw_text)
+void read_file_text_from_array(const char *array, char *processed_text, char *raw_text)
 {
 	// we have no filename, so copy a substitute
 	strcpy(Current_filename_sub, "internal default file");
@@ -1984,7 +1984,7 @@ void allocate_mission_text(int size)
 }
 
 // Goober5000
-void read_raw_file_text(char *filename, int mode, char *raw_text)
+void read_raw_file_text(const char *filename, int mode, char *raw_text)
 {
 	CFILE	*mf;
 	int	file_is_encrypted;

@@ -11,6 +11,8 @@
 #ifndef GR_OPENGLDRAW_H
 #define GR_OPENGLDRAW_H
 
+#include "physics/physics.h"
+#include "graphics/2d.h"
 
 typedef struct glvertexc {
 	float x, y, z;

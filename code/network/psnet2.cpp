@@ -357,7 +357,7 @@ typedef struct {
 	float mean_ping;	
 } reliable_socket;
 
-reliable_socket Reliable_sockets[MAXRELIABLESOCKETS];
+reliable_socket *Reliable_sockets = NULL;
 
 // sockets for IPX and TCP (unreliable)
 SOCKET IPX_socket;
@@ -381,7 +381,7 @@ unsigned int Serverconn = 0xffffffff;
 //*******************************
 
 // top layer buffers
-network_packet_buffer_list Psnet_top_buffers[PSNET_NUM_TYPES];
+network_packet_buffer_list *Psnet_top_buffers;
 
 // -------------------------------------------------------------------------------------------------------
 // PSNET 2 FORWARD DECLARATIONS
@@ -661,6 +661,9 @@ void psnet_init( int protocol, int port_num )
 #if defined(DEMO) || defined(OEM_BUILD) // not for FS2_DEMO
 	return;
 #endif
+
+	Reliable_sockets = (reliable_socket*)vm_malloc(sizeof(reliable_socket)*MAXRELIABLESOCKETS);
+	Psnet_top_buffers = (network_packet_buffer_list* ) vm_malloc(sizeof(network_packet_buffer_list)*PSNET_NUM_TYPES);
 
 	// GAME PORT INITIALIZATION STUFF
 	if ( Network_status == NETWORK_STATUS_RUNNING ){

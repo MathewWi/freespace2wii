@@ -79,6 +79,8 @@
 #ifndef _HUDLOCK_H
 #define _HUDLOCK_H
 
+#include "physics/physics.h"
+
 void hud_init_missile_lock();
 void hud_draw_lock_triangles(int center_x, int center_y, float frametime);
 void hud_calculate_lock_position(float frametime);

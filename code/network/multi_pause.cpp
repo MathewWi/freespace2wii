@@ -165,7 +165,7 @@
 #include "network/multi.h"
 #include "globalincs/alphacolors.h"
 #include "io/timer.h"
-
+#include "freespace2/freespace.h"
 
 
 // ----------------------------------------------------------------------------------
@@ -260,8 +260,6 @@ int Multi_paused = 0;
 // ----------------------------------------------------------------------------------
 // EXTERNAL FUNCTIONS/VARIABLES
 //
-
-extern void game_flush();
 
 extern void beam_pause_sounds();
 extern void beam_unpause_sounds();

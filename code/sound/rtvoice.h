@@ -79,6 +79,8 @@
 #ifndef __RTVOICE_H__
 #define __RTVOICE_H__
 
+#include "globalincs/pstypes.h"
+
 // general
 void  rtvoice_set_qos(int qos);
 

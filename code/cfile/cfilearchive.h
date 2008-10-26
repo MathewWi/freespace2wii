@@ -57,7 +57,9 @@
 #ifndef _CFILEARCHIVE_H
 #define _CFILEARCHIVE_H
 
-#ifndef _CFILE_INTERNAL 
+#include "cfile/cfile.h"
+
+#if !defined(_CFILE_INTERNAL) && !defined(PRECOMP_HEADER)
 #error This file should only be included internally in CFILE!!
 #endif
 

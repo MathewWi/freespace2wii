@@ -289,12 +289,12 @@
 #include "parse/lua.h"
 #include "parse/scripting.h"
 #include "ship/shipfx.h"
+#include "freespace2/freespace.h"
 
 
 extern float ai_endangered_time(object *ship_objp, object *weapon_objp);
 int check_inside_radius_for_big_ships( object *ship, object *weapon, obj_pair *pair );
 float estimate_ship_speed_upper_limit( object *ship, float time );
-extern float flFrametime;
 extern int Cmdline_decals;
 
 

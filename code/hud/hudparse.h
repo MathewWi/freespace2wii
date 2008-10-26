@@ -36,8 +36,8 @@
 //#define NEW_HUD
 
 #include "globalincs/globals.h"
+#include "hud/hud.h"
 #include "hud/hudescort.h"
-#include "ai/ai.h"
 
 //Teh hud_info struct...maybe class
 #define MAX_CUSTOM_HUD_GAUGES 32

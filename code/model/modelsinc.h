@@ -10,10 +10,11 @@
 #ifndef _MODELSINC_H
 #define _MODELSINC_H
 
+#include "physics/physics.h"
 
 struct polymodel;
 
-#ifndef MODEL_LIB 
+#if !defined(MODEL_LIB) && !defined(PRECOMP_HEADER)
 #error This should only be used internally by the model library.  See John if you think you need to include this elsewhere.
 #endif
 

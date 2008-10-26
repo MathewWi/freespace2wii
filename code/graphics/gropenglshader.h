@@ -11,6 +11,7 @@
 #ifndef _GROPENGLSHADER_H
 #define _GROPENGLSHADER_H
 
+#include <GL/gl.h>
 #include "globalincs/pstypes.h"
 
 #include <vector>

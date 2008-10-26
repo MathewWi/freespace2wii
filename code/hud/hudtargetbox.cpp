@@ -541,11 +541,6 @@ static int Target_static_next;
 static int Target_static_playing;
 int Target_static_looping;
 
-#ifndef NDEBUG
-extern int Show_target_debug_info;
-extern int Show_target_weapons;
-#endif
-
 // used to print out + or - after target distance and speed
 char* modifiers[] = {
 //XSTR:OFF
