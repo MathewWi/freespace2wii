@@ -177,8 +177,12 @@
 #define FAR
 
 // Standard data types
+#ifdef SCP_WII
 #include <gctypes.h>
 #include <inttypes.h>
+#else
+typedef int BOOL;
+#endif
 typedef unsigned short WORD;
 typedef unsigned int UINT;
 #ifdef IAM_64BIT
