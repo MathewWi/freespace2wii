@@ -9283,8 +9283,6 @@ int main(int argc, char *argv[])
 	char *argptr = NULL;
 	int i, len = 0;
 	char userdir[MAX_PATH];
-	
-	Assert(0);
 
 #ifdef APPLE_APP
 	// Finder sets the working directory to the root of the drive so we have to get a little creative

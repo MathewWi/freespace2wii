@@ -481,3 +481,6 @@ extern void game_render_post_frame();
 
 #endif			// endif of #ifndef STAMPER_PROGRAM
 #endif 
+
+#undef exit
+#define exit(a) pause_exit((a), __FILE__, __LINE__)

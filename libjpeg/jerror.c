@@ -28,6 +28,11 @@
 #include <windows.h>
 #endif
 
+#ifdef SCP_WII
+#include "wii_port/wiiassert.h"
+#include "wii_port/wiiexit.h"
+#endif
+
 #ifndef EXIT_FAILURE		/* define exit() codes if not provided */
 #define EXIT_FAILURE  1
 #endif
