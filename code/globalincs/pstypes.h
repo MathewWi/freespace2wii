@@ -433,7 +433,7 @@
  * $NoKeywords: $
  *
  */
-
+ 
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
@@ -467,6 +467,11 @@
 #include <memory.h>
 #endif
 #include <string.h>
+
+#ifdef SCP_WII
+#include "wii_port/wiiassert.h"
+#define exit(a) pause_exit((a), __FILE__, __LINE__)
+#endif
 
 #if defined( __x86_64__ ) || defined( _WIN64 )
 #define IAM_64BIT 1
@@ -644,7 +649,6 @@ void gr_activate(int);
 #define Assert(x) do { if (!(x)){ WinAssert(#x,__FILE__,__LINE__); } } while (0)
 #else
 #include "wii_port/wiiassert.h"
-#include <assert.h>
 #define Assert(x) do { if (!(x)){ WiiAssert(#x,__FILE__,__LINE__); } } while (0)
 #endif
 #endif
@@ -1118,5 +1122,10 @@ public:
 	int getSignature();
 	bool isValid();
 };
+
+#ifdef SCP_WII
+#include "wii_port/wiiassert.h"
+#define exit(a) pause_exit((a), __FILE__, __LINE__)
+#endif
 
 #endif		// PS_TYPES_H

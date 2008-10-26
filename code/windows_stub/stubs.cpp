@@ -147,8 +147,10 @@
 #include <malloc.h>
 #endif
 
-#include "globalincs/pstypes.h"
 #include "parse/lua.h"
+#include "globalincs/pstypes.h"
+
+#include "wii_port/wiiexit.h"
 
 bool env_enabled = false;
 bool cell_enabled = false;

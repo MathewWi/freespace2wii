@@ -11,7 +11,7 @@ static void *exception_xfb = (void*)0xC1710000;			//we use a static address abov
 extern "C" void __console_init(void *framebuffer,int xstart,int ystart,int xres,int yres,int stride);
 
 
-void WiiAssert(const char * text,const char *filename, int line)
+extern "C" void WiiAssert(const char * text,const char *filename, int line)
 {
 	LWP_Reschedule(LWP_PRIO_IDLE);
 	LWP_SetThreadPriority (LWP_GetSelf (), LWP_PRIO_HIGHEST);
@@ -42,7 +42,7 @@ void WiiAssert(const char * text,const char *filename, int line)
 	}
 }
 
-void pause_exit(int code)
+extern "C" void pause_exit(int code,const char *filename, int line)
 {
 	LWP_Reschedule(LWP_PRIO_IDLE);
 	LWP_SetThreadPriority (LWP_GetSelf (), LWP_PRIO_HIGHEST);
@@ -53,6 +53,7 @@ void pause_exit(int code)
 		__console_init(exception_xfb,20,20,640,250,1280);
 		
 		kprintf("\n\n");
+		kprintf("Exit was called from %s at %d\n\n", filename, line);
 		kprintf("Press Home on WiiMote 1 or A on Gamecube Pad 1 to exit\n");
 
 		WPAD_ScanPads();

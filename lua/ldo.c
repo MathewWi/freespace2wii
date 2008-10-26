@@ -30,6 +30,10 @@
 #include "lvm.h"
 #include "lzio.h"
 
+#ifdef SCP_WII
+#include "wii_port/wiiassert.h"
+#include "wii_port/wiiexit.h"
+#endif
 
 
 

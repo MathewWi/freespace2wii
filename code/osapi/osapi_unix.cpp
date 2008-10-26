@@ -190,7 +190,7 @@ void os_deinit();
 // detect users home directory
 const char *detect_home(void)
 {
-	return (getenv("HOME"));
+	return "/Freespace2/home/";
 }
 
 // If app_name is NULL or ommited, then TITLE is used
