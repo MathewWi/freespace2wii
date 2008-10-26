@@ -81,7 +81,7 @@ void dbugfile_init()
 	}
 #endif
 
-#pragma message fix me
+#pragma warning fix me
     //_tzset();
 
     // Display operating system-style date and time.

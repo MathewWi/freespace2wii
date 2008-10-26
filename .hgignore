@@ -9,3 +9,4 @@ code\build\freespace2.elf.map
 *.ii
 *.d
 .deps/*.Po
+.svn/*
