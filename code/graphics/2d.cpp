@@ -1918,7 +1918,7 @@ void gr_pline_special(vec3d **pts, int num_pts, int thickness,bool resize)
 }
 
 
-bool same_vert(vertex *v1, vertex *v2, vec3d *n1, vec3d *n2)
+inline bool same_vert(vertex *v1, vertex *v2, vec3d *n1, vec3d *n2)
 {
 	return (
 		(v1->x == v2->x) &&

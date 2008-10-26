@@ -109,7 +109,6 @@
 #include <sys/time.h>	// The OS X 10.3 SDK appears to need this for some reason (for timeval struct)
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>

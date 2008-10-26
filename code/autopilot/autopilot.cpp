@@ -168,9 +168,6 @@
 #include "localization/localize.h"
 #include "camera/camera.h"
 #include "asteroid/asteroid.h"
-#ifdef SCP_WII
-#include "wii_port/wiiclock.h"
-#endif
 #include <map>
 
 // Extern functions/variables
@@ -1163,11 +1160,7 @@ void nav_warp(bool prewarp=false)
 void NavSystem_Do()
 {
 	static unsigned int last_update = 0;
-#ifdef SCP_WII
-	if (wiiclock() - last_update > NPS_TICKRATE)
-#else
-	if (clock() - last_update > NPS_TICKRATE)
-#endif
+	if (clock () - last_update > NPS_TICKRATE)
 	{
 		if (AutoPilotEngaged)
 		{
