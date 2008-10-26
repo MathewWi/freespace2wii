@@ -643,8 +643,9 @@ void gr_activate(int);
 #ifndef SCP_WII
 #define Assert(x) do { if (!(x)){ WinAssert(#x,__FILE__,__LINE__); } } while (0)
 #else
+#include "wii_port/wiiassert.h"
 #include <assert.h>
-#define Assert(x) do { if (!(x)){ assert(x); } } while (0)
+#define Assert(x) do { if (!(x)){ WiiAssert(#x,__FILE__,__LINE__); } } while (0)
 #endif
 #endif
 /*******************NEVER UNCOMMENT Assert ************************************************/
