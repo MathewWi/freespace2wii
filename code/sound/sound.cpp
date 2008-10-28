@@ -571,9 +571,9 @@ int snd_init(int use_a3d, int use_eax, unsigned int sample_rate, unsigned short 
 			break;
 		}
 
-		if ( num_tries++ > 5 ) {
+		if ( num_tries++ >= 0 ) {
 			if ( !gave_warning ) {
-				MessageBox(NULL, XSTR("Audio could not be initialized.  If you are running any applications playing sound in the background, you should stop them before continuing.",971), NULL, MB_OK);
+				//MessageBox(NULL, XSTR("Audio could not be initialized.  If you are running any applications playing sound in the background, you should stop them before continuing.",971), NULL, MB_OK);
 				gave_warning = 1;
 			} else {
 				goto Failure;

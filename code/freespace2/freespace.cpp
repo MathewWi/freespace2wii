@@ -3614,6 +3614,9 @@ void run_launcher()
 #endif
 }
 
+
+extern "C" void wiipause();
+
 #ifdef APPLE_APP
 char full_path[1024];
 #endif
@@ -3969,13 +3972,21 @@ void game_init()
 	obj_init();	
 	mflash_game_init();	
 	armor_init();
+		
 	weapon_init();	
+	
+	
 	ai_init();
 	ai_profiles_init();		// Goober5000
 	ship_init();						// read in ships.tbl	
 
+	printf("player_init\n");
+	wiipause();
 	player_init();	
 	mission_campaign_init();		// load in the default campaign	
+	
+	
+	printf("anim_init\n");
 	anim_init();
 	context_help_init();			
 	techroom_intel_init();			// parse species.tbl, load intel info  
@@ -4031,6 +4042,9 @@ void game_init()
 	mprintf(("cfile_init() took %d\n", e1 - s1));
 	// mprintf(("1000 cfopens() took %d\n", e2 - s2));	
 	Script_system.RunBytecode(Script_gameinithook);
+	
+	printf("Ready...\n");
+	wiipause();
 }
 
 char transfer_text[128];

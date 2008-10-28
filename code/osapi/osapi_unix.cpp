@@ -369,9 +369,14 @@ void os_poll()
 	unix_process(0);
 }
 
+	
+extern "C" void wiipause();
+
 void debug_int3(char *file, int line)
 {
 	mprintf(("Int3(): From %s at line %d\n", file, line));
+	
+	wiipause();
 
 	// we have to call os_deinit() before abort() so we make sure that SDL gets
 	// closed out and we don't lose video/input control
