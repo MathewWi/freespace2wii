@@ -505,8 +505,8 @@ extern int required_string_3(char *str1, char *str2, char *str3);
 extern int required_string_4(char *str1, char *str2, char *str3, char *str4);
 
 // stuff
-extern void copy_to_eoln(char *outstr, char *more_terminators, char *instr, int max);
-extern void copy_text_until(char *outstr, char *instr, char *endstr, int max_chars);
+extern void copy_to_eoln(char *outstr, const char *more_terminators, const char *instr, int max);
+extern void copy_text_until(char *outstr, const char *instr, const char *endstr, int max_chars);
 extern void stuff_string_white(char *pstr, int len = 0);
 extern void stuff_string_until(char *pstr, char *endstr, int len = 0);
 extern void stuff_string(char *pstr, int type, int len, char *terminators = NULL);

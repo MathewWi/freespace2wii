@@ -28,6 +28,8 @@ opengl_texture_state::~opengl_texture_state()
 	}
 }
 
+extern "C" void wiipause();
+
 void opengl_texture_state::init(GLint n_units)
 {
 	Assert( n_units > 0 );

@@ -436,6 +436,12 @@
 
 
 
+extern int pause_stuff;
+extern "C" void wiipause();
+#define pause_print() if(pause_stuff) { printf("%s - %d\n",LOCATION); wiipause(); }
+#define longjmp(f,a) {pause_print(); longjmp(f,a);}
+
+
 #define	ERROR_LENGTH	64
 #define	RS_MAX_TRIES	5
 
@@ -1097,7 +1103,7 @@ int required_string_either_fred(char *str1, char *str2)
 
 //	Copy characters from instr to outstr until eoln is found, or until max
 //	characters have been copied (including terminator).
-void copy_to_eoln(char *outstr, char *more_terminators, char *instr, int max)
+void copy_to_eoln(char *outstr, const char *more_terminators, const char *instr, int max)
 {
 	int	count = 0;
 	char	ch;
@@ -1125,7 +1131,7 @@ void copy_to_eoln(char *outstr, char *more_terminators, char *instr, int max)
 
 //	Copy characters from instr to outstr until next white space is found, or until max
 //	characters have been copied (including terminator).
-void copy_to_next_white(char *outstr, char *instr, int max)
+void copy_to_next_white(char *outstr, const char *instr, int max)
 {
 	int	count = 0;
 	int	in_quotes = 0;
@@ -1182,12 +1188,17 @@ char* alloc_text_until(char* instr, char* endstr)
 //	Copy text until a certain string is matched.
 //	For example, this is used to copy mission notes, scanning until $END NOTES:
 // is found.
-void copy_text_until(char *outstr, char *instr, char *endstr, int max_chars)
+void copy_text_until(char *outstr, const char *instr, const char *endstr, int max_chars)
 {
+	pause_print();
 	char *foundstr;
 	Assert(outstr && instr && endstr);
+	
+	pause_print();
 
 	foundstr = stristr(instr, endstr);
+	
+	pause_print();
 
 	if (foundstr == NULL) {
 		nprintf(("Error", "Error.  Looking for [%s], but never found it.\n", endstr));
@@ -1195,6 +1206,8 @@ void copy_text_until(char *outstr, char *instr, char *endstr, int max_chars)
 	}
 
 	if (foundstr - instr + strlen(endstr) < (uint) max_chars) {
+	
+		pause_print();
 		strncpy(outstr, instr, foundstr - instr);
 		outstr[foundstr - instr] = 0;
 
@@ -1205,8 +1218,13 @@ void copy_text_until(char *outstr, char *instr, char *endstr, int max_chars)
 
 		longjmp(parse_abort, 4);
 	}
+	
+	pause_print();
 
 	diag_printf("Here's the partial wad of text:\n%.30s\n", outstr);
+	
+	pause_print();
+
 }
 
 // stuffs a string into a buffer.  Can get a string between " marks and stops
@@ -1307,21 +1325,31 @@ char* alloc_block(char* startstr, char* endstr, int extra_chars)
 	return rval;
 }
 
+
+
 //	Stuff a string into a string buffer.
 //	Supports various FreeSpace primitive types.  If 'len' is supplied, it will override
 // the default string length if using the F_NAME case.
 void stuff_string(char *pstr, int type, int len, char *terminators)
 {
-	char read_str[PARSE_BUF_SIZE] = "";
+	pause_print();
+	char read_str[PARSE_BUF_SIZE];	
+	//char *read_str = aptraz;
+	memset(read_str, 0, PARSE_BUF_SIZE);
+	strncpy(read_str, "", PARSE_BUF_SIZE);
 	int read_len = PARSE_BUF_SIZE;
 	int final_len = len - 1;
 	int tag_id;
 
 	// make sure we have enough room
 	Assert( final_len > 0 );
+	
+
+	pause_print();
 
 	// make sure it's zero'd out
 	memset( pstr, 0, len );
+	pause_print();
 
 	switch (type) {
 		case F_RAW:
@@ -1347,9 +1375,13 @@ void stuff_string(char *pstr, int type, int len, char *terminators)
 
 		case F_DATE:
 			ignore_gray_space();
+	pause_print();
 			copy_to_eoln(read_str, terminators, Mp, read_len);
+	pause_print();
 			drop_trailing_white_space(read_str);
+	pause_print();
 			advance_to_eoln(terminators);
+	pause_print();
 			break;
 
 		case F_NOTES:
@@ -1377,9 +1409,13 @@ void stuff_string(char *pstr, int type, int len, char *terminators)
 
 		case F_MULTITEXT:		
 			ignore_white_space();
+	pause_print();
 			copy_text_until(read_str, Mp, "$end_multi_text", read_len);
+	pause_print();
 			Mp += strlen(read_str);
+	pause_print();
 			drop_trailing_white_space(read_str);
+	pause_print();
 			required_string("$end_multi_text");
 			break;
 
@@ -1392,33 +1428,51 @@ void stuff_string(char *pstr, int type, int len, char *terminators)
 
 		case F_MESSAGE:
 			ignore_gray_space();
+	pause_print();
 			copy_to_eoln(read_str, terminators, Mp, read_len);
+	pause_print();
 			drop_trailing_white_space(read_str);
+	pause_print();
 			advance_to_eoln(terminators);
+	pause_print();
 			break;		
 
 		default:
 			Assert(0);
 	}
+	
+	pause_print();
 
 	// now we want to do any final localization
 	if(type != F_RAW && type != F_LNAME)
 	{
+		
+	pause_print();
 		lcl_ext_localize(read_str, pstr, final_len, &tag_id);
 
+		
+	pause_print();
 		// if the hash localized text hash table is active and we have a valid external string - hash it
 		if(fhash_active() && (tag_id > -2)){
 			fhash_add_str(pstr, tag_id);
 		}
+		
+	pause_print();
 	}
 	else
 	{
+	
+	pause_print();
 		if ( strlen(read_str) > (uint)final_len )
 			error_display(0, "Token too long: [%s].  Length = %i.  Max is %i.\n", read_str, strlen(read_str), final_len);
 
+	pause_print();
 		strncpy(pstr, read_str, final_len);
+		
+	pause_print();
 	}
 
+	pause_print();
 	diag_printf("Stuffed string = [%.30s]\n", pstr);
 }
 
@@ -1458,20 +1512,28 @@ char *stuff_and_malloc_string( int type, char *terminators, int len)
 
 	char tmp_result[MAX_TMP_STRING_LENGTH];
 	int final_len = len;
+	pause_print();
 
 	if ( !len || (len > MAX_TMP_STRING_LENGTH) )
 		final_len = MAX_TMP_STRING_LENGTH;
+	pause_print();
 
 	stuff_string(tmp_result, type, final_len, terminators);
+	pause_print();
 	drop_white_space(tmp_result);
+	
+	pause_print();
 
-	l = strlen(tmp_result);
+	l = strnlen(tmp_result, MAX_TMP_STRING_LENGTH);
+	pause_print();
 	Assert(l < MAX_TMP_STRING_LENGTH);		// Get John!!
 	if (l < 1)
 		return NULL;
 
 	return vm_strdup(tmp_result);
 }
+
+extern "C" void wiipause();
 
 void stuff_malloc_string(char **dest, int type, char *terminators, int len)
 {

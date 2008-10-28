@@ -903,8 +903,11 @@ void lcl_ext_close()
 // now will also replace $quote with double quotation marks
 // now will also replace $semicolon with semicolon mark
 #define LCL_NUM_REPLACEMENTS 4
+char replace[LCL_NUM_REPLACEMENTS][2][NAME_LENGTH];
 void lcl_replace_stuff(char *text, unsigned int max_len)
 {
+
+	memset(replace, 0, sizeof(replace));
 	Assert(text);	// Goober5000
 
 	if (Fred_running)
@@ -914,7 +917,6 @@ void lcl_replace_stuff(char *text, unsigned int max_len)
 		return;
 
 	int i;
-	char replace[LCL_NUM_REPLACEMENTS][2][NAME_LENGTH];
 
 	// fill replacements array (this is if we want to add more in the future)
 	strcpy(replace[0][0], "$callsign");
@@ -941,11 +943,15 @@ void lcl_replace_stuff(char *text, unsigned int max_len)
 // XSTR("whee", 20)
 // and these should cover all the externalized string cases
 // fills in id if non-NULL. a value of -2 indicates it is not an external string
+
+char text_str[PARSE_BUF_SIZE];
+char lookup_str[PARSE_BUF_SIZE];
+
 void lcl_ext_localize_sub(char *in, char *out, int max_len, int *id)
 {			
 	char first_four[5];
-	char text_str[PARSE_BUF_SIZE]="";
-	char lookup_str[PARSE_BUF_SIZE]="";
+	strcpy(text_str, "");
+	strcpy(lookup_str, "");
 	int str_id;	
 	int str_len;	
 
