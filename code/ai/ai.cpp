@@ -19,8 +19,13 @@
 
 int Total_goal_ship_names = 0;
 char Goal_ship_names[MAX_GOAL_SHIP_NAMES][NAME_LENGTH];
-ai_info Ai_info[MAX_AI_INFO];
+ai_info *Ai_info;
 ai_info *Player_ai;
+
+void ai_init_mem()
+{
+	Ai_info = new(vm_malloc(sizeof(ai_info)*MAX_AI_INFO)) ai_info[MAX_AI_INFO];
+}
 
 // Return index of free AI slot.
 // Return -1 if no free slot.

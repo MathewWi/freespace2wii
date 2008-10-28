@@ -1170,7 +1170,8 @@ void bm_init()
 {
 	int i;
 	
-	bm_bitmaps = (bitmap_entry*)vm_malloc(sizeof(bitmap_entry)*MAX_BITMAPS);
+	bm_bitmaps = new (vm_malloc(sizeof(bitmap_entry)*MAX_BITMAPS)) bitmap_entry[MAX_BITMAPS];
+	Assert(bm_bitmaps);
 
 	mprintf(( "Size of bitmap info = %d KB\n", sizeof( bm_bitmaps )/1024 ));
 	mprintf(( "Size of bitmap extra info = %d bytes\n", sizeof( bm_extra_info ) ));
@@ -1324,7 +1325,7 @@ int bm_load_sub_slow(const  char *real_filename, const int num_ext, const char *
 
 		return rval;
 	}
-
+	
 	// umm, that's not good...
 	return -1;
 }
@@ -1489,7 +1490,7 @@ int bm_load( const char *real_filename )
 Done:
 	if (img_cfp != NULL)
 		cfclose(img_cfp);
-
+	
 	return handle;
 }
 

@@ -199,6 +199,7 @@
 #include "network/multi_log.h"
 #include "network/multi_rate.h"
 #include "cmdline/cmdline.h"
+#include "ship/ship.h"
 
 #ifdef PSNET2
 
@@ -662,8 +663,8 @@ void psnet_init( int protocol, int port_num )
 	return;
 #endif
 
-	Reliable_sockets = (reliable_socket*)vm_malloc(sizeof(reliable_socket)*MAXRELIABLESOCKETS);
-	Psnet_top_buffers = (network_packet_buffer_list* ) vm_malloc(sizeof(network_packet_buffer_list)*PSNET_NUM_TYPES);
+	Reliable_sockets = new((vm_malloc(sizeof(reliable_socket)*MAXRELIABLESOCKETS))) reliable_socket[MAXRELIABLESOCKETS];
+	Psnet_top_buffers = new(vm_malloc(sizeof(network_packet_buffer_list)*PSNET_NUM_TYPES)) network_packet_buffer_list[PSNET_NUM_TYPES];
 
 	// GAME PORT INITIALIZATION STUFF
 	if ( Network_status == NETWORK_STATUS_RUNNING ){

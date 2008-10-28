@@ -390,7 +390,7 @@
 
 
 char Cfile_root_dir[CFILE_ROOT_DIRECTORY_LEN] = "";
-#ifdef SCP_UNIX
+#if defined SCP_UNIX || defined SCP_WII
 char Cfile_user_dir[CFILE_ROOT_DIRECTORY_LEN] = "";
 #endif
 
@@ -502,7 +502,7 @@ int cfile_in_root_dir(char *exe_path)
 	} while(tok != NULL);
 		
 	// root directory if we have <= 1 slash
-	if(token_count <= 2){
+	if(token_count <= 1){
 		return 1;
 	}
 
@@ -533,6 +533,7 @@ int cfile_init(char *exe_dir, char *cdrom_dir)
 
 		// are we in a root directory?		
 		if(cfile_in_root_dir(buf)){
+			printf("%s\n", buf);
 			MessageBox((HWND)NULL, "FreeSpace2/Fred2 cannot be run from a drive root directory!", "Error", MB_OK);
 			return 1;
 		}		
@@ -1085,6 +1086,7 @@ CFILE *cfopen(const char *file_path, char *mode, int type, int dir_type, bool lo
 
 		// Fount it, now create a cfile out of it
 		
+#ifdef SCP_WII
 		if ( type & CFILE_MEMORY_MAPPED ) {
 		
 			// Can't open memory mapped files out of pack files
@@ -1106,7 +1108,7 @@ CFILE *cfopen(const char *file_path, char *mode, int type, int dir_type, bool lo
 			} 
 
 		} else {
-
+#endif
 			FILE *fp = fopen( longname, "rb" );
 
 			if ( fp )	{
@@ -1118,7 +1120,9 @@ CFILE *cfopen(const char *file_path, char *mode, int type, int dir_type, bool lo
 					return cf_open_fill_cfblock(fp, dir_type);
 				} 
 			}
+#ifdef SCP_WII
 		}
+#endif
 
 	}
 

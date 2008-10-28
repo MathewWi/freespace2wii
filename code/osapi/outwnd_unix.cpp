@@ -189,7 +189,7 @@
 
 void outwnd_print(char *id = NULL, char *tmp = NULL);
 
-#define MAX_LINE_WIDTH	128
+#define MAX_LINE_WIDTH	1024
 
 bool outwnd_inited = false;
 ubyte Outwnd_no_filter_file = 0;		// 0 = .cfg file found, 1 = not found and warning not printed yet, 2 = not found and warning printed
@@ -393,6 +393,8 @@ void outwnd_print(char *id, char *tmp)
 		return;
 
 	if (Log_debug_output_to_file) {
+		fputs(tmp, stdout);
+		fflush(stdout);
 		if (Log_fp != NULL) {
 			fputs(tmp, Log_fp);	
 			fflush(Log_fp);

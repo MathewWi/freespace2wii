@@ -19,7 +19,7 @@ extern "C" void WiiAssert(const char * text,const char *filename, int line)
 	while ( 1 ) {
 		VIDEO_SetNextFramebuffer(exception_xfb);
 		
-		__console_init(exception_xfb,20,20,640,250,1280);
+		__console_init(exception_xfb,20,270,640,250,1280);
 		
 		kprintf("\n\n");
 		kprintf("Assertion failed:\n %s \n", text);
@@ -35,6 +35,36 @@ extern "C" void WiiAssert(const char * text,const char *filename, int line)
 		if ( (buttonsDown & PAD_BUTTON_A) || (wbuttonsDown & WPAD_BUTTON_HOME) )
 		{
 			kprintf("Reset\n");
+			throw;
+			exit(0);
+		}
+		
+		VIDEO_WaitVSync();
+	}
+}
+
+extern "C" void wiipause()
+{
+	kprintf("Press Home on WiiMote 1 or A on Gamecube Pad 1 to continue\n");
+	
+	fflush(stdout);
+	fflush(stderr);
+	
+	while(1) {
+
+		WPAD_ScanPads();
+		PAD_ScanPads();
+
+		int buttonsDown = PAD_ButtonsDown(0);
+		int wbuttonsDown = WPAD_ButtonsDown(0);
+
+		if ( (buttonsDown & PAD_BUTTON_A) || (wbuttonsDown & WPAD_BUTTON_HOME) )
+		{
+			return;
+		}
+		
+		if(wbuttonsDown & WPAD_BUTTON_1)
+		{
 			exit(0);
 		}
 		
@@ -44,13 +74,14 @@ extern "C" void WiiAssert(const char * text,const char *filename, int line)
 
 extern "C" void pause_exit(int code,const char *filename, int line)
 {
+	fflush(stderr);
 	LWP_Reschedule(LWP_PRIO_IDLE);
 	LWP_SetThreadPriority (LWP_GetSelf (), LWP_PRIO_HIGHEST);
 	
 	while ( 1 ) {
 		VIDEO_SetNextFramebuffer(exception_xfb);
 		
-		__console_init(exception_xfb,20,20,640,250,1280);
+		__console_init(exception_xfb,20,350,640,100,1280);
 		
 		kprintf("\n\n");
 		kprintf("Exit was called from %s at %d\n\n", filename, line);

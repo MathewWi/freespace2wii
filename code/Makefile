@@ -30,29 +30,29 @@ FSSOURCES	:=	ai anim autopilot bmpman camera cfile cmdline cmeasure controlconfi
 LIBSOURCES	:= ../libjpeg ../lua
 SOURCES		:= $(FSSOURCES) $(LIBSOURCES)
 DATA		:=	data  
-INCLUDES	:=  ../../setup/SDL-Port/include . ../lua ../libjpeg/ ../openal/include/ ../oggvorbis/include ../../netport/include
+INCLUDES	:=  ../../setup/SDL-Port/include . ../lua ../libjpeg/ ../openal/include/ ../oggvorbis/include ../../netport/include ../../gnulib/include
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -save-temps -Os $(MACHDEP) $(INCLUDE) -DSCP_WII -DUSE_OPENAL -DSCP_UNIX -D_POSIX_SOURCE -DNO_DIRECT3D \
+CFLAGS	= -g -save-temps -Os $(MACHDEP) $(INCLUDE) -DSCP_WII -DUSE_OPENAL -DSCP_UNIX -D_POSIX_SOURCE -DNO_DIRECT3D \
 		-D_POSIX_TIMERS 
 CXXFLAGS	=	$(CFLAGS)
 
-LDFLAGS	= $(MACHDEP) -Wl,-Map,$(notdir $@).map
+LDFLAGS	= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
 #LIBS	:=	-logc -nodefaultlibs -lstdc++ -lsupc++ -lc -lgcc
-LIBS	:=	-ltheora -lvorbis -logg -lopenal -lnetport -lSDL -lgl2gx -lfat -lwiiuse -lbte -logc -lm 
+LIBS	:=	-lgnu -ltheora -lvorbis -logg -lopenal -lnetport -lSDL -lgl2gx -lfat -lwiiuse -lbte -logc -lm 
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= /i/setup/gl2gx/libogc/lib/wii /i/setup/SDL-Port/lib
+LIBDIRS	:= /i/setup/gl2gx/libogc/lib/wii /i/setup/SDL-Port/lib /i/libogc/lib/wii /i/gnulib/lib
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional

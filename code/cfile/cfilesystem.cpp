@@ -265,12 +265,7 @@
 #include <winbase.h>		/* needed for memory mapping of file functions */
 #endif
 
-#ifdef SCP_WII
-#undef SCP_UNIX
-#endif
-
 #ifdef SCP_UNIX
-#include <glob.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <fnmatch.h>
@@ -282,8 +277,6 @@
 #include "cfile/cfile.h"
 #include "cfile/cfilesystem.h"
 #include "localization/localize.h"
-
-
 
 #define CF_ROOTTYPE_PATH 0
 #define CF_ROOTTYPE_PACK 1
@@ -453,22 +446,22 @@ int cf_get_packfile_count(cf_root *root)
 			Warning(LOCATION, "Could not concatenate '*.vp' to filespec; path too long.");
 			continue;
 		}
-		strcat( filespec, "*.[vV][pP]" );
+		
+		DIR *dirp;
+		struct dirent *dir;
 
-		glob_t globinfo;
-		memset(&globinfo, 0, sizeof(globinfo));
-		int status = glob(filespec, 0, NULL, &globinfo);
-		if (status == 0) {
-			for (unsigned int j = 0;  j < globinfo.gl_pathc;  j++) {
-				// Determine if this is a regular file
-				struct stat statbuf;
-				memset(&statbuf, 0, sizeof(statbuf));
-				stat(globinfo.gl_pathv[j], &statbuf);
-				if (S_ISREG(statbuf.st_mode)) {
+		dirp = opendir (filespec);
+		
+		if ( dirp ) {
+			while ((dir = readdir (dirp)) != NULL)
+			{
+				if (!fnmatch ("*.[vV][pP]", dir->d_name, 0))
+				{
 					packfile_count++;
 				}
 			}
-			globfree(&globinfo);
+			
+			closedir(dirp);
 		}
 #endif
 	}
@@ -562,34 +555,30 @@ void cf_build_pack_list( cf_root *root )
 			_findclose( find_handle );
 		}	
 #elif defined SCP_UNIX
-		strcat( filespec, "*.[vV][pP]" );
-		glob_t globinfo;
+		
+		DIR *dirp;
+		struct dirent *dir;
 
-		memset(&globinfo, 0, sizeof(globinfo));
-
-		int status = glob(filespec, 0, NULL, &globinfo);
-
-		if (status == 0) {
-			for (uint j = 0;  j < globinfo.gl_pathc;  j++) {
-				// Determine if this is a regular file
-				struct stat statbuf;
-				memset(&statbuf, 0, sizeof(statbuf));
-				stat(globinfo.gl_pathv[j], &statbuf);
-
-				if ( S_ISREG(statbuf.st_mode) ) {
+		dirp = opendir (filespec);
+		
+		if ( dirp ) {
+			while ((dir = readdir (dirp)) != NULL)
+			{
+				if (!fnmatch ("*.[vV][pP]", dir->d_name, 0))
+				{
 					Assert(root_index < temp_root_count);
 
 					// get a temp pointer
 					rptr_sort = &temp_roots_sort[root_index++];
 
 					// fill in all the proper info
-					strcpy(rptr_sort->path, globinfo.gl_pathv[j] );
+					strcpy(rptr_sort->path, dir->d_name );
 					rptr_sort->roottype = CF_ROOTTYPE_PACK;
 					rptr_sort->cf_type = i;
 				}
 			}
-
-			globfree(&globinfo);
+			
+			closedir(dirp);
 		}
 #endif
 	}
@@ -606,7 +595,7 @@ void cf_build_pack_list( cf_root *root )
 		new_root = cf_create_root();
 		strcpy( new_root->path, root->path );
 
-#ifndef NDEBUG
+#if !defined NDEBUG && !defined SCP_WII
 		uint chksum = 0;
 		cf_chksum_pack(temp_roots_sort[i].path, &chksum);
 		mprintf(("Found root pack '%s' with a checksum of 0x%08x\n", temp_roots_sort[i].path, chksum));
@@ -836,6 +825,7 @@ void cf_search_root_path(int root_index)
 		struct dirent *dir;
 
 		dirp = opendir (search_path);
+		
 		if ( dirp ) {
 			while ((dir = readdir (dirp)) != NULL)
 			{
@@ -941,7 +931,7 @@ void cf_search_root_pack(int root_index)
 	int i;
 	for (i=0; i<VP_header.num_files; i++ )	{
 		VP_FILE find;
-
+		
 		fread( &find, sizeof(VP_FILE), 1, fp );
 
 		find.offset = INTEL_INT( find.offset );

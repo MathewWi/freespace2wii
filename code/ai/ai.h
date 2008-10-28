@@ -739,7 +739,7 @@ extern void ai_frame_all(void);
 
 extern int find_guard_obj(void);
 
-extern ai_info Ai_info[];
+extern ai_info *Ai_info;
 extern ai_info *Player_ai;
 
 extern int Waypoints_created;	// externed since needed for save/restore
@@ -758,6 +758,7 @@ extern object	*Pl_objp;
 extern object	*En_objp;
 extern float	AI_frametime;
 
+void ai_init_mem();
 
 // Return index of free AI slot.
 // Return 0 if no free slot.

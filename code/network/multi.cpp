@@ -499,7 +499,7 @@ int Multi_current_file_length = -1;
 void multi_init()
 {
 	int idx;
-	Net_players = (net_player *) vm_malloc(sizeof(net_player )*MAX_PLAYERS);
+	Net_players = new (vm_malloc(sizeof(net_player )*MAX_PLAYERS)) net_player[MAX_PLAYERS];
 
 	// read in config file
 	multi_options_read_config();
