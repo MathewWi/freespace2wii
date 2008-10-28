@@ -1763,6 +1763,8 @@ LOCAL int ai_inited = 0;
 void ai_init()
 {
 	if ( !ai_inited )	{
+		ai_init_mem();
+		
 		// Do the first time initialization stuff here
 		int	rval;
 

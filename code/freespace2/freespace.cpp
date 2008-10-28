@@ -1927,7 +1927,7 @@ typedef struct big_expl_flash {
 #define DEFAULT_SKILL_LEVEL	1
 int	Game_skill_level = DEFAULT_SKILL_LEVEL;
 
-#define EXE_FNAME			("fs2.exe")
+#define EXE_FNAME			("freespace2.dol")
 
 #define LAUNCHER_FNAME	("Launcher.exe")
 
@@ -3668,6 +3668,10 @@ void game_init()
 		*c = '\0';
 	}
 	strncpy(whee, full_path, MAX_PATH_LEN-1);
+#elif SCP_WII
+	// Hard code this for now
+	SetCurrentDirectory("/Freespace2");
+	GetCurrentDirectory(MAX_PATH_LEN-1, whee);
 #else
 	GetCurrentDirectory(MAX_PATH_LEN-1, whee);
 #endif

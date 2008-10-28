@@ -152,8 +152,6 @@
 #include "parse/lua.h"
 #include "cmdline/cmdline.h"
 
-#include "wii_port/wiiexit.h"
-
 bool env_enabled = false;
 bool cell_enabled = false;
 
@@ -221,6 +219,9 @@ void WinAssert(char * text, char *filename, int line)
 
 	abort();
 }
+
+
+extern "C" void wiipause();
 
 // standard warning message
 void Warning( char * filename, int line, const char * format, ... )
@@ -310,8 +311,11 @@ void Error( char * filename, int line, const char * format, ... )
 
 	// Order UP!!
 	fprintf(stderr, "ERROR: \"%s\" at %s:%d\n", buffer, filename, line);
+	
+	fflush(stdout);
+	fflush(stderr);
+	wiipause();
 #endif
-
 	exit(EXIT_FAILURE);
 }
 
@@ -354,6 +358,8 @@ void LuaError(struct lua_State *L, char *format, ...)
 	ade_stackdump(L, buffer);
 	fprintf(stderr, "%s\n", buffer);
 	fprintf(stderr, "\n");
+	
+	wiipause();
 
 	exit(EXIT_FAILURE);
 }
@@ -545,6 +551,8 @@ void _splitpath (char *path, char *drive, char *dir, char *fname, char *ext)
 	}
 }
 
+extern "C" void wiipause();
+
 // some type of info message
 int MessageBox(HWND h, const char *s1, const char *s2, int i)
 {
@@ -553,6 +561,7 @@ int MessageBox(HWND h, const char *s1, const char *s2, int i)
 	}
 
 	fprintf(stderr, "%s: \"%s\"\n", s2, s1);
+	wiipause();
 
 	return 0;
 }
@@ -600,6 +609,19 @@ int vm_init(int min_heap_size)
 	return 1;
 }
 
+#define SYSMEM2_SIZE 0x04000000
+#define LIBOGC 0x01000000
+#define SYSMEM2_START 0x90000000
+
+struct point
+{
+	size_t size;
+	size_t start;
+};
+
+void * malloc_start = (void*)(SYSMEM2_START | LIBOGC);
+const void * malloc_end = (void*)(SYSMEM2_START | SYSMEM2_SIZE);
+
 #ifndef NDEBUG
 void *_vm_malloc( int size, char *filename, int line, int quiet )
 #else
@@ -608,14 +630,34 @@ void *_vm_malloc( int size, int quiet )
 {
 	Assert( size > 0 );
 
-	void *ptr = malloc( size );
+	
+	u8 *next_memory = (u8*)malloc_start;
+	next_memory += size+sizeof(size_t);
+	next_memory += 4 - (((u32)next_memory) % 4);
+	
+	Assert( ((u32)next_memory) % 4 == 0);
+	
+	void *ptr;
+	if(next_memory > malloc_end)
+	{
+		ptr = NULL;
+	}
+	else
+	{
+		point *p = (point*)malloc_start;
+		p->size = size;
+		ptr = (void*) &p->start;
+		malloc_start = (void*)next_memory;
+		memset(ptr, 0, size);
+	}
+	
 
 	if (!ptr)	{
 		if (quiet) {
 			return NULL;
 		}
 
-		Error(LOCATION, "Out of memory.");
+		Error(LOCATION, "Out of memory, %d, total alloc %d.", size,TotalRam);
 	}
 
 #ifndef NDEBUG
@@ -645,8 +687,17 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 {
 	if (ptr == NULL)
 		return vm_malloc(size);
-
-	void *ret_ptr = realloc( ptr, size );
+		
+	void *ret_ptr = vm_malloc(size);
+	
+	if(!ret_ptr)
+	{
+		size_t * p1 = (size_t*)ptr;
+		
+		point* p = (point*)(p1-1);
+		
+		memcpy(ret_ptr, ptr, p->size);
+	}
 
 	if (!ret_ptr)	{
 		if (quiet && (size > 0) && (ptr != NULL)) {
@@ -687,7 +738,7 @@ char *_vm_strdup( const char *ptr )
 	if (!dst)
 		return NULL;
 
-	strcpy( dst, ptr );
+	strncpy( dst, ptr, len + 1);
 
 	return dst;
 }
@@ -750,7 +801,8 @@ void _vm_free( void *ptr )
     }
 #endif // !NDEBUG
 
-	free(ptr);
+	// Don't free anything
+	//free(ptr);
 }
 
 void vm_free_all()

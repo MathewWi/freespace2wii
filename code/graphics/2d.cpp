@@ -1397,6 +1397,11 @@ bool gr_init(int d_mode, int d_width, int d_height, int d_depth)
 		height = 480;
 		depth = 16;
 	}
+	
+#ifdef SCP_WII
+	width = 640;
+	height = 480;
+#endif
 
 	// now try to actually init everything...
 	if ( gr_init_sub(mode, width, height, depth) == false ) {

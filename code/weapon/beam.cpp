@@ -883,7 +883,7 @@ int beam_will_tool_target(beam *b, object *objp);
 // init at game startup
 void beam_init()
 {
-	Beams =(beam *) vm_malloc(sizeof(beam)*MAX_BEAMS);				// all beams
+	Beams = new(vm_malloc(sizeof(beam)*MAX_BEAMS)) beam[MAX_BEAMS];				// all beams
 	// clear the beams
 	list_init( &Beam_free_list );
 	list_init( &Beam_used_list );

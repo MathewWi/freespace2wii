@@ -5380,10 +5380,10 @@ void ship_parse_post_cleanup()
 // structure
 void ship_init()
 {
-	Ship_objs = (ship_obj*)vm_malloc(sizeof(ship_obj)*MAX_SHIP_OBJS);		// array used to store ship object indexes
-	Ship_info = (ship_info*)vm_malloc(sizeof(ship_info)*MAX_SHIP_CLASSES);
-	Ships	  = (ship*)vm_malloc(sizeof(ship)*MAX_SHIPS);
-	Wings     = (wing*)vm_malloc(sizeof(wing)*MAX_WINGS);
+	Ship_objs = new ((vm_malloc(sizeof(ship_obj)*MAX_SHIP_OBJS))) ship_obj[MAX_SHIP_OBJS];		// array used to store ship object indexes
+	Ship_info = new (vm_malloc(sizeof(ship_info)*MAX_SHIP_CLASSES)) ship_info[MAX_SHIP_CLASSES];
+	Ships	  = new (vm_malloc(sizeof(ship)*MAX_SHIPS)) ship[MAX_SHIPS];
+	Wings     = new (vm_malloc(sizeof(wing)*MAX_WINGS)) wing[MAX_WINGS];
 	
 	if ( !ships_inited )
 	{
