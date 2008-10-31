@@ -571,13 +571,14 @@ void skip_token()
 
 //	Display a diagnostic message if Verbose is set.
 //	(Verbose is set if -v command line switch is present.)
+char asdaafsafasd[8192];
 void diag_printf(char *format, ...)
 {
-	char	buffer[8192];
+	char	*buffer = asdaafsafasd;
 	va_list args;
 
 	va_start(args, format);
-	vsprintf(buffer, format, args);
+	vsnprintf(buffer, sizeof(asdaafsafasd), format, args);
 	va_end(args);
 
 	nprintf(("Parse", "%s", buffer));
@@ -665,7 +666,7 @@ void error_display(int error_level, char *format, ...)
 	nprintf((error_text, "%s(line %i:%s: ", Current_filename, get_line_num(), error_text));
 
 	va_start(args, format);
-	vsprintf(buffer, format, args);
+	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 	Assert(strlen(buffer) < 1024);
 
@@ -1330,10 +1331,13 @@ char* alloc_block(char* startstr, char* endstr, int extra_chars)
 //	Stuff a string into a string buffer.
 //	Supports various FreeSpace primitive types.  If 'len' is supplied, it will override
 // the default string length if using the F_NAME case.
+
+char aasfadsi[PARSE_BUF_SIZE];
+
 void stuff_string(char *pstr, int type, int len, char *terminators)
 {
 	pause_print();
-	char read_str[PARSE_BUF_SIZE];	
+	char *read_str = aasfadsi;
 	//char *read_str = aptraz;
 	memset(read_str, 0, PARSE_BUF_SIZE);
 	strncpy(read_str, "", PARSE_BUF_SIZE);
@@ -3354,13 +3358,13 @@ void backspace(char* src)
 }
 
 // Goober5000
-void format_integer_with_commas(char *buf, int integer, bool use_comma_with_four_digits)
+void format_integer_with_commas(char *buf, size_t bufsize, int integer, bool use_comma_with_four_digits)
 {
 	int old_pos, new_pos, triad_count;
 	char backward_buf[32];
 
 	// print an initial string of just the digits
-	sprintf(buf, "%d", integer);
+	snprintf(buf, bufsize, "%d", integer);
 
 	// no commas needed?
 	if ((integer < 1000) || (integer < 10000 && !use_comma_with_four_digits))
@@ -3372,13 +3376,15 @@ void format_integer_with_commas(char *buf, int integer, bool use_comma_with_four
 	for (old_pos = strlen(buf) - 1; old_pos >= 0; old_pos--)
 	{
 		backward_buf[new_pos] = buf[old_pos];
-		new_pos++;
+		new_pos++; Assert(new_pos < sizeof(backward_buf));
 		triad_count++;
+		
+		
 
 		if (triad_count == 3 && old_pos > 0)
 		{
 			backward_buf[new_pos] = ',';
-			new_pos++;
+			new_pos++; Assert(new_pos < sizeof(backward_buf));
 			triad_count = 0;
 		}
 	}
@@ -3389,7 +3395,7 @@ void format_integer_with_commas(char *buf, int integer, bool use_comma_with_four
 	for (old_pos = strlen(backward_buf) - 1; old_pos >= 0; old_pos--)
 	{
 		buf[new_pos] = backward_buf[old_pos];
-		new_pos++;
+		new_pos++; Assert(new_pos < sizeof(backward_buf));
 	}
 	buf[new_pos] = '\0';
 }

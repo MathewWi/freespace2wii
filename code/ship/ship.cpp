@@ -2816,7 +2816,7 @@ void init_ship_entry(ship_info *sip)
 	int i,j;
 	
 	sip->name[0] = '\0';
-	sprintf(sip->short_name, "ShipClass%d", (sip - Ship_info));
+	snprintf(sip->short_name, sizeof(sip->short_name), "ShipClass%d", (sip - Ship_info));
 	sip->species = 0;
 	sip->class_type = -1;
 	
@@ -9591,7 +9591,7 @@ int ship_create(matrix *orient, vec3d *pos, int ship_type, char *ship_name)
 	// Goober5000 - if no ship name specified, or if specified ship already exists,
 	// or if specified ship has exited, use a default name
 	if ((ship_name == NULL) || (ship_name_lookup(ship_name) >= 0) || (ship_find_exited_ship_by_name(ship_name) >= 0)) {
-		sprintf(shipp->ship_name, NOX("%s %d"), Ship_info[ship_type].name, n);
+		snprintf(shipp->ship_name, sizeof(shipp->ship_name), NOX("%s %d"), Ship_info[ship_type].name, n);
 	} else {
 		strcpy(shipp->ship_name, ship_name);
 	}
@@ -12168,7 +12168,7 @@ int ship_info_lookup(char *token)
 	if (*p == '#')
 	{
 		// assemble using parentheses
-		sprintf(name, "%s (%s)", temp1, temp2);
+		snprintf(name, sizeof(name), "%s (%s)", temp1, temp2);
 	}
 	// found a parenthesis
 	else if (*p == '(')
@@ -12178,7 +12178,7 @@ int ship_info_lookup(char *token)
 		*p2 = '\0';
 
 		// assemble using hash
-		sprintf(name, "%s#%s", temp1, temp2);
+		snprintf(name, sizeof(name), "%s#%s", temp1, temp2);
 	}
 	// oops
 	else
@@ -14584,7 +14584,7 @@ int bitmask_2_bitnum(int num)
 // of what a ship's orders are.  Feel free to use this function if 
 // it suits your needs for something.
 //
-char *ship_return_orders(char *outbuf, ship *sp)
+char *ship_return_orders(char *outbuf, size_t outbuf_size, ship *sp)
 {
 	ai_info	*aip;
 	ai_goal	*aigp;
@@ -14641,7 +14641,7 @@ char *ship_return_orders(char *outbuf, ship *sp)
 		case AI_GOAL_DESTROY_SUBSYSTEM: {
 			char name[NAME_LENGTH];
 			if ( aip->targeted_subsys != NULL ) {
-				sprintf(outbuf, XSTR( "atk %s %s", 496), temp_name, hud_targetbox_truncate_subsys_name(aip->targeted_subsys->system_info->name));
+				snprintf(outbuf, outbuf_size, XSTR( "atk %s %s", 496), temp_name, hud_targetbox_truncate_subsys_name(aip->targeted_subsys->system_info->name));
 				strcat(outbuf, name);	//what is this for?
 			} else {
 				strcpy(outbuf, XSTR( "no orders", 495) );
@@ -14676,7 +14676,7 @@ char *ship_return_orders(char *outbuf, ship *sp)
 // This function is called from HUD code to get a text description
 // of what a ship's orders are.  Feel free to use this function if 
 // it suits your needs for something.
-char *ship_return_time_to_goal(char *outbuf, ship *sp)
+char *ship_return_time_to_goal(char *outbuf, size_t outbuf_size, ship *sp)
 {
 	ai_info	*aip;
 	int		time, seconds, minutes;
@@ -14748,9 +14748,9 @@ char *ship_return_time_to_goal(char *outbuf, ship *sp)
 			minutes = 99;
 			seconds = 99;
 		}
-		sprintf(outbuf, NOX("%02d:%02d"), minutes, seconds);
+		snprintf(outbuf, outbuf_size, NOX("%02d:%02d"), minutes, seconds);
 	} else {
-		sprintf( outbuf, XSTR( "Unknown", 497) );
+		snprintf( outbuf, outbuf_size, XSTR( "Unknown", 497) );
 	}
 
 	return outbuf;
