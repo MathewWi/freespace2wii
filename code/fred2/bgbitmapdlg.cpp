@@ -376,7 +376,7 @@ void bg_bitmap_dlg::create()
 
 	m_slider.SetRange(0, MAX_STARS);
 	m_slider.SetPos(Num_stars);
-	sprintf(buf, "%d", Num_stars);
+	snprintf(buf, sizeof(buf), "%d", Num_stars);
 	GetDlgItem(IDC_TOTAL)->SetWindowText(buf);
 
 	build_nebfile_list();	
@@ -450,7 +450,7 @@ void bg_bitmap_dlg::create()
 	for (i = 0; i < MAX_BACKGROUNDS; i++) 
 	{
 		char temp[NAME_LENGTH];
-		sprintf(temp, "Background %d", i + 1);
+		snprintf(temp, sizeof(temp), "Background %d", i + 1);
 
 		((CComboBox*) GetDlgItem(IDC_BACKGROUND_NUM))->AddString(temp);
 		((CComboBox*) GetDlgItem(IDC_BACKGROUND_SWAP_NUM))->AddString(temp);
@@ -475,11 +475,11 @@ void bg_bitmap_dlg::create()
 	m_amb_green.SetPos((The_mission.ambient_light_level >> 8) & 0xff);
 	m_amb_blue.SetPos((The_mission.ambient_light_level >> 16) & 0xff);
 
-	sprintf(buf, "Red: %d", m_amb_red.GetPos());
+	snprintf(buf, sizeof(buf), "Red: %d", m_amb_red.GetPos());
 	GetDlgItem(IDC_AMBIENT_R_TEXT)->SetWindowText(buf);
-	sprintf(buf, "Green: %d", m_amb_green.GetPos());
+	snprintf(buf, sizeof(buf), "Green: %d", m_amb_green.GetPos());
 	GetDlgItem(IDC_AMBIENT_G_TEXT)->SetWindowText(buf);
-	sprintf(buf, "Blue: %d", m_amb_blue.GetPos());
+	snprintf(buf, sizeof(buf), "Blue: %d", m_amb_blue.GetPos());
 	GetDlgItem(IDC_AMBIENT_B_TEXT)->SetWindowText(buf);
 	
 
@@ -618,7 +618,7 @@ void bg_bitmap_dlg::OnSelchangeNebcolor()
 	Assert( Mission_palette >= 0 );
 	Assert( Mission_palette <= 98 );
 
-	sprintf( palette_filename, "gamepalette%d-%02d", 1, Mission_palette+1 );
+	snprintf( palette_filename, sizeof(palette_filename), "gamepalette%d-%02d", 1, Mission_palette+1 );
 
 	mprintf(( "Loading palette %s\n", palette_filename ));
 
@@ -653,7 +653,7 @@ void bg_bitmap_dlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar)
 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
 
 	MODIFY(Num_stars, m_slider.GetPos());
-	sprintf(buf, "%d", Num_stars);
+	snprintf(buf, sizeof(buf), "%d", Num_stars);
 	GetDlgItem(IDC_TOTAL)->SetWindowText(buf);
 
 	int col = 0;
@@ -662,11 +662,11 @@ void bg_bitmap_dlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar)
 	col |= m_amb_green.GetPos() << 8;
 	col |= m_amb_blue.GetPos() << 16;
 
-	sprintf(buf, "Red: %d", m_amb_red.GetPos());
+	snprintf(buf, sizeof(buf), "Red: %d", m_amb_red.GetPos());
 	GetDlgItem(IDC_AMBIENT_R_TEXT)->SetWindowText(buf);
-	sprintf(buf, "Green: %d", m_amb_green.GetPos());
+	snprintf(buf, sizeof(buf),  "Green: %d", m_amb_green.GetPos());
 	GetDlgItem(IDC_AMBIENT_G_TEXT)->SetWindowText(buf);
-	sprintf(buf, "Blue: %d", m_amb_blue.GetPos());
+	snprintf(buf, sizeof(buf), "Blue: %d", m_amb_blue.GetPos());
 	GetDlgItem(IDC_AMBIENT_B_TEXT)->SetWindowText(buf);
 
 	The_mission.ambient_light_level = col;
@@ -1140,8 +1140,8 @@ void bg_bitmap_dlg::get_data_float(int id, float *var, float min, float max)
 	this->GetDlgItemText(id, buf, 16);
 
 	*var = (float)atof(buf);
-	sprintf(max_ch,"%.3f",max);
-	sprintf(min_ch,"%.3f",min);
+	snprintf(max_ch,sizeof(max_ch),"%.3f",max);
+	snprintf(min_ch,sizeof(min_ch),"%.3f",min);
 	CString error_msg = "Please Enter a number between ";
 	error_msg += min_ch;
 	error_msg += " and ";
@@ -1170,8 +1170,8 @@ void bg_bitmap_dlg::get_data_int(int id, int *var, int min, int max)
 
 	*var=this->GetDlgItemInt(id);
 
-	sprintf(max_ch,"%d",max);
-	sprintf(min_ch,"%d",min);
+	snprintf(max_ch, sizeof(max_ch),"%d",max);
+	snprintf(min_ch, sizeof(min_ch),"%d",min);
 	CString error_msg = "Please Enter a number between ";
 	error_msg += min_ch;
 	error_msg += " and ";
@@ -1354,7 +1354,7 @@ void bg_bitmap_dlg::OnImportBackground()
 
 	if ((rval = setjmp(parse_abort)) != 0) {
 		mprintf(("BGBITMAPDLG: Unable to parse '%s'!  Error code = %i.\n", filename, rval));
-		sprintf(error_str, "Could not parse file: %s", filename);
+		snprintf(error_str, sizeof(error_str), "Could not parse file: %s", filename);
 
 		MessageBox((LPCTSTR) error_str, (LPCTSTR) "Unable to import mission background!", MB_ICONERROR | MB_OK);
 		return;

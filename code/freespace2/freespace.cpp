@@ -3060,10 +3060,10 @@ void game_loading_callback(int count)
 			else
 				short_name++;
 
-			sprintf(mem_buffer,"%s:\t%d K", short_name, size);
+			snprintf(mem_buffer,sizeof(mem_buffer),"%s:\t%d K", short_name, size);
 			gr_string( 20, 220 + (i*10), mem_buffer);
 		}
-		sprintf(mem_buffer,"Total RAM:\t%d K", TotalRam / 1024);
+		snprintf(mem_buffer, sizeof(mem_buffer),"Total RAM:\t%d K", TotalRam / 1024);
 		gr_string( 20, 230 + (i*10), mem_buffer);
 #endif	// _WIN32
 	}
@@ -3541,7 +3541,7 @@ DCF(gamma,"Sets Gamma factor")
 		gr_set_gamma(FreeSpace_gamma);
 
 		char tmp_gamma_string[32];
-		sprintf( tmp_gamma_string, NOX("%.2f"), FreeSpace_gamma );
+		snprintf( tmp_gamma_string, sizeof(tmp_gamma_string), NOX("%.2f"), FreeSpace_gamma );
 		os_config_write_string( NULL, NOX("Gamma"), tmp_gamma_string );
 	}
 
@@ -3980,13 +3980,9 @@ void game_init()
 	ai_profiles_init();		// Goober5000
 	ship_init();						// read in ships.tbl	
 
-	printf("player_init\n");
-	wiipause();
 	player_init();	
 	mission_campaign_init();		// load in the default campaign	
 	
-	
-	printf("anim_init\n");
 	anim_init();
 	context_help_init();			
 	techroom_intel_init();			// parse species.tbl, load intel info  
@@ -4042,9 +4038,6 @@ void game_init()
 	mprintf(("cfile_init() took %d\n", e1 - s1));
 	// mprintf(("1000 cfopens() took %d\n", e2 - s2));	
 	Script_system.RunBytecode(Script_gameinithook);
-	
-	printf("Ready...\n");
-	wiipause();
 }
 
 char transfer_text[128];
@@ -4177,25 +4170,25 @@ void game_show_framerate()
 
 		// on win2k+, it should be == -1 if >4gig (indicates wrap around)
 		if ( ((int)Mem_starttime_phys == -1) || ((int)mem_stats.dwAvailPhys == -1) )
-			sprintf(mem_buffer, "Using Physical: *** (>4G)");
+			snprintf(mem_buffer, sizeof(mem_buffer), "Using Physical: *** (>4G)");
 		else
-			sprintf(mem_buffer,"Using Physical: %d Meg",(Mem_starttime_phys - mem_stats.dwAvailPhys)/1024/1024);
+			snprintf(mem_buffer, sizeof(mem_buffer), "Using Physical: %d Meg",(Mem_starttime_phys - mem_stats.dwAvailPhys)/1024/1024);
 
 		gr_string( 20, 120, mem_buffer);
-		sprintf(mem_buffer,"Using Pagefile: %d Meg",(Mem_starttime_pagefile - mem_stats.dwAvailPageFile)/1024/1024);
+		snprintf(mem_buffer,sizeof(mem_buffer),"Using Pagefile: %d Meg",(Mem_starttime_pagefile - mem_stats.dwAvailPageFile)/1024/1024);
 		gr_string( 20, 130, mem_buffer);
-		sprintf(mem_buffer,"Using Virtual:  %d Meg",(Mem_starttime_virtual - mem_stats.dwAvailVirtual)/1024/1024);
+		snprintf(mem_buffer,sizeof(mem_buffer), "Using Virtual:  %d Meg",(Mem_starttime_virtual - mem_stats.dwAvailVirtual)/1024/1024);
 		gr_string( 20, 140, mem_buffer);
 
 		if ( ((int)mem_stats.dwAvailPhys == -1) || ((int)mem_stats.dwTotalPhys == -1) )
-			sprintf(mem_buffer, "Physical Free: *** / *** (>4G)");
+			snprintf(mem_buffer,sizeof(mem_buffer),  "Physical Free: *** / *** (>4G)");
 		else
-			sprintf(mem_buffer,"Physical Free: %d / %d Meg",mem_stats.dwAvailPhys/1024/1024, mem_stats.dwTotalPhys/1024/1024);
+			snprintf(mem_buffer,sizeof(mem_buffer), "Physical Free: %d / %d Meg",mem_stats.dwAvailPhys/1024/1024, mem_stats.dwTotalPhys/1024/1024);
 
 		gr_string( 20, 160, mem_buffer);
-		sprintf(mem_buffer,"Pagefile Free: %d / %d Meg",mem_stats.dwAvailPageFile/1024/1024, mem_stats.dwTotalPageFile/1024/1024);
+		snprintf(mem_buffer,sizeof(mem_buffer), "Pagefile Free: %d / %d Meg",mem_stats.dwAvailPageFile/1024/1024, mem_stats.dwTotalPageFile/1024/1024);
 		gr_string( 20, 170, mem_buffer);
-		sprintf(mem_buffer,"Virtual Free:  %d / %d Meg",mem_stats.dwAvailVirtual/1024/1024, mem_stats.dwTotalVirtual/1024/1024);
+		snprintf(mem_buffer,sizeof(mem_buffer), "Virtual Free:  %d / %d Meg",mem_stats.dwAvailVirtual/1024/1024, mem_stats.dwTotalVirtual/1024/1024);
 		gr_string( 20, 180, mem_buffer);
 	}
 #endif
@@ -4343,11 +4336,11 @@ void game_show_framerate()
 			else
 				short_name++;
 
-			sprintf(mem_buffer,"%s:\t%d K", short_name, size);
+			snprintf(mem_buffer,sizeof(mem_buffer), "%s:\t%d K", short_name, size);
 			gr_string( 20, 220 + (mi*10), mem_buffer);
 		}
 
-		sprintf(mem_buffer,"Total RAM:\t%d K", TotalRam / 1024);
+		snprintf(mem_buffer,sizeof(mem_buffer), "Total RAM:\t%d K", TotalRam / 1024);
 		gr_string( 20, 230 + (mi*10), mem_buffer);
 	}
 #endif
@@ -5898,7 +5891,7 @@ void game_flip_page_and_time_it()
 	t2 = timer_get_fixed_seconds();
 	d = t2 - t1;
 	t = (gr_screen.max_w*gr_screen.max_h*gr_screen.bytes_per_pixel)/1024;
-	sprintf( transfer_text, NOX("%d MB/s"), (int)fixmuldiv(t,65,d) );
+	snprintf( transfer_text, sizeof(transfer_text), NOX("%d MB/s"), (int)fixmuldiv(t,65,d) );
 }
 
 void game_simulation_frame()
@@ -7148,7 +7141,7 @@ int game_poll()
 
 				// we could probably go with .3 here for 1,000 shots but people really need to clean out
 				// their directories better than that so it's 100 for now.
-				sprintf( tmp_name, NOX("screen%.4i"), counter );
+				snprintf( tmp_name, sizeof(tmp_name), NOX("screen%.4i"), counter );
 				counter++;
 
 				// we've got two character precision so we can only have 100 shots at a time, reset if needed
@@ -8883,7 +8876,7 @@ int game_do_ram_check(uint ram_in_bytes)
 
 		if ( allowed_to_run ) {
 
-			sprintf( tmp, XSTR( "FreeSpace has detected that you only have %dMB of free memory.\n\nFreeSpace requires at least 32MB of memory to run.  If you think you have more than %dMB of physical memory, ensure that you aren't running SmartDrive (SMARTDRV.EXE).  Any memory allocated to SmartDrive is not usable by applications\n\nPress 'OK' to continue running with less than the minimum required memory\n", 193), FreeSpace_total_ram_MB, FreeSpace_total_ram_MB);
+			snprintf( tmp, sizeof(tmp), XSTR( "FreeSpace has detected that you only have %dMB of free memory.\n\nFreeSpace requires at least 32MB of memory to run.  If you think you have more than %dMB of physical memory, ensure that you aren't running SmartDrive (SMARTDRV.EXE).  Any memory allocated to SmartDrive is not usable by applications\n\nPress 'OK' to continue running with less than the minimum required memory\n", 193), FreeSpace_total_ram_MB, FreeSpace_total_ram_MB);
 
 			int msgbox_rval;
 			msgbox_rval = MessageBox( NULL, tmp, XSTR( "Not Enough RAM", 194), MB_OKCANCEL );
@@ -8892,7 +8885,7 @@ int game_do_ram_check(uint ram_in_bytes)
 			}
 
 		} else {
-			sprintf( tmp, XSTR( "FreeSpace has detected that you only have %dMB of free memory.\n\nFreeSpace requires at least 32MB of memory to run.  If you think you have more than %dMB of physical memory, ensure that you aren't running SmartDrive (SMARTDRV.EXE).  Any memory allocated to SmartDrive is not usable by applications\n", 195), FreeSpace_total_ram_MB, FreeSpace_total_ram_MB);
+			snprintf( tmp, sizeof(tmp), XSTR( "FreeSpace has detected that you only have %dMB of free memory.\n\nFreeSpace requires at least 32MB of memory to run.  If you think you have more than %dMB of physical memory, ensure that you aren't running SmartDrive (SMARTDRV.EXE).  Any memory allocated to SmartDrive is not usable by applications\n", 195), FreeSpace_total_ram_MB, FreeSpace_total_ram_MB);
 			MessageBox( NULL, tmp, XSTR( "Not Enough RAM", 194), MB_OK );
 			return -1;
 		}
@@ -8965,7 +8958,7 @@ void game_spew_pof_info_sub(int model_num, polymodel *pm, int sm, CFILE *out, in
 	}
 	
 	// write out total
-	sprintf(str, "Submodel %s total : %d faces\n", pm->submodel[sm].name, total);
+	snprintf(str, sizeof(str), "Submodel %s total : %d faces\n", pm->submodel[sm].name, total);
 	cfputs(str, out);		
 
 	*out_total += total + sub_total;
@@ -8998,7 +8991,7 @@ void game_spew_pof_info()
 	}	
 	counted = 0;	
 	for(idx=0; idx<num_files; idx++, counted++){
-		sprintf(str, "%s.pof", pof_list[idx]);
+		snprintf(str, sizeof(str), "%s.pof", pof_list[idx]);
 		model_num = model_load(str, 0, NULL);
 		if(model_num >= 0){
 			pm = model_get(model_num);
@@ -9016,16 +9009,16 @@ void game_spew_pof_info()
 					total = submodel_get_num_polys(model_num, i);					
 					
 					model_total += total;
-					sprintf(str, "Submodel %s total : %d faces\n", pm->submodel[i].name, total);
+					snprintf(str, sizeof(str), "Submodel %s total : %d faces\n", pm->submodel[i].name, total);
 					cfputs(str, out);
 				}				
-				sprintf(str, "Model total %d\n", model_total);				
+				snprintf(str, sizeof(str), "Model total %d\n", model_total);				
 				cfputs(str, out);				
 
 				// now go through and do it by LOD
 				cfputs("BY LOD\n\n", out);				
 				for(i=0; i<pm->n_detail_levels; i++){
-					sprintf(str, "LOD %d\n", i);
+					snprintf(str, sizeof(str), "LOD %d\n", i);
 					cfputs(str, out);
 
 					// submodels
@@ -9036,14 +9029,14 @@ void game_spew_pof_info()
 						game_spew_pof_info_sub(model_num, pm, j, out, &total, &destroyed_total);
 					}
 
-					sprintf(str, "Submodel %s total : %d faces\n", pm->submodel[pm->detail[i]].name, root_total);
+					snprintf(str, sizeof(str), "Submodel %s total : %d faces\n", pm->submodel[pm->detail[i]].name, root_total);
 					cfputs(str, out);
 
-					sprintf(str, "TOTAL: %d\n", total + root_total);					
+					snprintf(str, sizeof(str), "TOTAL: %d\n", total + root_total);					
 					cfputs(str, out);
-					sprintf(str, "TOTAL not counting destroyed faces %d\n", (total + root_total) - destroyed_total);
+					snprintf(str, sizeof(str), "TOTAL not counting destroyed faces %d\n", (total + root_total) - destroyed_total);
 					cfputs(str, out);
-					sprintf(str, "TOTAL destroyed faces %d\n\n", destroyed_total);
+					snprintf(str, sizeof(str), "TOTAL destroyed faces %d\n\n", destroyed_total);
 					cfputs(str, out);
 				}				
 				cfputs("------------------------------------------------------------------------\n\n", out);				
@@ -9821,7 +9814,7 @@ void game_show_event_debug(float frametime)
 		z = Event_debug_index[k];
 		if (z & EVENT_DEBUG_EVENT) {
 			z &= 0x7fff;
-			sprintf(buf, NOX("%s%s (%s) %s%d %d"), (Mission_events[z].flags & MEF_CURRENT) ? NOX("* ") : "",
+			snprintf(buf, sizeof(buf), NOX("%s%s (%s) %s%d %d"), (Mission_events[z].flags & MEF_CURRENT) ? NOX("* ") : "",
 				Mission_events[z].name, Mission_events[z].result ? NOX("True") : NOX("False"),
 				(Mission_events[z].chain_delay < 0) ? "" : NOX("x "),
 				Mission_events[z].repeat_count, Mission_events[z].interval);
@@ -10067,7 +10060,7 @@ void game_feature_disabled_popup()
 }
 
 // format the specified time (fixed point) into a nice string
-void game_format_time(fix m_time,char *time_str)
+void game_format_time(fix m_time,char *time_str, size_t time_str_size)
 {
 	float mtime;
 	int hours,minutes,seconds;
@@ -10085,7 +10078,7 @@ void game_format_time(fix m_time,char *time_str)
 
 	// print the hour if necessary
 	if(hours > 0){		
-		sprintf(time_str,XSTR( "%d:", 201),hours);
+		snprintf(time_str, time_str_size,XSTR( "%d:", 201),hours);
 		// if there are less than 10 minutes, print a leading 0
 		if(minutes < 10){
 			strcpy(tmp,NOX("0"));
@@ -10095,10 +10088,10 @@ void game_format_time(fix m_time,char *time_str)
 	
 	// print the minutes
 	if(hours){
-		sprintf(tmp,XSTR( "%d:", 201),minutes);
+		snprintf(tmp, sizeof(tmp), XSTR( "%d:", 201),minutes);
 		strcat(time_str,tmp);
 	} else {
-		sprintf(time_str,XSTR( "%d:", 201),minutes);
+		snprintf(time_str, time_str_size,XSTR( "%d:", 201),minutes);
 	}
 
 	// print the seconds
@@ -10106,7 +10099,7 @@ void game_format_time(fix m_time,char *time_str)
 		strcpy(tmp,NOX("0"));
 		strcat(time_str,tmp);
 	} 
-	sprintf(tmp,"%d",seconds);
+	snprintf(tmp, sizeof(tmp),"%d",seconds);
 	strcat(time_str,tmp);
 }
 
@@ -10117,9 +10110,9 @@ void get_version_string(char *str, int max_size)
 	Assert( max_size > 6 );
 
 	if ( FS_VERSION_BUILD == 0 ) {
-		sprintf(str,"FreeSpace 2 Open v%d.%d", FS_VERSION_MAJOR, FS_VERSION_MINOR);
+		snprintf(str, sizeof(max_size), "FreeSpace 2 Open v%d.%d", FS_VERSION_MAJOR, FS_VERSION_MINOR);
 	} else {
-		sprintf(str,"FreeSpace 2 Open v%d.%d.%d", FS_VERSION_MAJOR, FS_VERSION_MINOR, FS_VERSION_BUILD );
+		snprintf(str, sizeof(max_size), "FreeSpace 2 Open v%d.%d.%d", FS_VERSION_MAJOR, FS_VERSION_MINOR, FS_VERSION_BUILD );
 	}
 
 	/*
@@ -10197,9 +10190,9 @@ void get_version_string(char *str, int max_size)
 	*/
 }
 
-void get_version_string_short(char *str)
+void get_version_string_short(char *str, size_t size)
 {
-	sprintf(str,"v%d.%d", FS_VERSION_MAJOR, FS_VERSION_MINOR);
+	snprintf(str, size, "v%d.%d", FS_VERSION_MAJOR, FS_VERSION_MINOR);
 }
 
 // ----------------------------------------------------------------
@@ -10777,7 +10770,7 @@ int set_cdrom_path(int drive_num)
 		rval = 0;
 //		#endif
 	} else {
-		sprintf(Game_CDROM_dir,NOX("%c:\\"), 'a' + drive_num );			//set directory
+		snprintf(Game_CDROM_dir,sizeof(Game_CDROM_dir),NOX("%c:\\"), 'a' + drive_num );			//set directory
 		rval = 1;
 	}
 

@@ -1099,7 +1099,7 @@ void debug_change_song(int delta)
 {
 	char buf[256];
 	if ( event_music_next_soundtrack(delta) != -1 ) {
-		event_music_get_soundtrack_name(buf);
+		event_music_get_soundtrack_name(buf, sizeof(buf));
 		HUD_sourced_printf(HUD_SOURCE_HIDDEN, XSTR( "Soundtrack changed to: %s", 2), buf);
 
 	} else {
@@ -1712,7 +1712,7 @@ void process_debug_keys(int k)
 					
 		case KEY_DEBUGGED + KEY_T: {
 			char buf[256];
-			event_music_get_info(buf);
+			event_music_get_info(buf, sizeof(buf));
 			HUD_sourced_printf(HUD_SOURCE_HIDDEN, buf);
 			break;
 		}
@@ -2133,7 +2133,7 @@ void game_process_cheats(int k)
 			// create a name for the ship.  use "Volition Bravos #".  look for collisions until one isn't found anymore
 			ship_idx = 1;
 			do {
-				sprintf(name, NOX("Volition Bravos %d"), ship_idx);
+				snprintf(name, sizeof(name), NOX("Volition Bravos %d"), ship_idx);
 				if ( (ship_name_lookup(name) == -1) && (ship_find_exited_ship_by_name(name) == -1) )
 				{
 					strcpy(shipp->ship_name, name);

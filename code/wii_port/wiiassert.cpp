@@ -10,7 +10,6 @@
 static void *exception_xfb = (void*)0xC1710000;			//we use a static address above ArenaHi.
 extern "C" void __console_init(void *framebuffer,int xstart,int ystart,int xres,int yres,int stride);
 
-
 extern "C" void WiiAssert(const char * text,const char *filename, int line)
 {
 	LWP_Reschedule(LWP_PRIO_IDLE);
@@ -100,4 +99,17 @@ extern "C" void pause_exit(int code,const char *filename, int line)
 		
 		VIDEO_WaitVSync();
 	}	
+}
+
+
+long __stack_chk_guard[8] = {0,0,0,0,0,0,0,0};
+extern "C" void __stack_chk_fail(void);
+
+extern "C" void __stack_chk_fail(void)
+{
+	char *p = 0x0;
+	printf("Stack failure!");
+	wiipause();
+	*p = 1;
+	
 }

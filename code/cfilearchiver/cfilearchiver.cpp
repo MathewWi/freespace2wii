@@ -179,7 +179,7 @@ void pack_file( char *filespec, char *filename, int filesize, _fs_time_t time_wr
 
 	printf( "Packing %s%s%s...", filespec, DIR_SEPARATOR_STR, filename );
 
-	sprintf( path, "%s%s%s", filespec, DIR_SEPARATOR_STR, filename );
+	snprintf( path, sizeof(path), "%s%s%s", filespec, DIR_SEPARATOR_STR, filename );
 
 
 	FILE *fp = fopen( path, "rb" );

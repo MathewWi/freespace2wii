@@ -2089,9 +2089,9 @@ void cfile_spew_pack_file_crcs()
 	time_t my_time;
 	
 #ifdef SCP_UNIX
-	sprintf(out_path, "%s%svp_crcs.txt", Cfile_user_dir, DIR_SEPARATOR_STR);
+	snprintf(out_path, sizeof(out_path), "%s%svp_crcs.txt", Cfile_user_dir, DIR_SEPARATOR_STR);
 #else
-	sprintf(out_path, "%s%svp_crcs.txt", Cfile_root_dir, DIR_SEPARATOR_STR);
+	snprintf(out_path, sizeof(out_path), "%s%svp_crcs.txt", Cfile_root_dir, DIR_SEPARATOR_STR);
 #endif
 
 	FILE *out = fopen(out_path, "w");

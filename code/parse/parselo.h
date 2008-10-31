@@ -600,7 +600,7 @@ extern int strextcmp(const char *s1, const char *s2);
 extern void backspace(char *src);
 
 // Goober5000 - prints a properly comma-separated integer to a string
-extern void format_integer_with_commas(char *buf, int integer, bool use_comma_with_four_digits);
+extern void format_integer_with_commas(char *buf, size_t bufsize, int integer, bool use_comma_with_four_digits);
 
 inline void parse_advance(int s){Mp+=s;}
 

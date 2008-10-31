@@ -36,11 +36,11 @@ INCLUDES	:=  ../../setup/SDL-Port/include . ../lua ../libjpeg/ ../openal/include
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -g -save-temps -Os $(MACHDEP) $(INCLUDE) -DSCP_WII -DUSE_OPENAL -DSCP_UNIX -D_POSIX_SOURCE -DNO_DIRECT3D \
-		-D_POSIX_TIMERS 
+CFLAGS	= -Wall -g -save-temps -Os $(MACHDEP) $(INCLUDE) -DSCP_WII -DUSE_OPENAL -DSCP_UNIX -D_POSIX_SOURCE -DNO_DIRECT3D \
+		-D_POSIX_TIMERS -fstack-protector-all -fbounds-check -fstack-limit-symbol=__stack_end -Wstack-protector
 CXXFLAGS	=	$(CFLAGS)
 
-LDFLAGS	= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
+LDFLAGS	= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map -fstack-protector-all -fbounds-check -fstack-limit-symbol=__stack_end
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project

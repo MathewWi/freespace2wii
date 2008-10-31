@@ -917,7 +917,7 @@ camid cam_create(char *n_name, vec3d *n_pos, matrix *n_ori, object *n_object, in
 	//Get name
 	char buf[NAME_LENGTH] = {'\0'};
 	if(n_name == NULL)
-		sprintf(buf, "Camera %d", cid.getSignature());
+		snprintf(buf, sizeof(buf), "Camera %d", cid.getSignature());
 	else
 		strncpy(buf, n_name, NAME_LENGTH-1);
 

@@ -831,15 +831,15 @@ void multi_pinfo_build_stats()
 		}
 	}	
 	*/
-	sprintf(Multi_pinfo_stats_vals[MPI_FIGHTER_KILLS], "%d", sc->kill_count);
+	snprintf(Multi_pinfo_stats_vals[MPI_FIGHTER_KILLS], MAX_LABEL_TEXT, "%d", sc->kill_count);
 	
 	// sprintf(Multi_pinfo_stats_vals[MPI_OTHER_KILLS],"%d",other_kills);
 
 	// missions flown
-	sprintf(Multi_pinfo_stats_vals[MPI_MISSIONS_FLOWN],"%d",(int)sc->missions_flown);
+	snprintf(Multi_pinfo_stats_vals[MPI_MISSIONS_FLOWN], MAX_LABEL_TEXT,"%d",(int)sc->missions_flown);
 
 	// flight time		
-	game_format_time(fl2f((float)sc->flight_time),Multi_pinfo_stats_vals[MPI_FLIGHT_TIME]);		
+	game_format_time(fl2f((float)sc->flight_time),Multi_pinfo_stats_vals[MPI_FLIGHT_TIME], MAX_LABEL_TEXT);		
 
 	// last flown	
 	if(sc->last_flown == 0){
@@ -858,28 +858,28 @@ void multi_pinfo_build_stats()
 	strcpy(Multi_pinfo_stats_vals[MPI_RANK],Ranks[sc->rank].name);
 
 	// primary shots fired
-	sprintf(Multi_pinfo_stats_vals[MPI_PSHOTS_FIRED],"%d",sc->p_shots_fired);
+	snprintf(Multi_pinfo_stats_vals[MPI_PSHOTS_FIRED], MAX_LABEL_TEXT,"%d",sc->p_shots_fired);
 
 	// primary shots hit
 	// sprintf(Multi_pinfo_stats_vals[MPI_PSHOTS_HIT],"%d",sc->p_shots_hit);
 	
 	// primary hit pct
 	if (sc->p_shots_fired > 0) {
-		sprintf(Multi_pinfo_stats_vals[MPI_PSHOTS_PCT], "%d%%", (int)(100.0f * ((float)sc->p_shots_hit / (float)sc->p_shots_fired)));
+		snprintf(Multi_pinfo_stats_vals[MPI_PSHOTS_PCT], MAX_LABEL_TEXT, "%d%%", (int)(100.0f * ((float)sc->p_shots_hit / (float)sc->p_shots_fired)));
 	} else {
-		sprintf(Multi_pinfo_stats_vals[MPI_PSHOTS_PCT], "%d%%", 0);
+		snprintf(Multi_pinfo_stats_vals[MPI_PSHOTS_PCT], MAX_LABEL_TEXT, "%d%%", 0);
 	}
 	// primary shots fired
-	sprintf(Multi_pinfo_stats_vals[MPI_SSHOTS_FIRED],"%d",sc->s_shots_fired);
+	snprintf(Multi_pinfo_stats_vals[MPI_SSHOTS_FIRED], MAX_LABEL_TEXT,"%d",sc->s_shots_fired);
 
 	// primary shots hit
 	// sprintf(Multi_pinfo_stats_vals[MPI_SSHOTS_HIT],"%d",sc->s_shots_hit);
 	
 	// primary hit pct
 	if (sc->s_shots_fired > 0) {
-		sprintf(Multi_pinfo_stats_vals[MPI_SSHOTS_PCT], "%d%%", (int)(100.0f * ((float)sc->s_shots_hit / (float)sc->s_shots_fired)));
+		snprintf(Multi_pinfo_stats_vals[MPI_SSHOTS_PCT], MAX_LABEL_TEXT, "%d%%", (int)(100.0f * ((float)sc->s_shots_hit / (float)sc->s_shots_fired)));
 	} else {
-		sprintf(Multi_pinfo_stats_vals[MPI_SSHOTS_PCT], "%d%%", 0);
+		snprintf(Multi_pinfo_stats_vals[MPI_SSHOTS_PCT], MAX_LABEL_TEXT, "%d%%", 0);
 	}
 }
 

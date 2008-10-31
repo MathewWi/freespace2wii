@@ -758,7 +758,7 @@ void fireball_parse_tbl()
 	// fill in extra LOD filenames
 	for (i = 0; i < Num_fireball_types; i++) {
 		for (j = 1; j < Fireball_info[i].lod_count; j++) {
-			sprintf( Fireball_info[i].lod[j].filename, "%s_%d", Fireball_info[i].lod[0].filename, j);
+			snprintf( Fireball_info[i].lod[j].filename, sizeof(Fireball_info[i].lod[j].filename), "%s_%d", Fireball_info[i].lod[0].filename, j);
 		}
 	}
 

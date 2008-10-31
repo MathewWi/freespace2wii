@@ -1482,14 +1482,14 @@ int debrief_find_persona_index()
 // Goober5000
 // V sez: "defaults to number 9 (Petrarch) for non-volition missions
 // this is an ugly, nasty, hateful way of doing this, but it saves us changing the missions at this point"
-void debrief_choose_voice(char *voice_dest, char *voice_base, int default_to_base = 0)
+void debrief_choose_voice(char *voice_dest, size_t dest_size, char *voice_base, int default_to_base = 0)
 {
 	// see if we have a persona
 	int persona_index = debrief_find_persona_index();
 	if (persona_index >= 0)
 	{
 		// get voice file
-		sprintf(voice_dest, NOX("%d_%s"), persona_index, voice_base);
+		snprintf(voice_dest, dest_size, NOX("%d_%s"), persona_index, voice_base);
 
 		// if it exists, we're done
 		if (cf_exists_full(voice_dest, CF_TYPE_VOICE_DEBRIEFINGS))
@@ -1535,13 +1535,13 @@ void debrief_award_init()
 			} else {
 				ver = 0;
 			}
-			sprintf(buf, NOX("%s%.2d"), Debrief_award_filename[gr_screen.res][DB_AWARD_WINGS], ver);	
+			snprintf(buf, sizeof(buf), NOX("%s%.2d"), Debrief_award_filename[gr_screen.res][DB_AWARD_WINGS], ver);	
 			Wings_bitmap = bm_load(buf);
 
 		} else if (Player->stats.m_medal_earned == 17) {  // special hack for the soc crest
 			Crest_bitmap = bm_load(Debrief_award_filename[gr_screen.res][DB_AWARD_SOC]);
 		} else {
-			sprintf(buf, NOX("%s%.2d"), Debrief_award_filename[gr_screen.res][DB_AWARD_MEDAL], Player->stats.m_medal_earned);
+			snprintf(buf, sizeof(buf), NOX("%s%.2d"), Debrief_award_filename[gr_screen.res][DB_AWARD_MEDAL], Player->stats.m_medal_earned);
 			Medal_bitmap = bm_load(buf);
 		}
 
@@ -1551,14 +1551,14 @@ void debrief_award_init()
 	// handle promotions
 	if ( Player->stats.m_promotion_earned != -1 ) {
 		Promoted = Player->stats.m_promotion_earned;
-		sprintf(buf, NOX("%s%.2d"), Debrief_award_filename[gr_screen.res][DB_AWARD_RANK], Promoted + 1);
+		snprintf(buf, sizeof(buf), NOX("%s%.2d"), Debrief_award_filename[gr_screen.res][DB_AWARD_RANK], Promoted + 1);
 		Rank_bitmap = bm_load(buf);
 
 		Promotion_stage.new_text = Ranks[Promoted].promotion_text;
 		Promotion_stage.new_recommendation_text = NULL;
 
 		// choose appropriate promotion voice for this mission
-		debrief_choose_voice(Promotion_stage.voice, Ranks[Promoted].promotion_voice_base);
+		debrief_choose_voice(Promotion_stage.voice, sizeof(Promotion_stage.voice), Ranks[Promoted].promotion_voice_base);
 
 		debrief_add_award_text(Ranks[Promoted].name);
 	}
@@ -1567,14 +1567,14 @@ void debrief_award_init()
 	// only grant badge if earned and allowed.  (no_promotion really means no promotion and no badges)
 	if ( Player->stats.m_badge_earned != -1 ) {
 		i = Player->stats.m_badge_earned;
-		sprintf(buf, NOX("%s%.2d"), Debrief_award_filename[gr_screen.res][DB_AWARD_BADGE], Medals[i].badge_num + 1);
+		snprintf(buf, sizeof(buf), NOX("%s%.2d"), Debrief_award_filename[gr_screen.res][DB_AWARD_BADGE], Medals[i].badge_num + 1);
 		Badge_bitmap = bm_load(buf);
 
 		Badge_stage.new_text = Medals[i].promotion_text;
 		Badge_stage.new_recommendation_text = NULL;
 
 		// choose appropriate voice
-		debrief_choose_voice(Badge_stage.voice, Medals[Player->stats.m_badge_earned].voice_base);
+		debrief_choose_voice(Badge_stage.voice, sizeof(Badge_stage.voice), Medals[Player->stats.m_badge_earned].voice_base);
 
 		debrief_add_award_text(Medals[i].name);
 	}
@@ -1640,7 +1640,7 @@ void debrief_traitor_init()
 //		}
 
 		// Goober5000
-		debrief_choose_voice(stagep->voice, traitor_voice_file, 1);
+		debrief_choose_voice(stagep->voice, MAX_FILENAME_LEN,  traitor_voice_file, 1);
 
 		required_string("$Recommendation text:");
 		if ( Fred_running )	{
@@ -2042,7 +2042,7 @@ void debrief_render_stagenum()
 	if (Num_stages < 2)
 		return;
 		
-	sprintf(buf, XSTR( "%d of %d", 445), Current_stage + 1, Num_stages);
+	snprintf(buf, sizeof(buf), XSTR( "%d of %d", 445), Current_stage + 1, Num_stages);
 	gr_get_string_size(&w, NULL, buf);
 	gr_set_color_fast(&Color_bright_blue);
 	gr_string(Debrief_stage_info_coords[gr_screen.res][0] - w, Debrief_stage_info_coords[gr_screen.res][1], buf);
@@ -2054,7 +2054,7 @@ void debrief_render_mission_time(int y_loc)
 {
 	char time_str[30];
 	
-	game_format_time(Missiontime, time_str);
+	game_format_time(Missiontime, time_str, sizeof(time_str));
 	gr_string(0, y_loc, XSTR( "Mission Time", 446));
 	gr_string(Debrief_text_x2[gr_screen.res], y_loc, time_str);	
 }
@@ -2923,7 +2923,7 @@ void debrief_add_award_text(char *str)
 	if (Debrief_award_text_num_lines < AWARD_TEXT_MAX_LINES) {
 		line2 = split_str_once(Debrief_award_text[Debrief_award_text_num_lines-1], field_width);
 		if (line2 != NULL) {
-			sprintf(Debrief_award_text[Debrief_award_text_num_lines], " %s", line2);  // indent a space
+			snprintf(Debrief_award_text[Debrief_award_text_num_lines], AWARD_TEXT_MAX_LINE_LENGTH, " %s", line2);  // indent a space
 		}
 		Debrief_award_text_num_lines++;		// leave blank line even if it all fits into 1
 	}

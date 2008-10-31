@@ -1477,7 +1477,7 @@ void os_validate_parms(char *cmdline)
 #ifdef _WIN32
 				// Changed this to MessageBox, this is a user error not a developer
 				char buffer[128];
-				sprintf(buffer,"Unrecogzined command line parameter %s, continue?",token);
+				snprintf(buffer,sizeof(buffer),"Unrecogzined command line parameter %s, continue?",token);
 				if( MessageBox(NULL, buffer, "Warning", MB_OKCANCEL | MB_ICONQUESTION) == IDCANCEL)
 					exit(0);
 #elif defined(APPLE_APP)
@@ -1485,7 +1485,7 @@ void os_validate_parms(char *cmdline)
 				char buffer[128];
 				CFOptionFlags result;
 
-				snprintf(buffer, 128, "Unrecognized command line parameter, \"%s\", continue?", token);
+				snprintf(buffer, sizeof(buffer), "Unrecognized command line parameter, \"%s\", continue?", token);
 				message = CFStringCreateWithCString(NULL, buffer, kCFStringEncodingASCII);
 
 				if ( CFUserNotificationDisplayAlert(0, kCFUserNotificationPlainAlertLevel, NULL, NULL, NULL, CFSTR("Unknown Command"), message, NULL, CFSTR("Quit"), NULL, &result) )

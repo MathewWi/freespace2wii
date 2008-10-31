@@ -50,7 +50,7 @@ BOOL BackgroundChooser::OnInitDialog()
 	for (i = 0; i < m_numBackgrounds; i++) 
 	{
 		char temp[NAME_LENGTH];
-		sprintf(temp, "Background %d", i + 1);
+		snprintf(temp, sizeof(temp), "Background %d", i + 1);
 
 		((CComboBox*) GetDlgItem(IDC_BACKGROUND))->AddString(temp);
 	}

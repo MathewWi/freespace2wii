@@ -573,7 +573,7 @@ void briefing_editor_dlg::update_data(int update)
 							char msg[1024];
 
 							valid = 0;
-							sprintf(msg, "Icon ID #%d is already used in a later stage.  You can only\n"
+							snprintf(msg, sizeof(msg), "Icon ID #%d is already used in a later stage.  You can only\n"
 								"change to that ID locally.  Icon ID has been reset back to %d", m_id, ptr->icons[m_last_icon].id);
 
 							m_id = ptr->icons[m_last_icon].id;
@@ -587,7 +587,7 @@ void briefing_editor_dlg::update_data(int update)
 					if ((i != m_last_icon) && (ptr->icons[i].id == m_id)) {
 						char msg[1024];
 
-						sprintf(msg, "Icon ID #%d is already used in this stage.  Icon ID has been reset back to %d",
+						snprintf(msg, sizeof(msg), "Icon ID #%d is already used in this stage.  Icon ID has been reset back to %d",
 							m_id, ptr->icons[m_last_icon].id);
 
 						m_id = ptr->icons[m_last_icon].id;

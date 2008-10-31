@@ -279,7 +279,7 @@ char* NavPoint::GetInteralName()
 		strcpy(NavName, ((waypoint_list*)target_obj)->name);
 
 		strcat(NavName, ":");
-		sprintf(strtmp, "%d", waypoint_num);
+		snprintf(strtmp, sizeof(strtmp), "%d", waypoint_num);
 		strcat(NavName, strtmp);
 	}
 	else
