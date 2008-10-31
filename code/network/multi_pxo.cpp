@@ -771,7 +771,7 @@ DCF(players, "")
 	// add a bunch of bogus players
 	dc_get_arg(ARG_INT);
 	for(int idx=0; idx<Dc_arg_int; idx++){
-		sprintf(name, "player %d", idx);
+		snprintf(name, sizeof(name), "player %d", idx);
 		multi_pxo_add_player(name);
 	}
 }
@@ -1199,7 +1199,8 @@ char *Multi_pxo_pinfo_stats_labels[MULTI_PXO_PINFO_NUM_LABELS];
 */
 //XSTR:ON
 
-char Multi_pxo_pinfo_vals[MULTI_PXO_PINFO_NUM_LABELS][50];
+#define PXO_PINFO_SIZE 50
+char Multi_pxo_pinfo_vals[MULTI_PXO_PINFO_NUM_LABELS][PXO_PINFO_SIZE];
 
 int Multi_pxo_pinfo_stats_spacing[MULTI_PXO_PINFO_NUM_LABELS] = {
 	10,20,10,10,20,10,10,20,10,10,20,10,10,20,10,20,10,0
@@ -2117,8 +2118,8 @@ void multi_pxo_button_pressed(int n)
 			}
 			// if we didn't get stats for this guy.
 			else {
-				memset(stats,0,255);
-				sprintf(stats,XSTR("Could not get stats for %s\n(May not be a registered pilot)",946),Multi_pxo_player_select->name);
+				memset(stats,0,sizeof(stats));
+				snprintf(stats,sizeof(stats),XSTR("Could not get stats for %s\n(May not be a registered pilot)",946),Multi_pxo_player_select->name);
 				popup(PF_USE_AFFIRMATIVE_ICON,1,POPUP_OK,stats);
 			}
 		} else {
@@ -2163,11 +2164,11 @@ int multi_pxo_connect_do()
 
 		// build the tracker id string
 		memset(id_string, 0, 255);
-		sprintf(id_string, "%s %s", Multi_tracker_id_string, Player->callsign);
+		snprintf(id_string, sizeof(id_string), "%s %s", Multi_tracker_id_string, Player->callsign);
 
 		// build the ip string
 		memset(ip_string, 0, 255);
-		sprintf(ip_string, "%s:%d", Multi_options_g.pxo_ip, PXO_CHAT_PORT);
+		snprintf(ip_string, sizeof(ip_string), "%s:%d", Multi_options_g.pxo_ip, PXO_CHAT_PORT);
 
 		// connect to the server
 		ret_code = ConnectToChatServer(ip_string, Multi_pxo_nick, id_string);		
@@ -2363,8 +2364,8 @@ void multi_pxo_api_process()
 				multi_pxo_del_player(cmd->data);
 
 				// add a text message
-				memset(msg_str, 0, 512);
-				sprintf(msg_str, XSTR("*** %s has left", 950), cmd->data);			
+				memset(msg_str, 0, sizeof(msg_str));
+				snprintf(msg_str, sizeof(msg_str), XSTR("*** %s has left", 950), cmd->data);			
 				multi_pxo_chat_process_incoming(msg_str);
 
 				// decrease the player count
@@ -2834,15 +2835,15 @@ void multi_pxo_blit_channels()
 		}
 
 		// get the # of users on the channel
-		memset(chan_users, 0, 15);
-		sprintf(chan_users, "%d", moveup->num_users);
+		memset(chan_users, 0, sizeof(chan_users));
+		snprintf(chan_users, sizeof(chan_users), "%d", moveup->num_users);
 
 		// get the width of the user count string
 		gr_get_string_size(&user_w, NULL, chan_users);
 
 		// get the # of servers on the channel
-		memset(chan_servers,0,15);
-		sprintf(chan_servers, "%d", moveup->num_servers);
+		memset(chan_servers,0,sizeof(chan_servers));
+		snprintf(chan_servers,sizeof(chan_servers), "%d", moveup->num_servers);
 
 		// get the width of the user count string
 		gr_get_string_size(&server_w, NULL, chan_servers);
@@ -2946,12 +2947,12 @@ void multi_pxo_join_channel(pxo_channel *chan)
 		multi_pxo_clear_players();
 
 		// display a line of text indicating that we're switching channels
-		memset(switch_msg,0,256);
+		memset(switch_msg,0,sizeof(switch_msg));
 
 		if(strlen(Multi_pxo_channel_switch.name) > 1){
-			sprintf(switch_msg, "[Switching to channel %s]", Multi_pxo_channel_switch.name + 1);
+			snprintf(switch_msg,sizeof(switch_msg), "[Switching to channel %s]", Multi_pxo_channel_switch.name + 1);
 		} else {
-			sprintf(switch_msg, "[Switching to channel %s]", Multi_pxo_channel_switch.name);
+			snprintf(switch_msg,sizeof(switch_msg), "[Switching to channel %s]", Multi_pxo_channel_switch.name);
 		}
 
 		multi_pxo_chat_process_incoming(switch_msg, CHAT_MODE_CHANNEL_SWITCH);
@@ -3586,9 +3587,9 @@ void multi_pxo_chat_blit()
 	memset(title,0,15);
 	if(ON_CHANNEL()){
 		if(strlen(Multi_pxo_channel_current.name) > 1){
-			sprintf(title, XSTR("%s on %s", 955), Multi_pxo_nick, Multi_pxo_channel_current.name+1);  // [[ <who> on <channel> ]]
+			snprintf(title, sizeof(title), XSTR("%s on %s", 955), Multi_pxo_nick, Multi_pxo_channel_current.name+1);  // [[ <who> on <channel> ]]
 		} else {
-			sprintf(title, XSTR("%s on %s", 955), Multi_pxo_nick, Multi_pxo_channel_current.name);	  // [[ <who> on <channel> ]]
+			snprintf(title, sizeof(title), XSTR("%s on %s", 955), Multi_pxo_nick, Multi_pxo_channel_current.name);	  // [[ <who> on <channel> ]]
 		}
 	} else {
 		strcpy(title,XSTR("Parallax Online - No Channel", 956));
@@ -4498,8 +4499,8 @@ void multi_pxo_find_process_input()
 				GetChannelByUser(name_lookup);			
 
 				// set the top text
-				memset(search_text,0,512);
-				sprintf(search_text,XSTR("Searching for %s",963),name_lookup);
+				memset(search_text,0,sizeof(search_text));
+				snprintf(search_text,sizeof(search_text),XSTR("Searching for %s",963),name_lookup);
 				multi_pxo_com_set_top_text(search_text);
 			}
 			// clear everything
@@ -4539,7 +4540,7 @@ void multi_pxo_find_search_process()
 
 				// if this guy is on a public channel, display which one
 				if(channel[0] == '#'){			
-					sprintf(p_text,XSTR("Found %s on :",966),name_lookup);
+					snprintf(p_text,sizeof(p_text),XSTR("Found %s on :",966),name_lookup);
 
 					// display the results								
 					multi_pxo_com_set_middle_text(p_text);								
@@ -4554,7 +4555,7 @@ void multi_pxo_find_search_process()
 				}
 				// if this is a private channel
 				else if(channel[0] == '+'){
-					sprintf(p_text,XSTR("Found %s on a private channel",967),name_lookup);
+					snprintf(p_text,sizeof(p_text),XSTR("Found %s on a private channel",967),name_lookup);
 					multi_pxo_com_set_middle_text(p_text);
 
 					strcpy(Multi_pxo_find_channel,"");
@@ -4688,37 +4689,37 @@ void multi_pxo_pinfo_build_vals()
 	player *fs = &Multi_pxo_pinfo_player;	
 			
 	// pilot name
-	memset(Multi_pxo_pinfo_vals[0], 0, 50);
+	memset(Multi_pxo_pinfo_vals[0], 0, PXO_PINFO_SIZE);
 	strcpy(Multi_pxo_pinfo_vals[0], fs->callsign);
-	gr_force_fit_string(Multi_pxo_pinfo_vals[0], 49, Multi_pxo_pinfo_coords[gr_screen.res][2] - (Multi_pxo_pinfo_val_x[gr_screen.res] - Multi_pxo_pinfo_coords[gr_screen.res][0]));
+	gr_force_fit_string(Multi_pxo_pinfo_vals[0], PXO_PINFO_SIZE-1, Multi_pxo_pinfo_coords[gr_screen.res][2] - (Multi_pxo_pinfo_val_x[gr_screen.res] - Multi_pxo_pinfo_coords[gr_screen.res][0]));
 
 	// rank
-	memset(Multi_pxo_pinfo_vals[1], 0, 50);	
+	memset(Multi_pxo_pinfo_vals[1], 0, PXO_PINFO_SIZE);	
 	multi_sg_rank_build_name(Ranks[fs->stats.rank].name, Multi_pxo_pinfo_vals[1]);	
-	gr_force_fit_string(Multi_pxo_pinfo_vals[1], 49, Multi_pxo_pinfo_coords[gr_screen.res][2] - (Multi_pxo_pinfo_val_x[gr_screen.res] - Multi_pxo_pinfo_coords[gr_screen.res][0]));
+	gr_force_fit_string(Multi_pxo_pinfo_vals[1], PXO_PINFO_SIZE-1, Multi_pxo_pinfo_coords[gr_screen.res][2] - (Multi_pxo_pinfo_val_x[gr_screen.res] - Multi_pxo_pinfo_coords[gr_screen.res][0]));
 
 	// kills
-	memset(Multi_pxo_pinfo_vals[2], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[2], "%d", fs->stats.kill_count);
+	memset(Multi_pxo_pinfo_vals[2], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[2], PXO_PINFO_SIZE, "%d", fs->stats.kill_count);
 
 	// assists
-	memset(Multi_pxo_pinfo_vals[3], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[3], "%d", fs->stats.assists);
+	memset(Multi_pxo_pinfo_vals[3], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[3], PXO_PINFO_SIZE, "%d", fs->stats.assists);
 
 	// friendly kills
-	memset(Multi_pxo_pinfo_vals[4], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[4], "%d", fs->stats.kill_count - fs->stats.kill_count_ok);
+	memset(Multi_pxo_pinfo_vals[4], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[4], PXO_PINFO_SIZE, "%d", fs->stats.kill_count - fs->stats.kill_count_ok);
 
 	// missions flown
-	memset(Multi_pxo_pinfo_vals[5], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[5], "%d", (int)fs->stats.missions_flown);	
+	memset(Multi_pxo_pinfo_vals[5], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[5], PXO_PINFO_SIZE, "%d", (int)fs->stats.missions_flown);	
 
 	// flight time	
-	memset(Multi_pxo_pinfo_vals[6], 0, 50);
-	game_format_time( fl2f((float)fs->stats.flight_time), Multi_pxo_pinfo_vals[6] );	
+	memset(Multi_pxo_pinfo_vals[6], 0, PXO_PINFO_SIZE);
+	game_format_time( fl2f((float)fs->stats.flight_time), Multi_pxo_pinfo_vals[6], PXO_PINFO_SIZE);	
 
 	// last flown
-	memset(Multi_pxo_pinfo_vals[7], 0, 50);
+	memset(Multi_pxo_pinfo_vals[7], 0, PXO_PINFO_SIZE);
 	if (fs->stats.last_flown == 0) {		
 		strcpy (Multi_pxo_pinfo_vals[7], XSTR("No missions flown", 970) );
 	} else {
@@ -4731,57 +4732,57 @@ void multi_pxo_pinfo_build_vals()
 	}		
 
 	// primary shots fired
-	memset(Multi_pxo_pinfo_vals[8], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[8], "%d", (int)fs->stats.p_shots_fired);
+	memset(Multi_pxo_pinfo_vals[8], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[8], PXO_PINFO_SIZE, "%d", (int)fs->stats.p_shots_fired);
 
 	// primary shots hit
-	memset(Multi_pxo_pinfo_vals[9],0,50);
-	sprintf(Multi_pxo_pinfo_vals[9], "%d", (int)fs->stats.p_shots_hit);
+	memset(Multi_pxo_pinfo_vals[9],0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[9], PXO_PINFO_SIZE, "%d", (int)fs->stats.p_shots_hit);
 
 	// primary hit pct
-	memset(Multi_pxo_pinfo_vals[10], 0, 50);
+	memset(Multi_pxo_pinfo_vals[10], 0, PXO_PINFO_SIZE);
 	if (fs->stats.p_shots_fired > 0) {		
-		sprintf(Multi_pxo_pinfo_vals[10], "%d%%", (int)((float)fs->stats.p_shots_hit / (float)fs->stats.p_shots_fired * 100.0f));
+		snprintf(Multi_pxo_pinfo_vals[10], PXO_PINFO_SIZE, "%d%%", (int)((float)fs->stats.p_shots_hit / (float)fs->stats.p_shots_fired * 100.0f));
 	} else {		
 		strcpy(Multi_pxo_pinfo_vals[10], "0%");
 	}
 
 	// secondary shots fired
-	memset(Multi_pxo_pinfo_vals[11], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[11], "%d", (int)fs->stats.s_shots_fired);
+	memset(Multi_pxo_pinfo_vals[11], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[11], PXO_PINFO_SIZE, "%d", (int)fs->stats.s_shots_fired);
 
 	// secondary shots hit
-	memset(Multi_pxo_pinfo_vals[12], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[12], "%d", (int)fs->stats.s_shots_hit);
+	memset(Multi_pxo_pinfo_vals[12], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[12], PXO_PINFO_SIZE, "%d", (int)fs->stats.s_shots_hit);
 
 	// secondary hit pct
-	memset(Multi_pxo_pinfo_vals[13], 0, 50);
+	memset(Multi_pxo_pinfo_vals[13], 0, PXO_PINFO_SIZE);
 	if (fs->stats.s_shots_fired > 0) {		
-		sprintf(Multi_pxo_pinfo_vals[13], "%d%%", (int)((float)fs->stats.s_shots_hit / (float)fs->stats.s_shots_fired * 100.0f));
+		snprintf(Multi_pxo_pinfo_vals[13], PXO_PINFO_SIZE, "%d%%", (int)((float)fs->stats.s_shots_hit / (float)fs->stats.s_shots_fired * 100.0f));
 	} else {		
 		strcpy(Multi_pxo_pinfo_vals[13], "0%");
 	}
 
 	// primary friendly hits
-	memset(Multi_pxo_pinfo_vals[14], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[14], "%d", fs->stats.p_bonehead_hits);
+	memset(Multi_pxo_pinfo_vals[14], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[14], PXO_PINFO_SIZE, "%d", fs->stats.p_bonehead_hits);
 
 	// primary friendly hit %
-	memset(Multi_pxo_pinfo_vals[15], 0, 50);
+	memset(Multi_pxo_pinfo_vals[15], 0, PXO_PINFO_SIZE);
 	if (fs->stats.p_shots_hit > 0) {		
-	   sprintf(Multi_pxo_pinfo_vals[15], "%d%%", (int)((float)100.0f*((float)fs->stats.p_bonehead_hits/(float)fs->stats.p_shots_fired)));
+	   snprintf(Multi_pxo_pinfo_vals[15], PXO_PINFO_SIZE, "%d%%", (int)((float)100.0f*((float)fs->stats.p_bonehead_hits/(float)fs->stats.p_shots_fired)));
 	} else {		
 		strcpy(Multi_pxo_pinfo_vals[15], "0%");
 	}
 
 	// secondary friendly hits
-	memset(Multi_pxo_pinfo_vals[16], 0, 50);
-	sprintf(Multi_pxo_pinfo_vals[16], "%d", fs->stats.s_bonehead_hits);
+	memset(Multi_pxo_pinfo_vals[16], 0, PXO_PINFO_SIZE);
+	snprintf(Multi_pxo_pinfo_vals[16], PXO_PINFO_SIZE, "%d", fs->stats.s_bonehead_hits);
 
 	// secondary friendly hit %
-	memset(Multi_pxo_pinfo_vals[17], 0, 50);
+	memset(Multi_pxo_pinfo_vals[17], 0, PXO_PINFO_SIZE);
 	if (fs->stats.s_shots_hit > 0) {
-	   sprintf(Multi_pxo_pinfo_vals[17], "%d%%", (int)((float)100.0f*((float)fs->stats.s_bonehead_hits/(float)fs->stats.s_shots_fired)));
+	   snprintf(Multi_pxo_pinfo_vals[17], PXO_PINFO_SIZE, "%d%%", (int)((float)100.0f*((float)fs->stats.s_bonehead_hits/(float)fs->stats.s_shots_fired)));
 	} else {		
 		strcpy(Multi_pxo_pinfo_vals[17], "0%");
 	}
@@ -5279,7 +5280,7 @@ void multi_pxo_ban_process()
 	// start downloading list
 	case PXO_BAN_MODE_LIST_STARTUP:		
 		// remote file
-		sprintf(url_string, /*"%s/%s"*/ "http://www.pxo.net/files/%s", /*Multi_options_g.pxo_banner_url,*/ PXO_BANNERS_CONFIG_FILE);
+		snprintf(url_string, sizeof(url_string), /*"%s/%s"*/ "http://www.pxo.net/files/%s", /*Multi_options_g.pxo_banner_url,*/ PXO_BANNERS_CONFIG_FILE);
 
 		// local file
 		cf_create_default_path_string(local_file, sizeof(local_file) - 1, CF_TYPE_MULTI_CACHE, PXO_BANNERS_CONFIG_FILE);

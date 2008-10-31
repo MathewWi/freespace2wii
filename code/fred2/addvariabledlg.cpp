@@ -212,7 +212,7 @@ void CAddVariableDlg::validate_data(int set_focus)
 			// verify valid number
 			int temp_num = atoi(temp_data);
 			char buf[TOKEN_LENGTH];
-			sprintf(buf, "%d", temp_num);
+			snprintf(buf, sizeof(buf), "%d", temp_num);
 
 			if ( stricmp(buf, temp_data) ) {
 				m_data_validated = false;

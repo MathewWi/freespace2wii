@@ -1556,7 +1556,7 @@ void parse_soundtrack()
 		for(i = 0; i < Num_pattern_types; i++)
 		{
 			//Check for the tag based on description
-			sprintf(tagbuf, "$%s:", Pattern_info[i].pattern_desc);
+			snprintf(tagbuf, sizeof(tagbuf), "$%s:", Pattern_info[i].pattern_desc);
 			if(optional_string(tagbuf))
 			{
 				//Parse it
@@ -1959,13 +1959,13 @@ int hostile_ships_to_arrive()
 //
 // Return information about the event music in the buffer outbuf
 // NOTE: callers to this function are advised to allocate a 256 byte buffer
-void event_music_get_info(char *outbuf)
+void event_music_get_info(char *outbuf, size_t outbuf_size)
 {
 	if ( Event_music_enabled == FALSE || Event_music_level_inited == FALSE || Current_pattern == -1 ) {
-		sprintf(outbuf,XSTR( "Event music is not playing", 213));
+		snprintf(outbuf,outbuf_size,XSTR( "Event music is not playing", 213));
 	}
 	else {	
-		sprintf(outbuf,XSTR( "soundtrack: %s [%s]", 214), Soundtracks[Current_soundtrack_num].name, Pattern_info[Current_pattern].pattern_desc);
+		snprintf(outbuf,outbuf_size,XSTR( "soundtrack: %s [%s]", 214), Soundtracks[Current_soundtrack_num].name, Pattern_info[Current_pattern].pattern_desc);
 	}
 }
 
@@ -2022,13 +2022,13 @@ void event_sexp_change_soundtrack(char *name)
 //
 // Return information about the event music in the buffer outbuf
 // NOTE: callers to this function are advised to allocate a NAME_LENGTH buffer
-void event_music_get_soundtrack_name(char *outbuf)
+void event_music_get_soundtrack_name(char *outbuf, size_t max_buf)
 {
 	if ( Event_music_enabled == FALSE || Event_music_level_inited == FALSE ) {
 		strcpy(outbuf, XSTR( "Event music is not playing", 213));
 	}
 	else {
-		sprintf(outbuf, Soundtracks[Current_soundtrack_num].name);
+		snprintf(outbuf, max_buf, Soundtracks[Current_soundtrack_num].name);
 	}
 }
 

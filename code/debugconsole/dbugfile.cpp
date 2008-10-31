@@ -173,7 +173,7 @@ void dbugfile_init()
 #else
 		release_type = "Release";
 #endif
-		sprintf(big_buffer, "OS: %s %s, ", version, release_type);
+		snprintf(big_buffer, sizeof(big_buffer), "OS: %s %s, ", version, release_type);
 	}				  
 
 	fwrite(big_buffer, sizeof(char) * strlen(big_buffer), 1, fp);
@@ -218,74 +218,16 @@ void dbugfile_sprintf(int line, char *file, const char *format, ...)
 	}
 
 	char buffer[1000];
-	int i =  sprintf(buffer, "[%s,%4d] ", ptr, line);
+	char buffer2[1000];
 
 	va_list ap;
-	char *p, *sval;
-	long ival;
-	double dval;
 
 	// Add each extra parameter to string
 	va_start(ap, format);
-
-	for(p = (char *) format; *p; p++)
-	{
-		if(*p != '%')
-		{
-			*(buffer + i) = *p;
-			i++;
-			continue;
-		}
-
-		p++;
-
-		switch(*p)
-		{
-			case 'd':
-			{
-				ival = va_arg(ap, int);
-				i += sprintf(buffer+i,"%d", ival);
-				break;
-			}
-			case 'c':
-			{
-				ival = va_arg(ap, char);
-				buffer[i] = (char) ival;
-				i++;
-				break;
-			}
-			case 'x':
-			{
-				ival = va_arg(ap, int);
-				i += sprintf(buffer+i,"%x", ival);
-				break;
-			}
-
-			case 'f':
-			{
-				dval = va_arg(ap, double);
-				i += sprintf(buffer+i,"%f", dval);
-				break;
-			}
-			case 's':
-			{
-				for(sval = va_arg(ap, char *); *sval; sval++)
-				{
-					*(buffer + i++) = *sval;
-				}
-				break;
-			}
-			default:
-			{
-				i += sprintf(buffer+i,"N/A: %%%c", *p);
-				break;
-			}
-		}
-	}
-
+	vsnprintf(buffer2, sizeof(buffer2), format, ap);
 	va_end(ap);
-
-	i += sprintf(buffer + i, "\n");
+	
+	int i =  snprintf(buffer, sizeof(buffer), "[%s,%4d] %s\n", ptr, line, buffer2);
 
 	dbugfile_output(buffer);
 }
@@ -321,7 +263,7 @@ void dbugfile_print_matrix_4x4(int line, char *file, float *matrix, char *text)
 
 	char buffer[1000];
 
-	sprintf(buffer,"[%s,%4d] Matrix %s:\n"
+	snprintf(buffer,sizeof(buffer),"[%s,%4d] Matrix %s:\n"
 			"%f %f %f %f\n"
 		    "%f %f %f %f\n"
 		    "%f %f %f %f\n"
@@ -378,7 +320,7 @@ void dbugfile_print_matrix_3x3(int line, char *file, float *matrix, char *text)
 
 	char buffer[1000];
 
-	sprintf(buffer,"[%s,%4d] Matrix %s:\n"
+	snprintf(buffer, sizeof(buffer), "[%s,%4d] Matrix %s:\n"
 			"%f %f %f\n"
 		    "%f %f %f\n"
 		    "%f %f %f\n",

@@ -1256,7 +1256,7 @@ int anim_write_frames_out(char *filename)
 	for ( i = 0; i < source_anim->total_frames; i++ ) {
 		anim_get_next_raw_buffer(ai, 0, 0, 16);
 		strcpy(pcxname, root_name);
-		sprintf(buf,"%04d",i);
+		snprintf(buf,sizeof(buf),"%04d",i);
 		strcat(pcxname, buf);
 
 		for ( j = 0; j < source_anim->height; j++ ) {

@@ -950,7 +950,11 @@ char lookup_str[PARSE_BUF_SIZE];
 void lcl_ext_localize_sub(char *in, char *out, int max_len, int *id)
 {			
 	char first_four[5];
+	
+	memset(text_str, 0, sizeof(text_str));
 	strcpy(text_str, "");
+	
+	memset(lookup_str, 0, sizeof(lookup_str));
 	strcpy(lookup_str, "");
 	int str_id;	
 	int str_len;	

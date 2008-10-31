@@ -1269,7 +1269,7 @@ int bm_create( int bpp, int w, int h, void *data, int flags )
 
 	memset( &bm_bitmaps[n], 0, sizeof(bitmap_entry) );
 
-	sprintf( bm_bitmaps[n].filename, "TMP%dx%d+%d", w, h, bpp );
+	snprintf( bm_bitmaps[n].filename, MAX_FILENAME_LEN, "TMP%dx%d+%d", w, h, bpp );
 	bm_bitmaps[n].type = BM_TYPE_USER;
 	bm_bitmaps[n].comp_type = BM_TYPE_NONE;
 	bm_bitmaps[n].palette_checksum = 0;
@@ -1804,7 +1804,7 @@ int bm_load_animation( const char *real_filename, int *nframes, int *fps, int ca
 		memset( &bm_bitmaps[n+i], 0, sizeof(bitmap_entry) );
 	
 		if (type == BM_TYPE_EFF) {
-			sprintf(bm_bitmaps[n+i].info.ani.eff.filename, "%s_%.4d", clean_name, i);
+			snprintf(bm_bitmaps[n+i].info.ani.eff.filename, MAX_FILENAME_LEN, "%s_%.4d", clean_name, i);
 			bm_bitmaps[n+i].info.ani.eff.type = eff_type;
 
 			// gr_bm_load() returns non-0 on failure
@@ -1865,9 +1865,9 @@ int bm_load_animation( const char *real_filename, int *nframes, int *fps, int ca
 		bm_bitmaps[n+i].load_count++;
 
 		if ( i == 0 )	{
-			sprintf( bm_bitmaps[n+i].filename, "%s", filename );
+			snprintf( bm_bitmaps[n+i].filename, MAX_FILENAME_LEN, "%s", filename );
 		} else {
-			sprintf( bm_bitmaps[n+i].filename, "%s[%d]", filename, i );
+			snprintf( bm_bitmaps[n+i].filename, MAX_FILENAME_LEN, "%s[%d]", filename, i );
 		}
 
 	}
@@ -3550,7 +3550,7 @@ int bm_make_render_target( int width, int height, int flags )
 
 	bm_bitmaps[n].type = (flags & BMP_FLAG_RENDER_TARGET_STATIC) ? BM_TYPE_RENDER_TARGET_STATIC : BM_TYPE_RENDER_TARGET_DYNAMIC;
 	bm_bitmaps[n].signature = Bm_next_signature++;
-	sprintf( bm_bitmaps[n].filename, "RT_%dx%d+%d", w, h, bpp );
+	snprintf( bm_bitmaps[n].filename, MAX_FILENAME_LEN, "RT_%dx%d+%d", w, h, bpp );
 	bm_bitmaps[n].bm.w = (short)w;
 	bm_bitmaps[n].bm.h = (short)h;
 	bm_bitmaps[n].bm.rowsize = (short)w;

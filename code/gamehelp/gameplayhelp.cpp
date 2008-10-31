@@ -246,7 +246,7 @@ static int Current_help_page;
 // generate a line for the on-line help for a control item with specified id
 // input:	id		=>	index for control item within Control_config[]
 //				buf	=> buffer with enough space to hold ouput string
-char *gameplay_help_control_text(int id, char *buf)
+char *gameplay_help_control_text(int id, char *buf, size_t max_buf)
 {
 	int			has_key=0, has_joy=0;
 	config_item	*ci;
@@ -254,7 +254,7 @@ char *gameplay_help_control_text(int id, char *buf)
 	ci = &Control_config[id];
 
 	if ( ci->key_id >= 0 ) {
-		sprintf(buf, textify_scancode(ci->key_id));
+		snprintf(buf, max_buf, textify_scancode(ci->key_id));
 		has_key=1;
 	}
 
@@ -287,7 +287,7 @@ void gameplay_help_blit_control_line(int x, int y, int id)
 	buf[0] = 0;
 
 	if ( ci->key_id >= 0 ) {
-		sprintf(buf, textify_scancode(ci->key_id));
+		snprintf(buf, sizeof(buf), textify_scancode(ci->key_id));
 		has_key=1;
 	}
 
@@ -324,7 +324,7 @@ void gameplay_help_set_title(char *title)
 
 	gr_set_color_fast(&Color_bright);
 	gr_printf(0x8000,sy,title);
-	sprintf(buf, XSTR( "Page %d of %d", 132),  Current_help_page+1, Gp_last_screen+1);
+	snprintf(buf, sizeof(buf), XSTR( "Page %d of %d", 132),  Current_help_page+1, Gp_last_screen+1);
 	gr_printf(0x8000,sy+gr_get_font_height()+2,buf);
 	gr_set_color_fast(&Color_normal);
 }

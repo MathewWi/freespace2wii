@@ -405,7 +405,7 @@ ADE_FUNC(__tostring, l_Matrix, NULL, "Converts a matrix to a string with format 
 
 	char buf[128];
 	float *a = &mh->GetMatrix()->a1d[0];
-	sprintf(buf, "[%f %f %f | %f %f %f | %f %f %f]", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
+	snprintf(buf, sizeof(buf), "[%f %f %f | %f %f %f | %f %f %f]", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
 
 	return ade_set_args(L, "s", buf);
 }
@@ -1386,7 +1386,7 @@ ADE_FUNC(write, l_File, "string or number, ...",
 		{
 			double d = lua_tonumber(L, l_pos);
 			char buf[32]= {0};
-			sprintf(buf, LUA_NUMBER_FMT, d);
+			snprintf(buf, sizeof(buf), LUA_NUMBER_FMT, d);
 			if(cfwrite(buf, sizeof(char), strlen(buf), cfp))
 				num_successful++;
 		}
@@ -2377,7 +2377,7 @@ ADE_VIRTVAR(Value, l_SEXPVariable, "number/string", "SEXP variable value", "stri
 		if(!ade_get_args(L, "o|i", l_SEXPVariable.GetPtr(&svh), &newnumber))
 			return ADE_RETURN_NIL;
 
-		sprintf(number_as_str, "%d", newnumber);
+		snprintf(number_as_str, sizeof(number_as_str), "%d", newnumber);
 		newvalue = number_as_str;
 	}
 	else
@@ -2998,7 +2998,7 @@ ADE_FUNC(__tostring, l_Vector, NULL, "Converts a vector to string with format \"
 		return ade_set_error(L, "s", "");
 
 	char buf[128];
-	sprintf(buf, "(%f,%f,%f)", v3->xyz.x, v3->xyz.y, v3->xyz.z);
+	snprintf(buf, sizeof(buf), "(%f,%f,%f)", v3->xyz.x, v3->xyz.y, v3->xyz.z);
 
 	return ade_set_args(L, "s", buf);
 }
@@ -3693,16 +3693,16 @@ ADE_FUNC(__tostring, l_Object, NULL, "Returns name of object (if any)", "string"
 	switch(objh->objp->type)
 	{
 		case OBJ_SHIP:
-			sprintf(buf, "%s", Ships[objh->objp->instance].ship_name);
+			snprintf(buf, sizeof(buf), "%s", Ships[objh->objp->instance].ship_name);
 			break;
 		case OBJ_WEAPON:
-			sprintf(buf, "%s projectile", Weapon_info[Weapons[objh->objp->instance].weapon_info_index].name);
+			snprintf(buf, sizeof(buf), "%s projectile", Weapon_info[Weapons[objh->objp->instance].weapon_info_index].name);
 			break;
 	//	case OBJ_JUMP_NODE:
 	//		sprintf(buf, "%s", objh->objp->jnp->get_name_ptr());
 	//		break;
 		default:
-			sprintf(buf, "Object %d [%d]", OBJ_INDEX(objh->objp), objh->sig);
+			snprintf(buf, sizeof(buf), "Object %d [%d]", OBJ_INDEX(objh->objp), objh->sig);
 	}
 
 	return ade_set_args(L, "s", buf);
@@ -4412,7 +4412,7 @@ ADE_INDEXER(l_WaypointList, "number Index", "Array of waypoints that are part of
 	idx--;
 
 	//Get waypoint name
-	sprintf(wpname, "%s:%d", wlh->wlp->name, (idx & 0xffff) + 1);
+	snprintf(wpname, sizeof(wpname), "%s:%d", wlh->wlp->name, (idx & 0xffff) + 1);
 	int i = waypoint_lookup( wpname );
 	if( idx > -1 && idx < wlh->wlp->count && i != -1 ) {
 		return ade_set_args( L, "o", l_Waypoint.Set( object_h( &Objects[i] ), Objects[i].signature ) );
@@ -9506,7 +9506,7 @@ void ade_stackdump(lua_State *L, char *stackdump)
 	for(int argnum = 1; argnum <= stacksize; argnum++)
 	{
 		int type = lua_type(L, argnum);
-		sprintf(buf, "\r\n%d: ", argnum);
+		snprintf(buf, sizeof(buf), "\r\n%d: ", argnum);
 		strcat(stackdump, buf);
 		switch(type)
 		{
@@ -9515,17 +9515,17 @@ void ade_stackdump(lua_State *L, char *stackdump)
 				break;
 			case LUA_TNUMBER:
 				d = lua_tonumber(L, argnum);
-				sprintf(buf, "Number [%f]",d);
+				snprintf(buf, sizeof(buf), "Number [%f]",d);
 				strcat(stackdump, buf);
 				break;
 			case LUA_TBOOLEAN:
 				b = lua_toboolean(L, argnum);
-				sprintf(buf, "Boolean [%d]",b);
+				snprintf(buf, sizeof(buf), "Boolean [%d]",b);
 				strcat(stackdump, buf);
 				break;
 			case LUA_TSTRING:
 				s = (char *)lua_tostring(L, argnum);
-				sprintf(buf, "String [%s]",s);
+				snprintf(buf, sizeof(buf), "String [%s]",s);
 				strcat(stackdump, buf);
 				break;
 			case LUA_TTABLE:
@@ -9536,7 +9536,7 @@ void ade_stackdump(lua_State *L, char *stackdump)
 						lua_rawget(L, -2);
 						if(lua_isnumber(L, -1))
 						{
-							sprintf(buf, "Table [%s]", Ade_table_entries[(uint)lua_tonumber(L, -1)].Name);
+							snprintf(buf, sizeof(buf), "Table [%s]", Ade_table_entries[(uint)lua_tonumber(L, -1)].Name);
 							strcat(stackdump, buf);
 						}
 						else
@@ -9583,29 +9583,29 @@ void ade_stackdump(lua_State *L, char *stackdump)
 					lua_rawget(L, -2);
 					if(lua_isnumber(L, -1))
 					{
-						sprintf(buf, "Userdata [%s]", Ade_table_entries[(uint)lua_tonumber(L, -1)].Name);
+						snprintf(buf, sizeof(buf), "Userdata [%s]", Ade_table_entries[(uint)lua_tonumber(L, -1)].Name);
 					}
 					else
-						sprintf(buf, "non-default Userdata");
+						snprintf(buf, sizeof(buf), "non-default Userdata");
 
 					lua_pop(L, 2);	//metatable and nil/adeid
 				}
 				else
-					sprintf(buf, "Userdata w/ no metatable");
+					snprintf(buf, sizeof(buf), "Userdata w/ no metatable");
 				strcat(stackdump, buf);
 				break;
 			case LUA_TTHREAD:
 				//ls = lua_tothread(L, argnum);
-				sprintf(buf, "Thread");
+				snprintf(buf, sizeof(buf), "Thread");
 				strcat(stackdump, buf);
 				break;
 			case LUA_TLIGHTUSERDATA:
 				//v = lua_touserdata(L, argnum);
-				sprintf(buf, "Light userdata");
+				snprintf(buf, sizeof(buf), "Light userdata");
 				strcat(stackdump, buf);
 				break;
 			default:
-				sprintf(buf, "<UNKNOWN>: %s (%f) (%s)", lua_typename(L, type), lua_tonumber(L, argnum), lua_tostring(L, argnum));
+				snprintf(buf, sizeof(buf), "<UNKNOWN>: %s (%f) (%s)", lua_typename(L, type), lua_tonumber(L, argnum), lua_tostring(L, argnum));
 				strcat(stackdump, buf);
 				break;
 		}
@@ -9680,7 +9680,7 @@ int ade_get_args(lua_State *L, char *fmt, ...)
 		}
 		if(ar.currentline > -1) {
 			char buf[33];
-			sprintf(buf, "%d", ar.currentline);
+			snprintf(buf, sizeof(buf), "%d", ar.currentline);
 			strcat(funcname, " (Line ");
 			strcat(funcname, buf);
 			strcat(funcname, ")");

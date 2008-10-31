@@ -456,7 +456,7 @@ void game_feature_disabled_popup();
 void get_version_string(char *str, int max_size);
 
 // format the specified time (fixed point) into a nice string
-void game_format_time(fix m_time,char *time_str);
+void game_format_time(fix m_time,char *time_str, size_t time_str_size);
 
 // if the game is running using hacked data
 int game_hacked_data();

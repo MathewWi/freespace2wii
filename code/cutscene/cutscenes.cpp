@@ -498,9 +498,9 @@ int cutscenes_validate_cd(char *mve_name, int prompt_for_cd)
 		}
 
 #if defined(OEM_BUILD)
-		sprintf(volume_name, NOX("FS2_OEM"));
+		snprintf(volume_name, sizeof(volume_name), NOX("FS2_OEM"));
 #else
-		sprintf(volume_name, NOX("FREESPACE2_%c"), '1' + cd_mve_is_on);
+		snprintf(volume_name, sizeof(volume_name), NOX("FREESPACE2_%c"), '1' + cd_mve_is_on);
 #endif
 
 
@@ -523,9 +523,9 @@ int cutscenes_validate_cd(char *mve_name, int prompt_for_cd)
 		int popup_rval;
 
 #if defined(DVD_MESSAGE_HACK)
-		sprintf(popup_msg, XSTR( "Movie not found\n\nInsert FreeSpace DVD to continue", 203));
+		snprintf(popup_msg, sizeof(popup_msg), XSTR( "Movie not found\n\nInsert FreeSpace DVD to continue", 203));
 #else 
-		sprintf(popup_msg, XSTR( "Movie not found\n\nInsert FreeSpace CD #%d to continue", 203), cd_mve_is_on+1);
+		snprintf(popup_msg, sizeof(popup_msg), XSTR( "Movie not found\n\nInsert FreeSpace CD #%d to continue", 203), cd_mve_is_on+1);
 #endif
 
 		popup_rval = popup(PF_BODY_BIG, 2, POPUP_CANCEL, POPUP_OK, popup_msg);
@@ -568,9 +568,9 @@ void cutscenes_screen_play()
 		char str[256];
 
 		if (Cmdline_nomovies)
-			sprintf(str, XSTR("Movies are currently disabled.", -1));
+			snprintf(str, sizeof(str), XSTR("Movies are currently disabled.", -1));
 		else
-			sprintf(str, XSTR("Unable to play movie %s.", 204), Cutscenes[which_cutscene].name);
+			snprintf(str, sizeof(str), XSTR("Unable to play movie %s.", 204), Cutscenes[which_cutscene].name);
 
 		popup(0, 1, POPUP_OK, str );
 	}
