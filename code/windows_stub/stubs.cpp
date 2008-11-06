@@ -630,27 +630,7 @@ void *_vm_malloc( int size, int quiet )
 {
 	Assert( size > 0 );
 
-	
-	u8 *next_memory = (u8*)malloc_start;
-	next_memory += size+sizeof(size_t);
-	next_memory += 4 - (((u32)next_memory) % 4);
-	
-	Assert( ((u32)next_memory) % 4 == 0);
-	
-	void *ptr;
-	if(next_memory > malloc_end)
-	{
-		ptr = NULL;
-	}
-	else
-	{
-		point *p = (point*)malloc_start;
-		p->size = size;
-		ptr = (void*) &p->start;
-		malloc_start = (void*)next_memory;
-		memset(ptr, 0, size);
-	}
-	
+	void *ptr = malloc( size );
 
 	if (!ptr)	{
 		if (quiet) {
@@ -687,17 +667,8 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 {
 	if (ptr == NULL)
 		return vm_malloc(size);
-		
-	void *ret_ptr = vm_malloc(size);
-	
-	if(!ret_ptr)
-	{
-		size_t * p1 = (size_t*)ptr;
-		
-		point* p = (point*)(p1-1);
-		
-		memcpy(ret_ptr, ptr, p->size);
-	}
+
+	void *ret_ptr = realloc( ptr, size );
 
 	if (!ret_ptr)	{
 		if (quiet && (size > 0) && (ptr != NULL)) {
@@ -801,10 +772,8 @@ void _vm_free( void *ptr )
     }
 #endif // !NDEBUG
 
-	// Don't free anything
-	//free(ptr);
+	free(ptr);
 }
-
 void vm_free_all()
 {
 }

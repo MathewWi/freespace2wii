@@ -30,7 +30,8 @@ FSSOURCES	:=	ai anim autopilot bmpman camera cfile cmdline cmeasure controlconfi
 LIBSOURCES	:= ../libjpeg ../lua
 SOURCES		:= $(FSSOURCES) $(LIBSOURCES)
 DATA		:=	data  
-INCLUDES	:=  ../../setup/SDL-Port/include . ../lua ../libjpeg/ ../openal/include/ ../oggvorbis/include ../../netport/include ../../gnulib/include
+INCLUDES	:=  . ../lua ../libjpeg
+INCLUDE_DIR := /i/setup/SDL-Port/include /i/setup/libogg-1.1.3/include /i/setup/libtheora-1.0beta3/include /i/setup/libvorbis-1.2.0/include /i/setup/openal-soft-1.5.304/include /i/netport/include /i/gnulib/include /i/setup/gl2gx/include
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -52,7 +53,7 @@ LIBS	:=	-lgnu -ltheora -lvorbis -logg -lopenal -lnetport -lSDL -lgl2gx -lfat -lw
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= /i/setup/gl2gx/libogc/lib/wii /i/setup/SDL-Port/lib /i/libogc/lib/wii /i/gnulib/lib
+LIBDIRS	:= /i/setup/gl2gx/libogc/lib/wii /i/setup/SDL-Port/lib /i/libogc/lib/wii /i/gnulib/lib /i/setup/libogg-1.1.3/lib /i/setup/libtheora-1.0beta3/lib /i/setup/libvorbis-1.2.0/lib /i/setup/openal-soft-1.5.304/lib /i/netport/lib
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -97,6 +98,7 @@ export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 # build a list of include paths
 #---------------------------------------------------------------------------------
 export INCLUDE	:=	-I$(BUILD) $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
+					-I$(BUILD) $(foreach dir,$(INCLUDE_DIR),-I$(dir)) \
 					-I$(CURDIR)/$(BUILD) \
 					-I$(LIBOGC_INC)
 

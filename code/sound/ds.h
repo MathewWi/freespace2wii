@@ -192,7 +192,7 @@
 #ifndef USE_OPENAL
 #include "directx/vdsound.h"
 #else
-#if !(defined(__APPLE__) || defined(_WIN32)) && !defined(SCP_WII)
+#if !(defined(__APPLE__) || defined(_WIN32))
 	#include <AL/al.h>
 	#include <AL/alc.h>
 #else
