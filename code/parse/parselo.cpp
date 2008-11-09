@@ -434,14 +434,6 @@
 #include "weapon/weapon.h"
 #include "globalincs/version.h"
 
-
-
-extern int pause_stuff;
-extern "C" void wiipause();
-#define pause_print() if(pause_stuff) { printf("%s - %d\n",LOCATION); wiipause(); }
-#define longjmp(f,a) {pause_print(); longjmp(f,a);}
-
-
 #define	ERROR_LENGTH	64
 #define	RS_MAX_TRIES	5
 
@@ -1191,15 +1183,10 @@ char* alloc_text_until(char* instr, char* endstr)
 // is found.
 void copy_text_until(char *outstr, const char *instr, const char *endstr, int max_chars)
 {
-	pause_print();
 	char *foundstr;
 	Assert(outstr && instr && endstr);
-	
-	pause_print();
 
 	foundstr = stristr(instr, endstr);
-	
-	pause_print();
 
 	if (foundstr == NULL) {
 		nprintf(("Error", "Error.  Looking for [%s], but never found it.\n", endstr));
@@ -1207,8 +1194,6 @@ void copy_text_until(char *outstr, const char *instr, const char *endstr, int ma
 	}
 
 	if (foundstr - instr + strlen(endstr) < (uint) max_chars) {
-	
-		pause_print();
 		strncpy(outstr, instr, foundstr - instr);
 		outstr[foundstr - instr] = 0;
 
@@ -1219,12 +1204,8 @@ void copy_text_until(char *outstr, const char *instr, const char *endstr, int ma
 
 		longjmp(parse_abort, 4);
 	}
-	
-	pause_print();
 
 	diag_printf("Here's the partial wad of text:\n%.30s\n", outstr);
-	
-	pause_print();
 
 }
 
@@ -1336,7 +1317,6 @@ char aasfadsi[PARSE_BUF_SIZE];
 
 void stuff_string(char *pstr, int type, int len, char *terminators)
 {
-	pause_print();
 	char *read_str = aasfadsi;
 	//char *read_str = aptraz;
 	memset(read_str, 0, PARSE_BUF_SIZE);
@@ -1349,11 +1329,8 @@ void stuff_string(char *pstr, int type, int len, char *terminators)
 	Assert( final_len > 0 );
 	
 
-	pause_print();
-
 	// make sure it's zero'd out
 	memset( pstr, 0, len );
-	pause_print();
 
 	switch (type) {
 		case F_RAW:
@@ -1379,13 +1356,9 @@ void stuff_string(char *pstr, int type, int len, char *terminators)
 
 		case F_DATE:
 			ignore_gray_space();
-	pause_print();
 			copy_to_eoln(read_str, terminators, Mp, read_len);
-	pause_print();
 			drop_trailing_white_space(read_str);
-	pause_print();
 			advance_to_eoln(terminators);
-	pause_print();
 			break;
 
 		case F_NOTES:
@@ -1413,13 +1386,9 @@ void stuff_string(char *pstr, int type, int len, char *terminators)
 
 		case F_MULTITEXT:		
 			ignore_white_space();
-	pause_print();
 			copy_text_until(read_str, Mp, "$end_multi_text", read_len);
-	pause_print();
 			Mp += strlen(read_str);
-	pause_print();
 			drop_trailing_white_space(read_str);
-	pause_print();
 			required_string("$end_multi_text");
 			break;
 
@@ -1432,51 +1401,32 @@ void stuff_string(char *pstr, int type, int len, char *terminators)
 
 		case F_MESSAGE:
 			ignore_gray_space();
-	pause_print();
 			copy_to_eoln(read_str, terminators, Mp, read_len);
-	pause_print();
 			drop_trailing_white_space(read_str);
-	pause_print();
 			advance_to_eoln(terminators);
-	pause_print();
 			break;		
 
 		default:
 			Assert(0);
 	}
-	
-	pause_print();
 
 	// now we want to do any final localization
 	if(type != F_RAW && type != F_LNAME)
 	{
-		
-	pause_print();
 		lcl_ext_localize(read_str, pstr, final_len, &tag_id);
 
-		
-	pause_print();
 		// if the hash localized text hash table is active and we have a valid external string - hash it
 		if(fhash_active() && (tag_id > -2)){
 			fhash_add_str(pstr, tag_id);
 		}
-		
-	pause_print();
 	}
 	else
 	{
-	
-	pause_print();
 		if ( strlen(read_str) > (uint)final_len )
 			error_display(0, "Token too long: [%s].  Length = %i.  Max is %i.\n", read_str, strlen(read_str), final_len);
-
-	pause_print();
 		strncpy(pstr, read_str, final_len);
-		
-	pause_print();
 	}
-
-	pause_print();
+	
 	diag_printf("Stuffed string = [%.30s]\n", pstr);
 }
 
@@ -1516,20 +1466,16 @@ char *stuff_and_malloc_string( int type, char *terminators, int len)
 
 	char tmp_result[MAX_TMP_STRING_LENGTH];
 	int final_len = len;
-	pause_print();
 
 	if ( !len || (len > MAX_TMP_STRING_LENGTH) )
 		final_len = MAX_TMP_STRING_LENGTH;
-	pause_print();
 
 	stuff_string(tmp_result, type, final_len, terminators);
-	pause_print();
+	
 	drop_white_space(tmp_result);
 	
-	pause_print();
-
 	l = strnlen(tmp_result, MAX_TMP_STRING_LENGTH);
-	pause_print();
+	
 	Assert(l < MAX_TMP_STRING_LENGTH);		// Get John!!
 	if (l < 1)
 		return NULL;
