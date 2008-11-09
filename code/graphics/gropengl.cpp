@@ -2448,6 +2448,7 @@ int opengl_check_for_errors(char *err_at)
 
 void opengl_set_vsync(int status)
 {
+	GL_CHECK_FOR_ERRORS("start of set_vsync()");
 	if ( (status < 0) || (status > 1) ) {
 		Int3();
 		return;
