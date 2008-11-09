@@ -6,6 +6,7 @@
 
 #include <ogc/video.h>
 #include <wiiuse/wpad.h>
+#include <GL/GLwii.h>
 
 static void *exception_xfb = (void*)0xC1710000;			//we use a static address above ArenaHi.
 extern "C" void __console_init(void *framebuffer,int xstart,int ystart,int xres,int yres,int stride);
@@ -107,9 +108,25 @@ extern "C" void __stack_chk_fail(void);
 
 extern "C" void __stack_chk_fail(void)
 {
-	char *p = 0x0;
-	printf("Stack failure!");
+	u32 *p = (u32 *) 0x1;
+	printf("Stack failure!\n");
 	wiipause();
-	*p = 1;
-	
+	*p = 0xDEADBEEF;
 }
+
+volatile unsigned char power_pressed = 0;
+	
+extern "C" void fs2_power_off(s32 chan)
+{
+	power_pressed = 1;
+}
+
+void WiiInit()
+{
+	ShowConsole(); 
+	CON_SetStipple(0);
+	
+	// Listen for power off
+	WPAD_SetPowerCallback(&fs2_power_off);
+}
+
