@@ -1552,6 +1552,8 @@ int opengl_compress_image( ubyte **compressed_data, ubyte *in_data, int width, i
 	}
 
 	glGenTextures(1, &tex);
+	
+	Assert(tex);
 
 	GL_state.Texture.SetActiveUnit(0);
 	GL_state.Texture.SetTarget(GL_TEXTURE_2D);

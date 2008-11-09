@@ -187,7 +187,7 @@
 #include <vector>
 
 
-void outwnd_print(char *id = NULL, char *tmp = NULL);
+void outwnd_print(const char *id = NULL, const char *tmp = NULL);
 
 #define MAX_LINE_WIDTH	1024
 
@@ -311,7 +311,7 @@ void save_filter_info(void)
 	}
 }
 
-void outwnd_printf2(char *format, ...)
+void outwnd_printf2(const char *format, ...)
 {
 	char tmp[MAX_LINE_WIDTH*4];
 	va_list args;
@@ -326,7 +326,7 @@ void outwnd_printf2(char *format, ...)
 	outwnd_print("General", tmp);
 }
 
-void outwnd_printf(char *id, char *format, ...)
+void outwnd_printf(const char *id, const char *format, ...)
 {
 	char tmp[MAX_LINE_WIDTH*4];
 	va_list args;
@@ -341,7 +341,7 @@ void outwnd_printf(char *id, char *format, ...)
 	outwnd_print(id, tmp);
 }
 
-void outwnd_print(char *id, char *tmp)
+void outwnd_print(const char *id, const char *tmp)
 {
 	uint i;
 
@@ -450,7 +450,7 @@ void outwnd_close()
 	outwnd_inited = false;
 }
 
-void safe_point_print(char *format, ...)
+void safe_point_print(const char *format, ...)
 {
 	char tmp[512];
 	va_list args;
@@ -461,7 +461,7 @@ void safe_point_print(char *format, ...)
 	strcpy(safe_string, tmp);
 }
 
-void safe_point(char *file, int line, char *format, ...)
+void safe_point(const char *file, int line, const char *format, ...)
 {
 	safe_point_print("last safepoint: %s, %d; [%s]", file, line, format);
 }

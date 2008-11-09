@@ -285,10 +285,21 @@ void os_resume()
 extern int SDLtoFS2[SDLK_LAST];
 extern void joy_set_button_state(int button, int state);
 extern void joy_set_hat_state(int position);
+#ifdef SCP_WII
+extern volatile unsigned char power_pressed;
+#endif
 
 DWORD unix_process(DWORD lparam)
 {
 	SDL_Event event;
+
+#ifdef SCP_WII
+	if(power_pressed)
+	{
+		key_mark(KEY_ESC, 1, 0);
+		key_mark(KEY_ESC, 0, 0);
+	}
+#endif
 
 	while( SDL_PollEvent(&event) ) {
 		switch(event.type) {

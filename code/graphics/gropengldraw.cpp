@@ -962,7 +962,7 @@ void opengl_draw_primitive(int nv, vertex **verts, uint flags, float u_scale, fl
 
 	glEnd();
 
-	GL_CHECK_FOR_ERRORS("start of draw_primitive()");
+	GL_CHECK_FOR_ERRORS("end of draw_primitive()");
 }
 
 void opengl_tmapper_internal(int nv, vertex **verts, uint flags, int is_scaler = 0)

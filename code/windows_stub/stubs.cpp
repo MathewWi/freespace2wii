@@ -417,9 +417,9 @@ MMRESULT mmioClose(HMMIO hmmio, uint wFlags)
 }
 
 // get a filename minus any leading path
-char *clean_filename(char *name)
+const char *clean_filename(const char *name)
 {
-	char *p = name + strlen(name)-1;
+	const char *p = name + strlen(name)-1;
 
 	// Move p to point to first letter of EXE filename
 	while( (p > name) && (*p != '\\') && (*p != '/') && (*p != ':') )
@@ -619,17 +619,148 @@ struct point
 	size_t start;
 };
 
+#ifndef NDEBUG
+#define MEMCHECK_SIZE 10
+#else
+#define MEMCHECK_SIZE 0
+#endif
+
+void setDEADBEAF( void *ptr, size_t size )
+{
+	if(MEMCHECK_SIZE == 0) return;
+	
+	u32 *p = (u32*)ptr;
+	
+	int i = 0;
+	int count = MEMCHECK_SIZE;
+	
+	if(((u32)ptr) % 4 != 0)
+	{
+		u8 *next_memory = (u8*)ptr;
+		next_memory += 4 - (((u32)next_memory) % 4);
+		--count;
+	}
+		
+	for(i = 0; i < count; i++)
+	{
+		p[i] = 0xDEADBEEF;
+	}
+	
+	u8 * p8 = (u8*)ptr;
+	p8 += size-4*MEMCHECK_SIZE;
+	
+	count = MEMCHECK_SIZE;
+	if(((u32)p8) % 4 != 0)
+	{
+		p8 += 4 - (((u32)p8) % 4);
+		--count;
+	}
+	
+	p = (u32*) p8;
+	
+	for(i = 0; i < count; ++i)
+	{		
+		p[i] = 0xDEADBEEF;
+	}
+}
+
+void offset32(void **ret_ptr, size_t nInts)
+{
+	u32 * p = (u32*)*ret_ptr;
+	*ret_ptr = (void*)(p+nInts);
+}
+
+void checkDEADBEAF(void *ptr, const char *filename, int line, const char *func)
+{
+	if(MEMCHECK_SIZE == 0) return;
+	
+	if(ptr == NULL)
+	{
+		printf("Freeing a null pointer! %s - %d\n", filename, line);
+		wiipause();
+		return;
+	}
+	
+	offset32(&ptr,-MEMCHECK_SIZE);
+	
+	RAM *item = RamTable;
+
+	while (item != NULL) {
+		if (item->addr == (ptr_u)ptr) {
+			break;
+		}
+		item = item->next;
+    }
+	
+	if(item == NULL)
+	{
+		printf("Pointer not found in RamTable! %s - %d\n", filename, line);
+		wiipause();
+		return;
+	}
+	
+
+	u32 *p = (u32*)ptr;
+	
+	int i = 0;
+	int count = MEMCHECK_SIZE;
+	bool deadbeef = true;
+	
+	if(((u32)ptr) % 4 != 0)
+	{
+		u8 *next_memory = (u8*)ptr;
+		next_memory += 4 - (((u32)next_memory) % 4);
+		--count;
+	}
+		
+	for(i = 0; i < count; i++)
+	{
+		if(p[i] != 0xDEADBEEF)
+		{
+			printf("Front DEADBEEF %d missing!\n", i);
+			deadbeef = false;
+		}
+	}
+	u8 * p8 = (u8*)ptr;
+	p8 += item->size-4*MEMCHECK_SIZE;
+	
+	count = MEMCHECK_SIZE;
+	if(((u32)p8) % 4 != 0)
+	{
+		p8 += 4 - (((u32)p8) % 4);
+		--count;
+	}
+	
+	p = (u32*) p8;
+	
+	for(i = 0; i < count; ++i)
+	{		
+		if(p[i] != 0xDEADBEEF)
+		{
+			printf("Back DEADBEEF %d missing!\n", i);
+			deadbeef = false;
+		}
+	}
+	
+	if(!deadbeef)
+	{
+		printf("DEADBEEF failure checked at %s - %d, from %s\n", filename, line, func);
+		wiipause();
+	}
+}
+
 void * malloc_start = (void*)(SYSMEM2_START | LIBOGC);
 const void * malloc_end = (void*)(SYSMEM2_START | SYSMEM2_SIZE);
 
 #ifndef NDEBUG
-void *_vm_malloc( int size, char *filename, int line, int quiet )
+void *_vm_malloc( int size, const char *filename, int line, int quiet )
 #else
 void *_vm_malloc( int size, int quiet )
 #endif
 {
 	Assert( size > 0 );
 
+	size += 2*4*MEMCHECK_SIZE;
 	void *ptr = malloc( size );
 
 	if (!ptr)	{
@@ -648,25 +779,31 @@ void *_vm_malloc( int size, int quiet )
 	RAM *next = (RAM *)malloc(sizeof(RAM));
 
 	next->addr = (ptr_u)ptr;
-	next->size = (size + sizeof(RAM));
+	next->size = size;
 
 	next->next = RamTable;
 	RamTable = next;
 
-	TotalRam += size;
+	TotalRam += size + sizeof(RAM);
 #endif
-
+	setDEADBEAF( ptr, size );
+	offset32(&ptr,+MEMCHECK_SIZE);
+	checkDEADBEAF(ptr, filename, line, "malloc");
 	return ptr;
 }
 
 #ifndef NDEBUG
-void *_vm_realloc( void *ptr, int size, char *filename, int line, int quiet )
+void *_vm_realloc( void *ptr, int size, const char *filename, int line, int quiet )
 #else
 void *_vm_realloc( void *ptr, int size, int quiet )
 #endif
 {
 	if (ptr == NULL)
 		return vm_malloc(size);
+	
+	offset32(&ptr,-MEMCHECK_SIZE);
+	
+	if(size != 0) size += 2*4*MEMCHECK_SIZE;
 
 	void *ret_ptr = realloc( ptr, size );
 
@@ -692,11 +829,15 @@ void *_vm_realloc( void *ptr, int size, int quiet )
     }
 #endif
 
+	setDEADBEAF( ptr, size );
+	offset32(&ret_ptr,+MEMCHECK_SIZE);
+	checkDEADBEAF(ptr, filename, line, "realloc");
+
 	return ret_ptr;
 }
 
 #ifndef NDEBUG
-char *_vm_strdup( const char *ptr, char *filename, int line )
+char *_vm_strdup( const char *ptr, const char *filename, int line )
 #else
 char *_vm_strdup( const char *ptr )
 #endif
@@ -715,7 +856,7 @@ char *_vm_strdup( const char *ptr )
 }
 
 #ifndef NDEBUG
-char *_vm_strndup( const char *ptr, int size, char *filename, int line )
+char *_vm_strndup( const char *ptr, int size, const char *filename, int line )
 #else
 char *_vm_strndup( const char *ptr, int size )
 #endif
@@ -735,11 +876,14 @@ char *_vm_strndup( const char *ptr, int size )
 }
 
 #ifndef NDEBUG
-void _vm_free( void *ptr, char *filename, int line )
+void _vm_free( void *ptr, const char *filename, int line )
 #else
 void _vm_free( void *ptr )
 #endif
 {
+	checkDEADBEAF(ptr, filename, line, "free");
+	offset32(&ptr,-MEMCHECK_SIZE);
+	
 	if ( !ptr ) {
 #ifndef NDEBUG
 		mprintf(("Why are you trying to free a NULL pointer?  [%s(%d)]\n", clean_filename(filename), line));
@@ -777,5 +921,4 @@ void _vm_free( void *ptr )
 void vm_free_all()
 {
 }
-
 #endif // SCP_UNIX
