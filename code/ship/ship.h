@@ -1577,6 +1577,8 @@ typedef struct ship {
 	float flare_life;
 	int flare_bm;
 	*/
+	
+	ship();
 } ship;
 
 // structure and array def for ships that have exited the game.  Keeps track of certain useful
