@@ -1868,6 +1868,13 @@
 
 #include "globalincs/pstypes.h"
 
+
+
+#ifdef SCP_WII
+#include <gl/GLwii.h>
+#include <ogc/consol.h>
+#endif
+
 extern int Om_tracker_flag; // needed for FS2OpenPXO config
 
 
@@ -9184,6 +9191,8 @@ int game_main(char *cmdline)
 		gameseq_post_event(GS_EVENT_GAME_INIT);		// start the game rolling -- check for default pilot, or go to the pilot select screen
 	}
 
+	CON_SetStipple(0);
+	
 	while (1) {
 		// only important for non THREADED mode
 		os_poll();
@@ -9294,6 +9303,10 @@ int main(int argc, char *argv[])
 	char *argptr = NULL;
 	int i, len = 0;
 	char userdir[MAX_PATH];
+	
+#ifdef SCP_WII
+	extern void WiiInit(); WiiInit();
+#endif
 
 #ifdef APPLE_APP
 	// Finder sets the working directory to the root of the drive so we have to get a little creative
