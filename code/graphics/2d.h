@@ -967,7 +967,7 @@ typedef struct screen {
 
 //	void (*gf_rect)(int x, int y, int w, int h,bool resize);
 //	void (*gf_shade)(int x, int y, int w, int h);
-	void (*gf_string)(int x, int y, char * text,bool resize);
+	void (*gf_string)(int x, int y, const char * text,bool resize);
 
 	// Draw a gradient line... x1,y1 is bright, x2,y2 is transparent.
 	void (*gf_gradient)(int x1, int y1, int x2, int y2, bool resize);
@@ -1200,7 +1200,7 @@ extern void gr_set_palette(char *name, ubyte *palette, int restrict_to_128 = 0);
 // These two functions use a Windows mono font.  Only for use
 // in the editor, please.
 void gr_get_string_size_win(int *w, int *h, char *text);
-void gr_string_win(int x, int y, char *s );
+void gr_string_win(int x, int y, const char *s );
 
 // set the mouse pointer to a specific bitmap, used for animating cursors
 #define GR_CURSOR_LOCK		1
@@ -1269,7 +1269,7 @@ void gr_shade(int x, int y, int w, int h, bool resize = true);
 
 //#define gr_shade				GR_CALL(gr_screen.gf_shade)
 //#define gr_string				GR_CALL(gr_screen.gf_string)
-__inline void gr_string(int x, int y, char* string, bool resize = true)
+__inline void gr_string(int x, int y, const char* string, bool resize = true)
 {
 	(*gr_screen.gf_string)(x,y,string,resize);
 }

@@ -175,6 +175,7 @@
 #include "localization/localize.h"
 #include "cmdline/cmdline.h"
 
+#include "wii_port/wiiosk.h"
 
 
 // global xstr colors
@@ -205,6 +206,8 @@ UI_WINDOW::UI_WINDOW()
 	mask_data = NULL;					// points to raw mask bitmap data
 	mask_w = -1;						// bitmap width
 	mask_h = -1;						// bitmap height
+	osk_active = false;
+	osk_disable = false;
 	tooltip_handler = NULL;			// pointer to function to handle custom tooltips
 
 	// NULL all the xstring structs
@@ -419,6 +422,11 @@ void UI_WINDOW::draw()
 
 	// draw tooltips
 	draw_tooltip();
+	
+	if(osk_active)
+	{
+		draw_osk();
+	}
 
 	// convenient debug code for showing mouse coords
 	if(Cmdline_mouse_coords){
@@ -551,9 +559,40 @@ void UI_WINDOW::render_tooltip(char *str)
 	gr_string(ttx, tty, str);
 }
 
+
+
+
+
+extern int SDLtoFS2[SDLK_LAST];
+
+static const char *osk_buffer;
+
+const char * take_osk(int key, int modifier)
+{
+	key_mark(SDLtoFS2[key], (modifier & SDL_KEYDOWN) != 0, 0);
+	
+	return osk_buffer;
+}
+
+
+
+void UI_WINDOW::activate_OSK(const char * buf)
+{
+	osk_active = true;
+	osk_disable = false;
+	osk_buffer = buf;
+}
+
+void UI_WINDOW::deactive_OSK()
+{
+	osk_disable = true;
+}
+
 // key_in: If not -1, this means to use this key as input, and not call game_poll()
 int UI_WINDOW::process(int key_in,int process_mouse)
 {
+	osk_disable = true;
+
 	UI_GADGET *tmp;
 
 	// only does stuff in non THREADED mode
@@ -606,6 +645,19 @@ int UI_WINDOW::process(int key_in,int process_mouse)
 			tmp = tmp->next;
 
 		} while (tmp != first_gadget);
+	}
+	
+	if(osk_active)
+	{
+		if(osk_disable)
+		{
+			osk_active = false;
+			osk_buffer = NULL;
+		}
+		else
+		{
+			process_osk(ui_mouse.x, ui_mouse.y, (ui_mouse.b1_status & BUTTON_PRESSED) != 0, (ui_mouse.b2_status & BUTTON_PRESSED) != 0, take_osk);
+		}
 	}
 
 	use_hack_to_get_around_stupid_problem_flag = 0;

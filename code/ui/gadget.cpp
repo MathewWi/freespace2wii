@@ -553,6 +553,12 @@ int UI_GADGET::is_mouse_on()
 	int offset, pixel_val;
 	ubyte *mask_data;
 	int mask_w, mask_h;
+	
+	// If the on-screen keyboard is active, ignore all GADGETs
+	if(my_wnd->osk_active)
+	{
+		return 0;
+	}
 
 	// if linked to a hotspot, use the mask for determination
 	if (linked_to_hotspot) {

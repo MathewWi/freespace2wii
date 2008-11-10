@@ -389,7 +389,7 @@ int get_char_width(ubyte c1,ubyte c2,int *width,int *spacing)
 }
 
 // NOTE: this returns an unscaled size for non-standard resolutions
-int get_centered_x(char *s)
+int get_centered_x(const char *s)
 {
 	int w,w2,s2;
 
@@ -716,7 +716,7 @@ void gr8_string(int sx, int sy, char *s )
 HFONT MyhFont = NULL;
 HDC hDibDC = NULL;
 
-void gr_string_win(int x, int y, char *s)
+void gr_string_win(int x, int y, const char *s)
 {
 	int old_bitmap = gr_screen.current_bitmap; 
 	gr_set_font(FONT1);
