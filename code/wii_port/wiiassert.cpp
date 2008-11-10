@@ -1,4 +1,5 @@
 #include "wii_port/wiiassert.h"
+#include "wii_port/wiiclock.h"
 #undef exit
 
 #include <stdio.h>
@@ -121,12 +122,76 @@ extern "C" void fs2_power_off(s32 chan)
 	power_pressed = 1;
 }
 
+static volatile u32 perf_count;
+
+#include "SDL_Timer.h"
+
+extern "C" unsigned int getCount()
+{
+	return SDL_GetTicks();
+}
+
+void incCount(syswd_t)
+{
+	++perf_count;
+}
+
+
+syswd_t perf_timer;
+FILE * perf_log;
+
+static u32 counter;
+extern "C" void tic()
+{
+	counter = getCount();
+}
+
+extern "C" void tocInternal(const char *file, int line)
+{
+	u32 c = getCount() - counter;
+	printf("%u ticks at %s - %d\n", c, file, line);
+	fprintf(perf_log, "%u ticks at %s - %d\n", c, file, line);
+	counter = getCount();
+}
+
+extern "C" void tocInternalMsg(const char *file, int line, const char *msg)
+{
+	u32 c = getCount() - counter;
+	printf("%u ticks at %s - %d\n", c, file, line);
+	fprintf(perf_log, "%u ticks at %s - %d, %s\n", c, file, line, msg);
+	counter = getCount();
+}
+
+
 void WiiInit()
 {
+	init_wiiclock();
 	ShowConsole(); 
 	CON_SetStipple(0);
 	
 	// Listen for power off
 	WPAD_SetPowerCallback(&fs2_power_off);
+	
+	perf_count = 0;
+	
+	timespec start;
+	timespec interval;
+	
+    int timer_created = !SYS_CreateAlarm(&perf_timer);
+	
+	start.tv_sec = 0;
+	start.tv_nsec = 0;
+	
+	interval.tv_sec = 0;
+	interval.tv_nsec = 1000;
+	
+	if(timer_created)
+	{		
+		SYS_SetPeriodicAlarm(perf_timer, &start, &interval, &incCount);
+	}
+	
+	perf_log = NULL;
+	
+	perf_log = fopen("/perf_log.txt","w");
 }
 

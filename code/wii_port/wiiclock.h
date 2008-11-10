@@ -9,6 +9,13 @@ extern "C" {
 
 clock_t wiiclock();
 void init_wiiclock();
+unsigned int getCount();
+
+void tic();
+void tocInternal(const char *file, int line);
+void tocInternalMsg(const char *file, int line, const char *msg);
+#define toc() tocInternal(__FILE__, __LINE__)
+#define tocMsg(m) tocInternalMsg(__FILE__, __LINE__, m)
 
 #ifdef __cplusplus
 }
