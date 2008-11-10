@@ -361,6 +361,7 @@ void LuaError(struct lua_State *L, char *format, ...)
 	exit(EXIT_FAILURE);
 }
 
+#ifdef SCP_WII
 
 HMMIO mmioOpen(LPSTR szFilename, LPMMIOINFO lpmmioinfo, DWORD dwOpenFlags)
 {
@@ -412,6 +413,9 @@ MMRESULT mmioClose(HMMIO hmmio, uint wFlags)
 
 	return 0;
 }
+
+#endif
+
 
 // get a filename minus any leading path
 const char *clean_filename(const char *name)
@@ -843,7 +847,11 @@ char *_vm_strdup( const char *ptr )
 	char *dst;
 	int len = strlen(ptr);
 
+#ifndef NDEBUG
+	dst = (char *)_vm_malloc( len+1 , filename, line, 0);
+#else
 	dst = (char *)vm_malloc( len+1 );
+#endif
 
 	if (!dst)
 		return NULL;
@@ -860,8 +868,13 @@ char *_vm_strndup( const char *ptr, int size )
 #endif
 {
 	char *dst;
+	
+#ifndef NDEBUG
+	dst = (char *)_vm_malloc( size+1 , filename, line, 0);
+#else
+	dst = (char *)vm_malloc( size1 );
+#endif
 
-	dst = (char *)vm_malloc( size+1 );
 
 	if (!dst)
 		return NULL;
