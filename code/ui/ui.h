@@ -983,7 +983,6 @@ protected:
 	void draw_xstrs();			// draw xstrs
 	void draw_one_xstr(UI_XSTR *xstr, int frame);
 	
-	bool osk_active;
 	bool osk_disable;
 public:
 	UI_WINDOW();	// constructor
@@ -1006,6 +1005,7 @@ public:
 	
 	void activate_OSK(const char *);
 	void deactive_OSK();
+	bool osk_active;
 
 	char *(*tooltip_handler)(char *text);
 	int last_keypress;		// filled in each frame

@@ -569,7 +569,13 @@ static const char *osk_buffer;
 
 const char * take_osk(int key, int modifier)
 {
-	key_mark(SDLtoFS2[key], (modifier & SDL_KEYDOWN) != 0, 0);
+	if(modifier & SDL_KEYDOWN)
+	{
+		key_mark(SDLtoFS2[key], 1, 0);
+	} else if(modifier & SDL_KEYUP)
+	{
+		key_mark(SDLtoFS2[key], 0, 0);
+	}	
 	
 	return osk_buffer;
 }
@@ -656,6 +662,8 @@ int UI_WINDOW::process(int key_in,int process_mouse)
 		}
 		else
 		{
+			if(!process_mouse) ui_mouse_process();
+			
 			process_osk(ui_mouse.x, ui_mouse.y, (ui_mouse.b1_status & BUTTON_PRESSED) != 0, (ui_mouse.b2_status & BUTTON_PRESSED) != 0, take_osk);
 		}
 	}
