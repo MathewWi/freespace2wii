@@ -496,11 +496,13 @@ int verify_pilot_file(char *filename, int single, int *rank)
 	int type;
 	char pname[MAX_FILENAME_LEN];
 
-	Assert( strlen(filename) < MAX_FILENAME_LEN - 4 );
+	Assert( strlen(filename) < MAX_FILENAME_LEN );
 	strcpy(pname, filename);
 
 	char *p = strchr( pname, '.' );
 	if ( p ) *p = 0;
+	
+	Assert( strlen(pname) < MAX_FILENAME_LEN - 4 );
 
 	if (single)
 		strcat(pname, ".pl2");
