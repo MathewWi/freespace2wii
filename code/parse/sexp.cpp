@@ -1563,6 +1563,7 @@
 #include <ctype.h>
 #include <assert.h>
 #include <limits.h>
+#include <new>
 
 #include "parse/parselo.h"
 #include "parse/sexp.h"
@@ -2204,7 +2205,7 @@ void arg_item::add_data(char *str)
 	arg_item *item, *ptr;
 
 	// create item
-	item = new arg_item;
+	item = new(vm_malloc(sizeof(arg_item))) arg_item;
 	item->text = str;
 	item->nesting_level = Sexp_current_argument_nesting_level;
 
@@ -2233,7 +2234,8 @@ void arg_item::expunge()
 	while (this->next != NULL)
 	{
 		ptr = this->next->next;
-		delete this->next;
+		this->next->~arg_item();
+		vm_free(this->next);
 		this->next = ptr;
 	}
 }
@@ -2246,7 +2248,8 @@ void arg_item::clear_nesting_level()
 	while (this->next != NULL && this->next->nesting_level >= Sexp_current_argument_nesting_level )
 	{
 		ptr = this->next->next;
-		delete this->next;
+		this->next->~arg_item();
+		vm_free(this->next);
 		this->next = ptr;
 	}
 }
