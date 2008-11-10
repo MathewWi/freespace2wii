@@ -377,6 +377,10 @@ void UI_BUTTON::draw()
 	}
 }
 
+#ifdef SCP_WII
+#include "wii_port/wiirumble.h"
+#endif
+
 // process() is called to process the button, which amounts to:
 //   If mouse is over button, hilight it
 //   If highlighted and mouse button down, flag button as down
@@ -435,6 +439,11 @@ void UI_BUTTON::process(int focus)
 		if ( !(old_flags & BF_HIGHLIGHTED) ) {
 			int do_callback = 1;
 			m_flags |= BF_JUST_HIGHLIGHTED;
+			
+#ifdef SCP_WII
+			timedRumble();
+#endif
+			
 			// if a callback exists, call it
 			if (m_just_highlighted_function) {
 

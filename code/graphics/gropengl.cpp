@@ -2436,8 +2436,10 @@ int opengl_check_for_errors(char *err_at)
 	if (error_str) {
 		if (err_at != NULL) {
 			nprintf(("OpenGL", "OpenGL Error from %s: %s\n", err_at, error_str));
+			mprintf(("OpenGL Error from %s: %s\n", err_at, error_str));
 		} else {
 			nprintf(("OpenGL", "OpenGL Error: %s\n", error_str));
+			mprintf(("OpenGL Error: %s\n", error_str));
 		}
 
 		num_errors++;

@@ -588,7 +588,11 @@ void UI_INPUTBOX::process(int focus)
 	pressed_down = 0;
 	clear_lastkey = (flags & UI_INPUTBOX_FLAG_KEYTHRU) ? 0 : 1;
 
-	if (focus) {
+	if (focus) {	
+		if (my_wnd->selected_gadget == this) {
+			my_wnd->activate_OSK( text );
+		}
+		
 		key = my_wnd->keypress;
 		switch (key) {
 			case 0:

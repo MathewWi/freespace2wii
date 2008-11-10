@@ -1,4 +1,5 @@
 syntax: glob
+*.orig
 *.elf
 *.dol
 code\build\freespace2.elf.map

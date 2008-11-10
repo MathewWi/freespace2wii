@@ -287,6 +287,8 @@ extern void joy_set_button_state(int button, int state);
 extern void joy_set_hat_state(int position);
 #ifdef SCP_WII
 extern volatile unsigned char power_pressed;
+#include <wiiuse/wpad.h>
+#include "wii_port/wiirumble.h"
 #endif
 
 DWORD unix_process(DWORD lparam)
@@ -294,11 +296,14 @@ DWORD unix_process(DWORD lparam)
 	SDL_Event event;
 
 #ifdef SCP_WII
-	if(power_pressed)
+	WPAD_ScanPads();
+	if(power_pressed || (WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME) || (WPAD_ButtonsHeld(0) & WPAD_BUTTON_HOME))
 	{
 		key_mark(KEY_ESC, 1, 0);
 		key_mark(KEY_ESC, 0, 0);
 	}
+	
+	doRumble();
 #endif
 
 	while( SDL_PollEvent(&event) ) {
