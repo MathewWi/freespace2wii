@@ -817,7 +817,8 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 	RAM *item = RamTable;
 
 	while (item != NULL) {
-		if (item->addr == (ptr_u)ret_ptr) {
+		if (item->addr == (ptr_u)ptr) {
+			item->addr = (ptr_u) ret_ptr;
 			TotalRam += (size - item->size);
 			item->size = size;
 			break;
@@ -826,9 +827,9 @@ void *_vm_realloc( void *ptr, int size, int quiet )
     }
 #endif
 
-	setDEADBEAF( ptr, size );
+	setDEADBEAF(ret_ptr, size );
 	offset32(&ret_ptr,+MEMCHECK_SIZE);
-	checkDEADBEAF(ptr, filename, line, "realloc");
+	checkDEADBEAF(ret_ptr, filename, line, "realloc");
 
 	return ret_ptr;
 }
