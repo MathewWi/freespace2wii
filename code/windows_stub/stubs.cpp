@@ -258,9 +258,6 @@ void Warning( char * filename, int line, const char * format, ... )
 	}
 
 	mprintf(("WARNING: \"%s\" at %s:%d\n", buffer, strrchr(filename, '/')+1, line));
-
-	// Order UP!!
-	fprintf(stderr, "WARNING: \"%s\" at %s:%d\n", buffer, filename, line);
 #endif
 }
 
