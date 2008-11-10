@@ -2586,6 +2586,9 @@ ship::ship() : warpin_effect(NULL), warpout_effect(NULL), shield_integrity(NULL)
 	}
 }
 
+ship_info::ship_info() : type_str(NULL), maneuverability_str(NULL), armor_str(NULL), manufacturer_str(NULL), 
+	desc(NULL), tech_desc(NULL), ship_length(NULL), gun_mounts(NULL), missile_banks(NULL), subsystems(NULL)
+{}
 
 // set the ship_obj struct fields to default values
 void ship_obj_list_reset_slot(int index)

@@ -1996,6 +1996,8 @@ typedef struct ship_info {
 
 	int num_maneuvering;
 	man_thruster maneuvering[MAX_MAN_THRUSTERS];
+	
+	ship_info();
 } ship_info;
 
 extern int Num_wings;
