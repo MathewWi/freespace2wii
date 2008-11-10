@@ -14,6 +14,10 @@ extern "C" void __console_init(void *framebuffer,int xstart,int ystart,int xres,
 
 extern "C" void WiiAssert(const char * text,const char *filename, int line)
 {
+	ShowConsole();
+	CON_SetStipple(0);
+	VIDEO_WaitVSync();	
+	
 	LWP_Reschedule(LWP_PRIO_IDLE);
 	LWP_SetThreadPriority (LWP_GetSelf (), LWP_PRIO_HIGHEST);
 	
@@ -46,6 +50,10 @@ extern "C" void WiiAssert(const char * text,const char *filename, int line)
 
 extern "C" void wiipause()
 {
+	ShowConsole();
+	CON_SetStipple(0);
+	VIDEO_WaitVSync();
+	
 	kprintf("Press Home on WiiMote 1 or A on Gamecube Pad 1 to continue\n");
 	
 	fflush(stdout);
@@ -75,6 +83,10 @@ extern "C" void wiipause()
 
 extern "C" void pause_exit(int code,const char *filename, int line)
 {
+	ShowConsole();
+	CON_SetStipple(0);
+	VIDEO_WaitVSync();
+	
 	fflush(stderr);
 	LWP_Reschedule(LWP_PRIO_IDLE);
 	LWP_SetThreadPriority (LWP_GetSelf (), LWP_PRIO_HIGHEST);
