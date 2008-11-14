@@ -1,0 +1,13 @@
+syntax: glob
+*.orig
+*.elf
+*.dol
+code\build\freespace2.elf.map
+*.i
+*.s
+*.o
+*.gch
+*.ii
+*.d
+.deps/*.Po
+.svn/*
