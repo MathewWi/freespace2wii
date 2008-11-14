@@ -42,6 +42,8 @@ int access(const char *pathname, int mode)
 	}
 }
 
+#include <math.h>
+
 int isfinitef(float f)
 {
 	return !(isinf(f) || isnan(f));
