@@ -1261,57 +1261,6 @@ int cf_find_file_location(const char *filespec, int pathtype, int max_out, char 
 	return 0;
 }
 
-#include <string>
-#include <map>
-
-struct FileElement
-{
-	FileElement(int t, const char *file) : type(t), filename(file) {};
-	int type;
-	std::string filename;
-};
-
-typedef std::multimap<std::string, FileElement> fileCacheType;
-fileCacheType file_cache;
-
-void build_file_index()
-{
-	static bool built = false;
-	int n_files = 0;
-	
-	if(built)
-	{
-		return;
-	}
-	
-	char longname[MAX_PATH_LEN];
-	
-	for (int i = CF_TYPE_ROOT; i < CF_MAX_PATH_TYPES; i++)
-	{
-		cf_create_default_path_string( longname, sizeof(longname)-1, i, NULL, 0);
-		
-		
-		DIR *dirp;
-		struct dirent *dir;
-
-		dirp = opendir (longname);
-		if ( dirp ) {
-			while ((dir = readdir (dirp)) != NULL)
-			{
-				if (!fnmatch("*.*", dir->d_name, 0))
-				{
-					std::string s(dir->d_name);
-					
-					file_cache.insert(std::make_pair(s.substr(0,s.find_last_of(".")), FileElement(i, dir->d_name)));
-					++n_files;
-				}
-			}
-		}
-	}
-	
-	built = true;
-}
-
 // -- from parselo.cpp --
 extern char *stristr(const char *str, const char *substr);
 
@@ -1330,6 +1279,7 @@ extern char *stristr(const char *str, const char *substr);
 int cf_find_file_location_ext(const char *filename, const int ext_num, const char **ext_list, int pathtype, int max_out, char *pack_filename, int *size, int *offset, bool localize )
 {
 	int i, cur_ext;
+	int cfs_slow_search = 0;
 	char longname[MAX_PATH_LEN];
 	char filespec[MAX_FILENAME_LEN];
 	char *p = NULL;
@@ -1355,34 +1305,79 @@ int cf_find_file_location_ext(const char *filename, const int ext_num, const cha
 		return 0;
 	}
 
+	// Search the hard drive for files first.
+	int num_search_dirs = 0;
+	int search_order[CF_MAX_PATH_TYPES];
+
+	if ( CF_TYPE_SPECIFIED(pathtype) )	{
+		search_order[num_search_dirs++] = pathtype;
+	} else {
+		for (i = CF_TYPE_ROOT; i < CF_MAX_PATH_TYPES; i++)
+			search_order[num_search_dirs++] = i;
+	}
+
 	memset( longname, 0, sizeof(longname) );
 	memset( filespec, 0, sizeof(filespec) );
 
 	// strip any existing extension
 	strncpy(filespec, filename, MAX_FILENAME_LEN-1);
-	
-	build_file_index();
-	
-	fileCacheType::iterator idx = file_cache.find(filename);
-	
-	if(idx != file_cache.end())
-	{
-		fileCacheType::iterator endidx = file_cache.upper_bound(filename);
-		
-		for(;idx != endidx; ++idx)
-		{
-			for (cur_ext = 0; cur_ext < ext_num; cur_ext++) {
-				// strip any extension and add the one we want to check for
-				// (NOTE: to be fully retail compatible, we need to support multiple periods for something like *_1.5.wav,
-				//        which means that we need to strip a length of >2 only, assuming that all valid ext are at least 2 chars)
-				p = strrchr(filespec, '.');
-				if ( p && (strlen(p) > 2) )
-					(*p) = 0;
 
-				SAFE_STRCAT( filespec, ext_list[cur_ext], sizeof(filespec)-1 );
-					
-				cf_create_default_path_string( longname, sizeof(longname)-1, idx->second.type, filespec, localize );
-				
+	for (i = 0; i < num_search_dirs; i++) {
+		// always hit the disk if we are looking in only one path
+		if (num_search_dirs == 1) {
+			cfs_slow_search = 1;
+		}
+		// otherwise hit based on a directory type
+		else {
+			switch (search_order[i])
+			{
+				case CF_TYPE_ROOT:
+				case CF_TYPE_DATA:
+				case CF_TYPE_SINGLE_PLAYERS:
+				case CF_TYPE_MULTI_PLAYERS:
+				case CF_TYPE_MULTI_CACHE:
+				case CF_TYPE_MISSIONS:
+				case CF_TYPE_CACHE:
+					cfs_slow_search = 1;
+					break;
+			}
+		}
+
+		if ( !cfs_slow_search )
+			continue;
+
+		for (cur_ext = 0; cur_ext < ext_num; cur_ext++) {
+			// strip any extension and add the one we want to check for
+			// (NOTE: to be fully retail compatible, we need to support multiple periods for something like *_1.5.wav,
+			//        which means that we need to strip a length of >2 only, assuming that all valid ext are at least 2 chars)
+			p = strrchr(filespec, '.');
+			if ( p && (strlen(p) > 2) )
+				(*p) = 0;
+
+			SAFE_STRCAT( filespec, ext_list[cur_ext], sizeof(filespec)-1 );
+ 
+			cf_create_default_path_string( longname, sizeof(longname)-1, search_order[i], filespec, localize );
+
+#if defined _WIN32
+			if (!Cmdline_safeloading) {
+				findhandle = _findfirst(longname, &findstruct);
+				if (findhandle != -1) {
+					if (size)
+						*size = findstruct.size;
+
+					_findclose(findhandle);
+
+					if (offset)
+						*offset = 0;
+
+					if (pack_filename)
+						strncpy( pack_filename, longname, max_out );
+
+					return cur_ext;
+				}
+			} else
+#endif
+			{
 				FILE *fp = fopen(longname, "rb" );
 
 				if (fp) {
@@ -1424,13 +1419,13 @@ int cf_find_file_location_ext(const char *filename, const int ext_num, const cha
 	int last_path_index = -1;
 
 	file_list_index.reserve(Num_files);
-	
+
 	// next, run though and pick out base matches
 	for (i = 0; i < Num_files; i++) {
 		cf_file *f = cf_get_file(i);
 
 		// ... only search paths that we're supposed to
-		if ( CF_TYPE_SPECIFIED(pathtype) && (pathtype != f->pathtype_index) )
+		if ( (num_search_dirs == 1) && (pathtype != f->pathtype_index) )
 			continue;
 
 		// ... check that our names are the same length (accounting for the missing extension on our own name)
@@ -1474,6 +1469,7 @@ int cf_find_file_location_ext(const char *filename, const int ext_num, const cha
 	// quick exit test
 	if (file_list_size < 1)
 		goto Bail;
+
 
 	// now try and find our preferred match
 	for (cur_ext = 0; cur_ext < ext_num; cur_ext++) {
