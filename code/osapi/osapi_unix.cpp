@@ -296,7 +296,6 @@ DWORD unix_process(DWORD lparam)
 	SDL_Event event;
 
 #ifdef SCP_WII
-	WPAD_ScanPads();
 	if(power_pressed || (WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME) || (WPAD_ButtonsHeld(0) & WPAD_BUTTON_HOME))
 	{
 		key_mark(KEY_ESC, 1, 0);

@@ -14,6 +14,10 @@ extern "C" void __console_init(void *framebuffer,int xstart,int ystart,int xres,
 
 extern "C" void WiiAssert(const char * text,const char *filename, int line)
 {
+	ShowConsole();
+	CON_SetStipple(0);
+	VIDEO_WaitVSync();	
+	
 	LWP_Reschedule(LWP_PRIO_IDLE);
 	LWP_SetThreadPriority (LWP_GetSelf (), LWP_PRIO_HIGHEST);
 	
@@ -46,6 +50,10 @@ extern "C" void WiiAssert(const char * text,const char *filename, int line)
 
 extern "C" void wiipause()
 {
+	ShowConsole();
+	CON_SetStipple(0);
+	VIDEO_WaitVSync();
+	
 	kprintf("Press Home on WiiMote 1 or A on Gamecube Pad 1 to continue\n");
 	
 	fflush(stdout);
@@ -75,6 +83,10 @@ extern "C" void wiipause()
 
 extern "C" void pause_exit(int code,const char *filename, int line)
 {
+	ShowConsole();
+	CON_SetStipple(0);
+	VIDEO_WaitVSync();
+	
 	fflush(stderr);
 	LWP_Reschedule(LWP_PRIO_IDLE);
 	LWP_SetThreadPriority (LWP_GetSelf (), LWP_PRIO_HIGHEST);
@@ -105,7 +117,8 @@ extern "C" void pause_exit(int code,const char *filename, int line)
 
 
 long __stack_chk_guard[8] = {0,0,0,0,0,0,0,0};
-extern "C" void __stack_chk_fail(void);
+extern "C" void __stack_chk_fail(void)
+	__attribute__ ((no_instrument_function));
 
 extern "C" void __stack_chk_fail(void)
 {
@@ -131,37 +144,32 @@ extern "C" unsigned int getCount()
 	return SDL_GetTicks();
 }
 
-void incCount(syswd_t)
-{
-	++perf_count;
-}
-
-
 syswd_t perf_timer;
 FILE * perf_log;
 
-static u32 counter;
+static u32 perf_counter;
 extern "C" void tic()
 {
-	counter = getCount();
+	perf_counter = getCount();
 }
 
 extern "C" void tocInternal(const char *file, int line)
 {
-	u32 c = getCount() - counter;
+	u32 c = getCount() - perf_counter;
 	printf("%u ticks at %s - %d\n", c, file, line);
 	fprintf(perf_log, "%u ticks at %s - %d\n", c, file, line);
-	counter = getCount();
+	perf_counter = getCount();
 }
 
 extern "C" void tocInternalMsg(const char *file, int line, const char *msg)
 {
-	u32 c = getCount() - counter;
+	u32 c = getCount() - perf_counter;
 	printf("%u ticks at %s - %d\n", c, file, line);
 	fprintf(perf_log, "%u ticks at %s - %d, %s\n", c, file, line, msg);
-	counter = getCount();
+	perf_counter = getCount();
 }
 
+#include <wiitrace.h>
 
 void WiiInit()
 {
@@ -170,28 +178,14 @@ void WiiInit()
 	CON_SetStipple(0);
 	
 	// Listen for power off
-	WPAD_SetPowerCallback(&fs2_power_off);
+	WPAD_SetPowerButtonCallback(fs2_power_off);
 	
-	perf_count = 0;
-	
-	timespec start;
-	timespec interval;
-	
-    int timer_created = !SYS_CreateAlarm(&perf_timer);
-	
-	start.tv_sec = 0;
-	start.tv_nsec = 0;
-	
-	interval.tv_sec = 0;
-	interval.tv_nsec = 1000;
-	
-	if(timer_created)
-	{		
-		SYS_SetPeriodicAlarm(perf_timer, &start, &interval, &incCount);
-	}
+	perf_counter = getCount();
 	
 	perf_log = NULL;
 	
 	perf_log = fopen("/perf_log.txt","w");
+	
+	initProfiler("/trace_log.txt",1);
 }
 
