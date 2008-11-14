@@ -9296,6 +9296,8 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int nCmdSh
 
 #else
 
+#include <wiitrace.h>
+
 // *NIX specific
 int main(int argc, char *argv[])
 {
@@ -9352,6 +9354,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Caught exception in main()!\n");
 		result = EXIT_FAILURE;
 	}
+	closeProfiler();
 
 	DBUGFILE_DEINIT();
 
