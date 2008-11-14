@@ -1,8 +1,18 @@
 #include <gccore.h>
 #include "wiiclock.h"
 
-clock_t counter;
+volatile clock_t counter;
 syswd_t pluser;
+
+	
+clock_t wiiclock()
+	__attribute__ ((no_instrument_function));
+	
+void pluse()
+	__attribute__ ((no_instrument_function));
+	
+void init_wiiclock()
+	__attribute__ ((no_instrument_function));
 
 clock_t wiiclock()
 {
