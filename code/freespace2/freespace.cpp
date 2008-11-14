@@ -9191,7 +9191,7 @@ int game_main(char *cmdline)
 		gameseq_post_event(GS_EVENT_GAME_INIT);		// start the game rolling -- check for default pilot, or go to the pilot select screen
 	}
 
-	CON_SetStipple(0);
+	CON_SetStipple(1);
 	
 	while (1) {
 		// only important for non THREADED mode
@@ -9202,6 +9202,9 @@ int game_main(char *cmdline)
 			break;
 		}
 	} 
+	
+	ShowConsole();
+	CON_SetStipple(0);	
 
 #ifdef FS2_DEMO
 	if(!Is_standalone){
