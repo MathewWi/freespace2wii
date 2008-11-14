@@ -626,6 +626,8 @@ struct point
 #define MEMCHECK_SIZE 0
 #endif
 
+#ifndef NDEBUG
+
 void setDEADBEAF( void *ptr, size_t size )
 {
 	if(MEMCHECK_SIZE == 0) return;
@@ -749,6 +751,7 @@ void checkDEADBEAF(void *ptr, const char *filename, int line, const char *func)
 		wiipause();
 	}
 }
+#endif
 
 void * malloc_start = (void*)(SYSMEM2_START | LIBOGC);
 const void * malloc_end = (void*)(SYSMEM2_START | SYSMEM2_SIZE);
@@ -768,8 +771,11 @@ void *_vm_malloc( int size, int quiet )
 		if (quiet) {
 			return NULL;
 		}
-
+#ifndef NDEBUG
 		Error(LOCATION, "Out of memory, %d, total alloc %d.", size,TotalRam);
+#else
+		Error(LOCATION, "Out of memory, %d", size);
+#endif
 	}
 
 #ifndef NDEBUG
@@ -786,10 +792,10 @@ void *_vm_malloc( int size, int quiet )
 	RamTable = next;
 
 	TotalRam += size + sizeof(RAM);
-#endif
 	setDEADBEAF( ptr, size );
 	offset32(&ptr,+MEMCHECK_SIZE);
 	checkDEADBEAF(ptr, filename, line, "malloc");
+#endif
 	return ptr;
 }
 
@@ -801,10 +807,11 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 {
 	if (ptr == NULL)
 		return vm_malloc(size);
-	
+#ifndef NDEBUG
 	offset32(&ptr,-MEMCHECK_SIZE);
 	
 	if(size != 0) size += 2*4*MEMCHECK_SIZE;
+#endif
 
 	void *ret_ptr = realloc( ptr, size );
 
@@ -829,11 +836,11 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 		}
 		item = item->next;
     }
-#endif
-
+	
 	setDEADBEAF(ret_ptr, size );
 	offset32(&ret_ptr,+MEMCHECK_SIZE);
 	checkDEADBEAF(ret_ptr, filename, line, "realloc");
+#endif
 
 	return ret_ptr;
 }
@@ -872,7 +879,7 @@ char *_vm_strndup( const char *ptr, int size )
 #ifndef NDEBUG
 	dst = (char *)_vm_malloc( size+1 , filename, line, 0);
 #else
-	dst = (char *)vm_malloc( size1 );
+	dst = (char *)vm_malloc( size+1 );
 #endif
 
 
@@ -892,8 +899,11 @@ void _vm_free( void *ptr, const char *filename, int line )
 void _vm_free( void *ptr )
 #endif
 {
+
+#ifndef NDEBUG
 	checkDEADBEAF(ptr, filename, line, "free");
 	offset32(&ptr,-MEMCHECK_SIZE);
+#endif
 	
 	if ( !ptr ) {
 #ifndef NDEBUG

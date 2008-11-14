@@ -37,8 +37,13 @@ INCLUDE_DIR := /i/setup/SDL-Port/include /i/setup/libogg-1.1.3/include /i/setup/
 # options for code generation
 #---------------------------------------------------------------------------------
 
+
+#CFLAGS	= -Wall -g -finline-functions -save-temps -Os $(MACHDEP) $(INCLUDE) -DSCP_WII -DUSE_OPENAL -DSCP_UNIX -D_POSIX_SOURCE -DNO_DIRECT3D \
+#		-D_POSIX_TIMERS -fstack-protector-all -fbounds-check -fstack-limit-symbol=__stack_end -Wstack-protector -finstrument-functions
+
 CFLAGS	= -Wall -g -finline-functions -save-temps -Os $(MACHDEP) $(INCLUDE) -DSCP_WII -DUSE_OPENAL -DSCP_UNIX -D_POSIX_SOURCE -DNO_DIRECT3D \
-		-D_POSIX_TIMERS -fstack-protector-all -fbounds-check -fstack-limit-symbol=__stack_end -Wstack-protector -finstrument-functions
+		-D_POSIX_TIMERS -DNDEBUG
+		
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map -fstack-protector-all -fbounds-check -fstack-limit-symbol=__stack_end -finstrument-functions
