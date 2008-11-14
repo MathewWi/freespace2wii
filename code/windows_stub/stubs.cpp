@@ -258,9 +258,6 @@ void Warning( char * filename, int line, const char * format, ... )
 	}
 
 	mprintf(("WARNING: \"%s\" at %s:%d\n", buffer, strrchr(filename, '/')+1, line));
-
-	// Order UP!!
-	fprintf(stderr, "WARNING: \"%s\" at %s:%d\n", buffer, filename, line);
 #endif
 }
 
@@ -364,6 +361,7 @@ void LuaError(struct lua_State *L, char *format, ...)
 	exit(EXIT_FAILURE);
 }
 
+#ifdef SCP_WII
 
 HMMIO mmioOpen(LPSTR szFilename, LPMMIOINFO lpmmioinfo, DWORD dwOpenFlags)
 {
@@ -415,6 +413,9 @@ MMRESULT mmioClose(HMMIO hmmio, uint wFlags)
 
 	return 0;
 }
+
+#endif
+
 
 // get a filename minus any leading path
 const char *clean_filename(const char *name)
@@ -625,6 +626,8 @@ struct point
 #define MEMCHECK_SIZE 0
 #endif
 
+#ifndef NDEBUG
+
 void setDEADBEAF( void *ptr, size_t size )
 {
 	if(MEMCHECK_SIZE == 0) return;
@@ -748,6 +751,7 @@ void checkDEADBEAF(void *ptr, const char *filename, int line, const char *func)
 		wiipause();
 	}
 }
+#endif
 
 void * malloc_start = (void*)(SYSMEM2_START | LIBOGC);
 const void * malloc_end = (void*)(SYSMEM2_START | SYSMEM2_SIZE);
@@ -767,8 +771,11 @@ void *_vm_malloc( int size, int quiet )
 		if (quiet) {
 			return NULL;
 		}
-
+#ifndef NDEBUG
 		Error(LOCATION, "Out of memory, %d, total alloc %d.", size,TotalRam);
+#else
+		Error(LOCATION, "Out of memory, %d", size);
+#endif
 	}
 
 #ifndef NDEBUG
@@ -785,10 +792,10 @@ void *_vm_malloc( int size, int quiet )
 	RamTable = next;
 
 	TotalRam += size + sizeof(RAM);
-#endif
 	setDEADBEAF( ptr, size );
 	offset32(&ptr,+MEMCHECK_SIZE);
 	checkDEADBEAF(ptr, filename, line, "malloc");
+#endif
 	return ptr;
 }
 
@@ -800,10 +807,11 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 {
 	if (ptr == NULL)
 		return vm_malloc(size);
-	
+#ifndef NDEBUG
 	offset32(&ptr,-MEMCHECK_SIZE);
 	
 	if(size != 0) size += 2*4*MEMCHECK_SIZE;
+#endif
 
 	void *ret_ptr = realloc( ptr, size );
 
@@ -820,18 +828,19 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 	RAM *item = RamTable;
 
 	while (item != NULL) {
-		if (item->addr == (ptr_u)ret_ptr) {
+		if (item->addr == (ptr_u)ptr) {
+			item->addr = (ptr_u) ret_ptr;
 			TotalRam += (size - item->size);
 			item->size = size;
 			break;
 		}
 		item = item->next;
     }
-#endif
-
-	setDEADBEAF( ptr, size );
+	
+	setDEADBEAF(ret_ptr, size );
 	offset32(&ret_ptr,+MEMCHECK_SIZE);
-	checkDEADBEAF(ptr, filename, line, "realloc");
+	checkDEADBEAF(ret_ptr, filename, line, "realloc");
+#endif
 
 	return ret_ptr;
 }
@@ -845,7 +854,11 @@ char *_vm_strdup( const char *ptr )
 	char *dst;
 	int len = strlen(ptr);
 
+#ifndef NDEBUG
+	dst = (char *)_vm_malloc( len+1 , filename, line, 0);
+#else
 	dst = (char *)vm_malloc( len+1 );
+#endif
 
 	if (!dst)
 		return NULL;
@@ -862,8 +875,13 @@ char *_vm_strndup( const char *ptr, int size )
 #endif
 {
 	char *dst;
-
+	
+#ifndef NDEBUG
+	dst = (char *)_vm_malloc( size+1 , filename, line, 0);
+#else
 	dst = (char *)vm_malloc( size+1 );
+#endif
+
 
 	if (!dst)
 		return NULL;
@@ -881,8 +899,11 @@ void _vm_free( void *ptr, const char *filename, int line )
 void _vm_free( void *ptr )
 #endif
 {
+
+#ifndef NDEBUG
 	checkDEADBEAF(ptr, filename, line, "free");
 	offset32(&ptr,-MEMCHECK_SIZE);
+#endif
 	
 	if ( !ptr ) {
 #ifndef NDEBUG

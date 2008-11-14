@@ -9191,7 +9191,7 @@ int game_main(char *cmdline)
 		gameseq_post_event(GS_EVENT_GAME_INIT);		// start the game rolling -- check for default pilot, or go to the pilot select screen
 	}
 
-	CON_SetStipple(0);
+	CON_SetStipple(1);
 	
 	while (1) {
 		// only important for non THREADED mode
@@ -9202,6 +9202,9 @@ int game_main(char *cmdline)
 			break;
 		}
 	} 
+	
+	ShowConsole();
+	CON_SetStipple(0);	
 
 #ifdef FS2_DEMO
 	if(!Is_standalone){
@@ -9296,6 +9299,8 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int nCmdSh
 
 #else
 
+#include <wiitrace.h>
+
 // *NIX specific
 int main(int argc, char *argv[])
 {
@@ -9352,6 +9357,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Caught exception in main()!\n");
 		result = EXIT_FAILURE;
 	}
+	closeProfiler();
 
 	DBUGFILE_DEINIT();
 

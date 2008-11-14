@@ -789,47 +789,32 @@ void player_select_do()
 	
 	// draw any ui window stuf
 	Player_select_window.draw();
+	if(!Player_select_window.osk_active)
+	{
+		// light up the correct mode button (single or multi)
+		if (Player_select_mode == PLAYER_SELECT_MODE_SINGLE){
+			Player_select_buttons[gr_screen.res][SINGLE_BUTTON].button.draw_forced(2);
+		} else {
+			Player_select_buttons[gr_screen.res][MULTI_BUTTON].button.draw_forced(2);
+		}
 
-	// light up the correct mode button (single or multi)
-	if (Player_select_mode == PLAYER_SELECT_MODE_SINGLE){
-		Player_select_buttons[gr_screen.res][SINGLE_BUTTON].button.draw_forced(2);
-	} else {
-		Player_select_buttons[gr_screen.res][MULTI_BUTTON].button.draw_forced(2);
+		// draw the pilot list text
+		player_select_draw_list();	
+
+		// draw copyright message on the bottom on the screen
+		player_select_display_copyright();
+
+		// draw any pending messages on the bottom or middle of the screen
+		player_select_display_all_text();	
 	}
-
-	// draw the pilot list text
-	player_select_draw_list();	
-
-	// draw copyright message on the bottom on the screen
-	player_select_display_copyright();
-
+	
 	if (!Player_select_input_mode) {
 		player_select_process_noninput(k);
 	} else {
 		player_select_process_input(k);
 	}
+		
 	
-	// draw any pending messages on the bottom or middle of the screen
-	player_select_display_all_text();	
-
-#ifndef RELEASE_REAL
-	// gr_set_color_fast(&Color_bright_green);
-	// gr_string(0x8000, 10, "Development version - DO NOT RELEASE");
-#endif
-	
-	/*
-	gr_set_color(255, 0, 0);
-	vec3d whee[5];
-	vec3d *arr[5] = {&whee[0], &whee[1], &whee[2], &whee[3], &whee[4]};
-	whee[0].x = 10; whee[0].y = 10; whee[0].z = 0.0f;
-	whee[1].x = 50; whee[1].y = 50; whee[1].z = 0.0f;
-	whee[2].x = 50; whee[2].y = 90; whee[2].z = 0.0f;
-	whee[3].x = 90; whee[3].y = 130; whee[3].z = 0.0f;
-	whee[4].x = 180; whee[4].y = 130; whee[4].z = 0.0f;
-	gr_pline_special(arr, 5, 2);
-	*/
-	
-
 	gr_flip();
 }
 
