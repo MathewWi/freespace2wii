@@ -612,8 +612,8 @@ typedef struct flag_def_list {
 //This are defined in MainWin.c
 extern void _cdecl WinAssert(char * text,char *filename, int line);
 extern void LuaError(struct lua_State *L, char *format=NULL, ...);
-extern void _cdecl Error( char * filename, int line, const char * format, ... );
-extern void _cdecl Warning( char * filename, int line, const char * format, ... );
+extern void _cdecl Error( const char * filename, int line, const char * format, ... );
+extern void _cdecl Warning( const char * filename, int line, const char * format, ... );
 
 #include "osapi/outwnd.h"
 
@@ -1031,7 +1031,7 @@ int vm_init(int min_heap_size);
 // Frees all RAM.
 void vm_free_all();
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 	// Debug versions
 
 	// Allocates some RAM.

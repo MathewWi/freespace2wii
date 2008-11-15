@@ -445,10 +445,8 @@ int Shift_is_modifier;
 int Ctrl_is_modifier;
 int Alt_is_modifier;
 
-int Axis_enabled[JOY_NUM_AXES] = { 1, 1, 1, 0, 0, 0 };
-int Axis_enabled_defaults[JOY_NUM_AXES] = { 1, 1, 1, 0, 0, 0 };
-int Invert_axis[JOY_NUM_AXES] = { 0, 0, 0, 0, 0, 0 };
-int Invert_axis_defaults[JOY_NUM_AXES] = { 0, 0, 0, 0, 0, 0 };
+int Invert_axis[NUM_JOY_AXIS_ACTIONS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+int Invert_axis_defaults[NUM_JOY_AXIS_ACTIONS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 // arrays which hold the key mappings.  The array index represents a key-independent action.
 //

@@ -322,20 +322,29 @@
 
 #define CONTROL_CONFIG_XSTR	507
 
-#define JOY_X_AXIS	0
-#define JOY_Y_AXIS	1
-#define JOY_Z_AXIS	2
-#define JOY_RX_AXIS	3
-#define JOY_RY_AXIS	4
-#define JOY_RZ_AXIS	5
+#define WIIMOTE_YAW	0
+#define WIIMOTE_PITCH	1
+#define WIIMOTE_ROLL	2
+#define WIIMOTE_GX	3
+#define WIIMOTE_GY	4
+#define WIIMOTE_GZ	5
+#define WII_STICK1_X	6
+#define WII_STICK1_Y	7
+#define WII_STICK2_X	8
+#define WII_STICK2_Y	9
+#define WII_R_SHOUDLER	10
+#define WII_L_SHOUDLER	11
 
-#define NUM_JOY_AXIS_ACTIONS	5
+#define NUM_JOY_AXIS_ACTIONS	8
 
 #define JOY_HEADING_AXIS		0
 #define JOY_PITCH_AXIS			1
 #define JOY_BANK_AXIS			2
 #define JOY_ABS_THROTTLE_AXIS	3
 #define JOY_REL_THROTTLE_AXIS	4
+#define JOY_REL_HEADING_AXIS	5
+#define JOY_REL_PITCH_AXIS		6
+#define JOY_REL_BANK_AXIS		7
 
 // --------------------------------------------------
 // different types of controls that can be assigned 
@@ -530,9 +539,9 @@ extern int Invert_thrust;
 extern int Disable_axis2;
 extern int Disable_axis3;
 
-extern int Axis_map_to[];
-extern int Invert_axis[];
-extern int Invert_axis_defaults[];
+extern int Axis_map_to[NUM_JOY_AXIS_ACTIONS];
+extern int Invert_axis[NUM_JOY_AXIS_ACTIONS];
+extern int Invert_axis_defaults[NUM_JOY_AXIS_ACTIONS];
 
 extern config_item Control_config[];	// stores the keyboard configuration
 extern char **Scan_code_text;
@@ -553,7 +562,7 @@ char *translate_key(char *key);
 char *textify_scancode(int code);
 float check_control_timef(int id);
 int check_control(int id, int key = -1);
-void control_get_axes_readings(int *h, int *p, int *b, int *ta, int *tr);
+void control_get_axes_readings(int *values);
 void control_used(int id);
 void control_config_clear();
 void clear_key_binding(short key);

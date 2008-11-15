@@ -711,32 +711,6 @@ int mouse_get_pos(int *xpos, int *ypos)
 {
 	int flags;
 
-    if (!Mouse_in_focus)
-    {
-        if (xpos)
-			*xpos = Mouse_x;
-
-		if (ypos)
-			*ypos = Mouse_y;
-
-        return 0;
-    }
-
-	if (Mouse_mode == MOUSE_MODE_DI) {
-		if (xpos)
-			*xpos = Mouse_x;
-
-		if (ypos)
-			*ypos = Mouse_y;
-
-		return mouse_flags;
-	}
-
-	if (!mouse_inited) {
-		*xpos = *ypos = 0;
-		return 0;
-	}
-
 	POINT pnt;
 	getWindowMousePos(&pnt);
 
