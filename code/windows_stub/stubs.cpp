@@ -759,13 +759,15 @@ void checkDEADBEAF(void *ptr, const char *filename, int line, const char *func)
 void * malloc_start = (void*)(SYSMEM2_START | LIBOGC);
 const void * malloc_end = (void*)(SYSMEM2_START | SYSMEM2_SIZE);
 
+#define AssertLoc(x,a,b) do { if (!(x)){ WiiAssert(#x,a,b); } } while (0)
+
 #if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 void *_vm_malloc( int size, const char *filename, int line, int quiet )
 #else
 void *_vm_malloc( int size, int quiet )
 #endif
 {
-	Assert( size > 0 );
+	AssertLoc( size >= 0 , filename, line);
 
 	size += 2*4*MEMCHECK_SIZE;
 	void *ptr = malloc( size );
