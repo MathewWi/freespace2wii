@@ -344,20 +344,13 @@ DWORD unix_process(DWORD lparam)
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
-#ifdef SCP_WII
-				if (event.button.button == SDL_BUTTON(7))
-				{
-					key_mark(KEY_ESC, 1, 0);
-					key_mark(KEY_ESC, 0, 0);
-				}
-#endif
 			case SDL_MOUSEBUTTONUP:
 				if (event.button.button == SDL_BUTTON_LEFT)
 					mouse_mark_button( MOUSE_LEFT_BUTTON, event.button.state );
 				else if (event.button.button == SDL_BUTTON_MIDDLE)
 					mouse_mark_button( MOUSE_MIDDLE_BUTTON, event.button.state );
 				else if (event.button.button == SDL_BUTTON_RIGHT)
-					mouse_mark_button( MOUSE_RIGHT_BUTTON, event.button.state );
+					mouse_mark_button( MOUSE_RIGHT_BUTTON, event.button.state );			
 
 				break;
 
@@ -368,6 +361,23 @@ DWORD unix_process(DWORD lparam)
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
 				if (event.jbutton.button < JOY_NUM_BUTTONS) {
+#ifdef SCP_WII
+					if(event.jbutton.button < 2)
+					{
+						// Do not double count A and B, they come in as mouse buttons
+						break;
+					}
+					if(event.jbutton.button == 6) // Home button
+					{
+						// Home button generates an escape press, not a joystick button
+						if(event.type == SDL_JOYBUTTONDOWN)
+						{
+							key_mark(KEY_ESC, 1, 0);
+							key_mark(KEY_ESC, 0, 0);
+						}
+						break;
+					}
+#endif
 					joy_set_button_state( event.jbutton.button, event.jbutton.state );
 				}
 				break;
