@@ -641,9 +641,9 @@ extern void _cdecl Warning( const char * filename, int line, const char * format
 
 // Disabling this functionality is dangerous, crazy values can run rampent unchecked and the longer its disabled
 // the more likely you are to have problems getting it working again.
-#if defined(NDEBUG)
-#define Assert(x) do {} while (0)
-#else
+//#if defined(NDEBUG)
+//#define Assert(x) do {} while (0)
+//#else
 void gr_activate(int);
 #ifndef SCP_WII
 #define Assert(x) do { if (!(x)){ WinAssert(#x,__FILE__,__LINE__); } } while (0)
@@ -651,7 +651,7 @@ void gr_activate(int);
 #include "wii_port/wiiassert.h"
 #define Assert(x) do { if (!(x)){ WiiAssert(#x,__FILE__,__LINE__); } } while (0)
 #endif
-#endif
+//#endif
 /*******************NEVER UNCOMMENT Assert ************************************************/
 
 // Goober5000 - shouldn't the above be never COMMENT (that is, never DISABLE) Assert?
