@@ -289,6 +289,7 @@ extern void joy_set_hat_state(int position);
 extern volatile unsigned char power_pressed;
 #include <wiiuse/wpad.h>
 #include "wii_port/wiirumble.h"
+#include "gamesequence/gamesequence.h"
 #endif
 
 DWORD unix_process(DWORD lparam)
@@ -296,10 +297,9 @@ DWORD unix_process(DWORD lparam)
 	SDL_Event event;
 
 #ifdef SCP_WII
-	if(power_pressed || (WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME) || (WPAD_ButtonsHeld(0) & WPAD_BUTTON_HOME))
+	if(power_pressed)
 	{
-		key_mark(KEY_ESC, 1, 0);
-		key_mark(KEY_ESC, 0, 0);
+		gameseq_post_event( GS_EVENT_QUIT_GAME );
 	}
 	
 	doRumble();
@@ -344,6 +344,13 @@ DWORD unix_process(DWORD lparam)
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
+#ifdef SCP_WII
+				if (event.button.button == SDL_BUTTON(7))
+				{
+					key_mark(KEY_ESC, 1, 0);
+					key_mark(KEY_ESC, 0, 0);
+				}
+#endif
 			case SDL_MOUSEBUTTONUP:
 				if (event.button.button == SDL_BUTTON_LEFT)
 					mouse_mark_button( MOUSE_LEFT_BUTTON, event.button.state );
