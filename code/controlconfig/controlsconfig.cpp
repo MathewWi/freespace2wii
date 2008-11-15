@@ -504,21 +504,15 @@ struct config_item_undo {
 
 config_item Control_config_backup[CCFG_MAX];
 
-#ifdef GRAVIS_OEM
-int Axis_map_to[] = { JOY_X_AXIS, JOY_Y_AXIS, JOY_RX_AXIS, JOY_Z_AXIS, -1 };
-int Axis_map_to_defaults[] = { JOY_X_AXIS, JOY_Y_AXIS, JOY_RX_AXIS, JOY_Z_AXIS, -1 };
-#else
-int Axis_map_to[] = { JOY_X_AXIS, JOY_Y_AXIS, JOY_RX_AXIS, -1, -1 };
-int Axis_map_to_defaults[] = { JOY_X_AXIS, JOY_Y_AXIS, JOY_RX_AXIS, -1, -1 };
-#endif
+int Axis_map_to[NUM_JOY_AXIS_ACTIONS] = { -1, -1, -1, -1, WII_STICK1_Y, WIIMOTE_YAW, WIIMOTE_PITCH, WIIMOTE_ROLL };
+int Axis_map_to_defaults[NUM_JOY_AXIS_ACTIONS] = { -1, -1, -1, -1, WII_STICK1_Y, WIIMOTE_YAW, WIIMOTE_PITCH, WIIMOTE_ROLL };
 
 // all this stuff is localized/externalized
-#define NUM_AXIS_TEXT			6
 #define NUM_MOUSE_TEXT			5
 #define NUM_MOUSE_AXIS_TEXT	2
 #define NUM_INVERT_TEXT			2	
 char *Joy_axis_action_text[NUM_JOY_AXIS_ACTIONS];
-char *Joy_axis_text[NUM_AXIS_TEXT];
+char *Joy_axis_text[JOY_NUM_AXES];
 char *Mouse_button_text[NUM_MOUSE_TEXT];
 char *Mouse_axis_text[NUM_MOUSE_AXIS_TEXT];
 char *Invert_text[NUM_INVERT_TEXT];
@@ -757,6 +751,25 @@ int control_config_detect_axis()
 
 	joystick_read_raw_axis(JOY_NUM_AXES, axes_values);
 	for (i=0; i<JOY_NUM_AXES; i++) {
+	
+		switch(i)
+		{
+		// Always ignore g-force readings
+		case WIIMOTE_GX:
+		case WIIMOTE_GY:
+		case WIIMOTE_GZ:
+			continue;
+		}
+		if(Use_mouse_to_fly)
+		{
+			// Ignore wii-mote axis!
+			switch(i)
+			{
+			case WIIMOTE_YAW:
+			case WIIMOTE_PITCH:
+				continue;
+			}
+		}
 		d = abs(axes_values[i] - Axes_origin[i]);
 		if (d > delta) {
 			axis = i;
@@ -768,9 +781,9 @@ int control_config_detect_axis()
 		mouse_get_delta( &dx, &dy, &dz );
 
 		if ( (dx > fudge) || (dx < -fudge) ) {
-			axis = 0;
+			axis = WIIMOTE_YAW;
 		} else if ( (dy > fudge) || (dy < -fudge) ) {
-			axis = 1;
+			axis = WIIMOTE_PITCH;
 		} else if ( (dz > fudge) || (dz < -fudge) ) {
 			axis = 2;
 		}
@@ -1696,18 +1709,27 @@ void control_config_init()
 	Config_item_undo = NULL;
 	control_config_conflict_check();
 
-	// setup strings					
-	Joy_axis_action_text[0] = vm_strdup(XSTR("Turn (Yaw) Axis", 1016));
-	Joy_axis_action_text[1] = vm_strdup(XSTR("Pitch Axis", 1017));
-	Joy_axis_action_text[2] = vm_strdup(XSTR("Bank Axis", 1018));
-	Joy_axis_action_text[3] = vm_strdup(XSTR("Absolute Throttle Axis", 1019));
-	Joy_axis_action_text[4] = vm_strdup(XSTR("Relative Throttle Axis", 1020));
-	Joy_axis_text[0] = vm_strdup(XSTR("Joystick/Mouse X Axis", 1021));
-	Joy_axis_text[1] = vm_strdup(XSTR("Joystick/Mouse Y Axis", 1022));
-	Joy_axis_text[2] = vm_strdup(XSTR("Joystick Z Axis", 1023));
-	Joy_axis_text[3] = vm_strdup(XSTR("Joystick rX Axis", 1024));
-	Joy_axis_text[4] = vm_strdup(XSTR("Joystick rY Axis", 1025));
-	Joy_axis_text[5] = vm_strdup(XSTR("Joystick rZ Axis", 1026));
+	// setup strings	
+	Joy_axis_action_text[JOY_HEADING_AXIS] = vm_strdup(XSTR("Turn (Yaw) Axis", 1016));
+	Joy_axis_action_text[JOY_PITCH_AXIS] = vm_strdup(XSTR("Pitch Axis", 1017));
+	Joy_axis_action_text[JOY_BANK_AXIS] = vm_strdup(XSTR("Bank Axis", 1018));
+	Joy_axis_action_text[JOY_ABS_THROTTLE_AXIS] = vm_strdup(XSTR("Absolute Throttle Axis", 1019));
+	Joy_axis_action_text[JOY_REL_THROTTLE_AXIS] = vm_strdup(XSTR("Relative Throttle Axis", 1020));
+	Joy_axis_action_text[JOY_REL_HEADING_AXIS] = vm_strdup("Relative Turn (Yaw) Axis");
+	Joy_axis_action_text[JOY_REL_PITCH_AXIS] = vm_strdup("Relative Pitch Axis Axis");
+	Joy_axis_action_text[JOY_REL_BANK_AXIS] = vm_strdup("Relative Bank Axis Axis");
+	Joy_axis_text[WIIMOTE_YAW] = vm_strdup("Wiimote yaw");
+	Joy_axis_text[WIIMOTE_PITCH] = vm_strdup("Wiimote pitch");
+	Joy_axis_text[WIIMOTE_ROLL] = vm_strdup("Wiimote roll");
+	Joy_axis_text[WIIMOTE_GX] = vm_strdup("Wiimote x-accel");
+	Joy_axis_text[WIIMOTE_GY] = vm_strdup("Wiimote y-accel");
+	Joy_axis_text[WIIMOTE_GZ] = vm_strdup("Wiimote z-accel");
+	Joy_axis_text[WII_STICK1_X] = vm_strdup("Stick 1 x");
+	Joy_axis_text[WII_STICK1_Y] = vm_strdup("Stick 1 y");
+	Joy_axis_text[WII_STICK2_X] = vm_strdup("Stick 2 x");
+	Joy_axis_text[WII_STICK2_Y] = vm_strdup("Stick 2 y");
+	Joy_axis_text[WII_R_SHOUDLER] = vm_strdup("Right shoulder");
+	Joy_axis_text[WII_L_SHOUDLER] = vm_strdup("Left shoulder");
 	Mouse_button_text[0] = vm_strdup("");
 	Mouse_button_text[1] = vm_strdup(XSTR("Left Button", 1027));
 	Mouse_button_text[2] = vm_strdup(XSTR("Right Button", 1028));
@@ -1749,7 +1771,7 @@ void control_config_close()
 			Joy_axis_action_text[idx] = NULL;
 		}
 	}
-	for(idx=0; idx<NUM_AXIS_TEXT; idx++){
+	for(idx=0; idx<JOY_NUM_AXES; idx++){
 		if(Joy_axis_text[idx] != NULL){
 			vm_free(Joy_axis_text[idx]);
 			Joy_axis_text[idx] = NULL;
@@ -2547,43 +2569,23 @@ int check_control(int id, int key)
 }
 
 // get heading, pitch, bank, throttle abs. and throttle rel. values.
-void control_get_axes_readings(int *h, int *p, int *b, int *ta, int *tr)
+void control_get_axes_readings(int *values)
 {
 	int axes_values[JOY_NUM_AXES];
 
 	joystick_read_raw_axis(JOY_NUM_AXES, axes_values);
-
-	//	joy_get_scaled_reading will return a value represents the joystick pos from -1 to +1 (fixed point)
-	*h = 0;
-	if (Axis_map_to[0] >= 0)
-		*h = joy_get_scaled_reading(axes_values[Axis_map_to[0]], Axis_map_to[0]);
-
-	*p = 0;
-	if (Axis_map_to[1] >= 0)
-		*p = joy_get_scaled_reading(axes_values[Axis_map_to[1]], Axis_map_to[1]);
-
-	*b = 0;
-	if (Axis_map_to[2] >= 0)
-		*b = joy_get_scaled_reading(axes_values[Axis_map_to[2]], Axis_map_to[2]);
-
-	*ta = 0;
-	if (Axis_map_to[3] >= 0)
-		*ta = joy_get_unscaled_reading(axes_values[Axis_map_to[3]], Axis_map_to[3]);
-
-	*tr = 0;
-	if (Axis_map_to[4] >= 0)
-		*tr = joy_get_scaled_reading(axes_values[Axis_map_to[4]], Axis_map_to[4]);
-
-	if (Invert_axis[0])
-		*h = -(*h);
-	if (Invert_axis[1])
-		*p = -(*p);
-	if (Invert_axis[2])
-		*b = -(*b);
-	if (Invert_axis[3])
-		*ta = F1_0 - *ta;
-	if (Invert_axis[4])
-		*tr = -(*tr);
+	
+	for(size_t i = 0; i < NUM_JOY_AXIS_ACTIONS; ++i)
+	{
+		values[i] = 0;
+		
+		//	joy_get_scaled_reading will return a value represents the joystick pos from -1 to +1 (fixed point)
+		if (Axis_map_to[i] >= 0)
+			values[i] = joy_get_scaled_reading(axes_values[Axis_map_to[i]], Axis_map_to[i]);
+			
+		if (Invert_axis[i])
+			values[i] *= -1;
+	}
 
 	return;
 }

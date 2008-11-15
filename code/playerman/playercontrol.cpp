@@ -652,6 +652,7 @@ player	*Player = NULL;
 
 // Goober5000
 int		Player_use_ai = 0;
+float delta_heading = 0.0f, delta_pitch = 0.0f, delta_bank = 0.0f;
 
 physics_info Descent_physics;			// used when we want to control the player like the descent ship
 
@@ -948,7 +949,7 @@ void player_control_reset_ci( control_info *ci )
 // because we only want to read it at a certain rate,
 // since it takes time.
 
-static int Joystick_saved_reading[JOY_NUM_AXES];
+static int Joystick_saved_reading[NUM_JOY_AXIS_ACTIONS];
 static int Joystick_last_reading = -1;
 
 void playercontrol_read_stick(int *axis, float frame_time)
@@ -965,16 +966,21 @@ void playercontrol_read_stick(int *axis, float frame_time)
 
 	if ( (Joystick_last_reading == -1)  || timestamp_elapsed(Joystick_last_reading) ) {
 		// Read the stick
-		control_get_axes_readings(&Joystick_saved_reading[0], &Joystick_saved_reading[1], &Joystick_saved_reading[2], &Joystick_saved_reading[3], &Joystick_saved_reading[4]);
+		control_get_axes_readings(Joystick_saved_reading);
+		
+
+		for (i=0; i < NUM_JOY_AXIS_ACTIONS; i++) {
+			axis[i] = Joystick_saved_reading[i];
+		}
+		
 		Joystick_last_reading = timestamp( 1000/10 );	// Read 10x per second, like we did in Descent.
 	}
 
-	for (i=0; i<NUM_JOY_AXIS_ACTIONS; i++) {
+	for (i=0; i < NUM_JOY_AXIS_ACTIONS; i++) {
 		axis[i] = Joystick_saved_reading[i];
 	}
 
 	if (Use_mouse_to_fly) {
-		int dx, dy, dz;
 		float factor;
 
 //		factor = (float) Mouse_sensitivity + 2.5f;
@@ -982,23 +988,39 @@ void playercontrol_read_stick(int *axis, float frame_time)
 		factor = (float) Mouse_sensitivity + 1.77f;
 		factor = factor * factor / frame_time / 0.6f;
 
-		mouse_get_delta(&dx, &dy, &dz);
-
-		if ( Invert_axis[0] ) {
-			dx = -dx;
+		int x,y;
+		
+		SDL_GetMouseState(&x, &y);
+		
+		float mouse_x = 100.*(x-640./2.)/640.;
+		if(fabs(mouse_x) < 1)
+		{
+			mouse_x = 0.f;
 		}
-
-		if ( Invert_axis[1] ) {
-			dy = -dy;
+		
+		float mouse_y = 100.*(y-480./2.)/640.;
+		if(fabs(mouse_y) < 1)
+		{
+			mouse_y = 0.f;
 		}
-
-		if ( Invert_axis[3] ) {
-			dz = -dz;
+		
+		for (i=0; i < NUM_JOY_AXIS_ACTIONS; i++) {
+			if(Axis_map_to[i] == WIIMOTE_YAW)
+			{
+				axis[i] = (int) ((float) mouse_x * factor);
+			
+				if(Invert_axis[i])
+					axis[i] *= -1;
+			}
+			
+			if(Axis_map_to[i] == WIIMOTE_PITCH)
+			{
+				axis[i] = (int) ((float) mouse_y * factor);
+				
+				if(Invert_axis[i])
+					axis[i] *= -1;
+			}
 		}
-
-		axis[0] += (int) ((float) dx * factor);
-		axis[1] += (int) ((float) dy * factor);
-		axis[3] += (int) ((float) dz * factor);
 	}
 }
 
@@ -1236,7 +1258,10 @@ void read_keyboard_controls( control_info * ci, float frame_time, physics_info *
 		if ( !(Game_mode & GM_DEAD) )	{
 			playercontrol_read_stick(axis, frame_time);
 		} else {
-			axis[0] = axis[1] = axis[2] = axis[3] = axis[4] = 0;
+			for(size_t i = 0; i < NUM_JOY_AXIS_ACTIONS; ++i)
+			{
+				axis[i] = 0;
+			}
 		}
 
 		ignore_pitch = FALSE;
@@ -1311,6 +1336,45 @@ void read_keyboard_controls( control_info * ci, float frame_time, physics_info *
 
 		if (Axis_map_to[JOY_REL_THROTTLE_AXIS] >= 0)
 			ci->forward_cruise_percent += f2fl(axis[JOY_REL_THROTTLE_AXIS]) * 100.0f * frame_time;
+
+		if (Axis_map_to[JOY_REL_HEADING_AXIS] >= 0) {
+			printf("rel head %d\n", axis[JOY_REL_HEADING_AXIS]);
+			// check the heading on the x axis
+			if ( check_control(BANK_WHEN_PRESSED) ) {
+				delta_bank += f2fl( axis[JOY_REL_HEADING_AXIS] ) / 5;
+				ci->bank -= delta_bank;
+				ignore_pitch = TRUE;
+			} else {
+				delta_heading += f2fl( axis[JOY_REL_HEADING_AXIS] ) / 5;
+			}
+		}
+
+		// check the pitch on the y axis
+		if (Axis_map_to[JOY_REL_PITCH_AXIS] >= 0)
+		{
+			printf("rel pitch %d\n", axis[JOY_REL_PITCH_AXIS]);
+			delta_pitch += f2fl( axis[JOY_REL_PITCH_AXIS] ) / 5;
+		}
+
+		// check the pitch on the y axis
+		if (Axis_map_to[JOY_REL_BANK_AXIS] >= 0)
+		{
+			printf("rel bank %d\n", axis[JOY_REL_BANK_AXIS]);
+			delta_bank += f2fl( axis[JOY_REL_BANK_AXIS] ) / 5;
+		}
+		
+		if (delta_heading > 1.0f ) delta_heading = 1.0f;
+		else if (delta_heading < -1.0f ) delta_heading = -1.0f;
+
+		if (delta_pitch > 1.0f ) delta_pitch = 1.0f;
+		else if (delta_pitch < -1.0f ) delta_pitch = -1.0f;
+		
+		if (delta_bank > 1.0f ) delta_bank = 1.0f;
+		else if (delta_bank < -1.00f ) delta_bank = -1.0f;
+				
+		ci->bank -= delta_pitch;
+		ci->pitch -= delta_pitch;
+		ci->heading += delta_heading;		
 
 		if ( ci->forward_cruise_percent > 100.0f )
 			ci->forward_cruise_percent = 100.0f;
