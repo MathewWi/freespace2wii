@@ -9192,6 +9192,7 @@ int game_main(char *cmdline)
 	}
 
 	CON_SetStipple(1);
+	HideConsole();
 	
 	while (1) {
 		// only important for non THREADED mode
