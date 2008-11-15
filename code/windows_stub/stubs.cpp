@@ -224,7 +224,7 @@ void WinAssert(char * text, char *filename, int line)
 extern "C" void wiipause();
 
 // standard warning message
-void Warning( char * filename, int line, const char * format, ... )
+void Warning( const char * filename, int line, const char * format, ... )
 {
 #ifndef NDEBUG
 	va_list args;
@@ -262,7 +262,7 @@ void Warning( char * filename, int line, const char * format, ... )
 }
 
 // fatal error message
-void Error( char * filename, int line, const char * format, ... )
+void Error( const char * filename, int line, const char * format, ... )
 {
 	va_list args;
 	int i;
@@ -312,6 +312,9 @@ void Error( char * filename, int line, const char * format, ... )
 	fflush(stdout);
 	fflush(stderr);
 	wiipause();
+	
+	u32 *death = (u32 *) 0x1;
+	*death = 0xDEADBEEF;
 #endif
 	exit(EXIT_FAILURE);
 }
@@ -443,7 +446,7 @@ bool QueryPerformanceCounter(LARGE_INTEGER *pcount)
 	return 1;
 }
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 int TotalRam = 0;
 #endif
 
@@ -603,7 +606,7 @@ static RAM *RamTable;
 
 int vm_init(int min_heap_size)
 {
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 	TotalRam = 0;
 #endif
 
@@ -756,7 +759,7 @@ void checkDEADBEAF(void *ptr, const char *filename, int line, const char *func)
 void * malloc_start = (void*)(SYSMEM2_START | LIBOGC);
 const void * malloc_end = (void*)(SYSMEM2_START | SYSMEM2_SIZE);
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 void *_vm_malloc( int size, const char *filename, int line, int quiet )
 #else
 void *_vm_malloc( int size, int quiet )
@@ -771,8 +774,8 @@ void *_vm_malloc( int size, int quiet )
 		if (quiet) {
 			return NULL;
 		}
-#ifndef NDEBUG
-		Error(LOCATION, "Out of memory, %d, total alloc %d.", size,TotalRam);
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
+		Error(filename, line, "Out of memory, %d, total alloc %d.", size,TotalRam);
 #else
 		Error(LOCATION, "Out of memory, %d", size);
 #endif
@@ -799,7 +802,7 @@ void *_vm_malloc( int size, int quiet )
 	return ptr;
 }
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 void *_vm_realloc( void *ptr, int size, const char *filename, int line, int quiet )
 #else
 void *_vm_realloc( void *ptr, int size, int quiet )
@@ -845,7 +848,7 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 	return ret_ptr;
 }
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 char *_vm_strdup( const char *ptr, const char *filename, int line )
 #else
 char *_vm_strdup( const char *ptr )
@@ -868,7 +871,7 @@ char *_vm_strdup( const char *ptr )
 	return dst;
 }
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 char *_vm_strndup( const char *ptr, int size, const char *filename, int line )
 #else
 char *_vm_strndup( const char *ptr, int size )
@@ -893,7 +896,7 @@ char *_vm_strndup( const char *ptr, int size )
 	return dst;
 }
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 void _vm_free( void *ptr, const char *filename, int line )
 #else
 void _vm_free( void *ptr )
