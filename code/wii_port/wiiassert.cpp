@@ -130,7 +130,7 @@ extern "C" void __stack_chk_fail(void)
 
 volatile unsigned char power_pressed = 0;
 	
-extern "C" void fs2_power_off(s32 chan)
+extern "C" void fs2_power_off()
 {
 	power_pressed = 1;
 }
@@ -178,7 +178,8 @@ void WiiInit()
 	CON_SetStipple(0);
 	
 	// Listen for power off
-	WPAD_SetPowerButtonCallback(fs2_power_off);
+	//WPAD_SetPowerButtonCallback(fs2_power_off);
+	SYS_SetPowerCallback(fs2_power_off);
 	
 	perf_counter = getCount();
 	
