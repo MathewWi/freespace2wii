@@ -3057,6 +3057,10 @@ int parse_create_object_sub(p_object *p_objp)
 
 	// if the wing index and wing pos are set for this parse object, set them for the ship.  This
 	// is useful in multiplayer when ships respawn
+	
+	Assert(p_objp->wing_status_wing_index >= -1 && p_objp->wing_status_wing_index < MAX_SQUADRON_WINGS);
+	Assert(p_objp->wing_status_wing_pos >= -1 && p_objp->wing_status_wing_pos < MAX_SHIPS_PER_WING);
+	
 	shipp->wing_status_wing_index = p_objp->wing_status_wing_index;
 	shipp->wing_status_wing_pos = p_objp->wing_status_wing_pos;
 
