@@ -1087,6 +1087,8 @@ typedef struct ship_weapon {
 	ubyte secondary_animation_position[MAX_SHIP_SECONDARY_BANKS];
 	int primary_animation_done_time[MAX_SHIP_PRIMARY_BANKS];
 	int  secondary_animation_done_time[MAX_SHIP_SECONDARY_BANKS];
+	
+	ship_weapon();
 } ship_weapon;
 
 //**************************************************************
