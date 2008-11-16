@@ -2584,6 +2584,11 @@ ship::ship() : warpin_effect(NULL), warpout_effect(NULL), shield_integrity(NULL)
 		this->trail_ptr[i] = NULL;
 		this->ABtrail_ptr[i] = NULL;
 	}
+	
+	wing_status_wing_index = -1;
+	wing_status_wing_pos = -1;
+	targeting_laser_bank = -1;
+	targeting_laser_objnum = -1;
 }
 
 ship_info::ship_info() : type_str(NULL), maneuverability_str(NULL), armor_str(NULL), manufacturer_str(NULL), 
@@ -2601,6 +2606,13 @@ ship_info::ship_info() : type_str(NULL), maneuverability_str(NULL), armor_str(NU
 	num_nondark_colors = 0;
 
 	num_maneuvering = 0;
+}
+
+
+ship_weapon::ship_weapon()
+{
+	last_fired_weapon_index = -1;
+	last_fired_weapon_signature = -1;
 }
 
 // set the ship_obj struct fields to default values
@@ -5503,6 +5515,7 @@ static void ship_clear_subsystems()
 
 	for (i = 0; i < NUM_SHIP_SUBSYSTEM_SETS; i++) {
 		if (Ship_subsystems[i] != NULL) {
+			Ship_subsystems[i]->~ship_subsys();
 			vm_free(Ship_subsystems[i]);
 			Ship_subsystems[i] = NULL;
 		}
@@ -11089,6 +11102,8 @@ int maybe_detonate_weapon(ship_weapon *swp, object *src)
 	int			objnum = swp->last_fired_weapon_index;
 	object		*objp;
 	weapon_info	*wip;
+	
+	Assert(objnum < MAX_OBJECTS && objnum >= 0);
 
 	objp = &Objects[objnum];
 
