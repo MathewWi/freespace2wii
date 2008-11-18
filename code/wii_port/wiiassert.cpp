@@ -9,6 +9,8 @@
 #include <wiiuse/wpad.h>
 #include <GL/GLwii.h>
 
+#include <ogc/audio.h>
+
 static void *exception_xfb = (void*)0xC1710000;			//we use a static address above ArenaHi.
 extern "C" void __console_init(void *framebuffer,int xstart,int ystart,int xres,int yres,int stride);
 
@@ -16,6 +18,8 @@ extern "C" void WiiAssert(const char * text,const char *filename, int line)
 {
 	ShowConsole();
 	CON_SetStipple(0);
+	AUDIO_StopDMA();
+	AUDIO_RegisterDMACallback(NULL);
 	VIDEO_WaitVSync();	
 	
 	LWP_Reschedule(LWP_PRIO_IDLE);
