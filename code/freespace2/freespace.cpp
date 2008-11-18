@@ -3493,7 +3493,7 @@ DCF(palette_flash,"Toggles palette flash effect on/off")
 	if ( Dc_status )	dc_printf( "palette_flash is %s\n", (Use_palette_flash?"TRUE":"FALSE") );	
 }
 
-int Use_low_mem = 0;
+int Use_low_mem = 1;
 
 DCF(low_mem,"Uses low memory settings regardless of RAM")
 {
@@ -3722,7 +3722,7 @@ void game_init()
 
 	Use_joy_mouse = 0;		//os_config_read_uint( NULL, NOX("JoystickMovesCursor"), 1 );
 	//Use_palette_flash = os_config_read_uint( NULL, NOX("PaletteFlash"), 0 );
-	Use_low_mem = os_config_read_uint( NULL, NOX("LowMem"), 0 );
+	Use_low_mem = 1;
 
 #ifndef NDEBUG
 	Use_fullscreen_at_startup = os_config_read_uint( NULL, NOX("ForceFullscreen"), 1 );
