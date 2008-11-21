@@ -10150,6 +10150,15 @@ int num_ships_attacking(int target_objnum)
 	ai_info	*attacking_aip;
 	ship_obj	*so;
 	int		count = 0;
+	
+	if(Objects[target_objnum].instance < 0)
+	{
+		return 0;
+	}
+	
+	Assert(target_objnum >= 0 && target_objnum < MAX_OBJECTS);
+	Assert(Objects[target_objnum].instance >= 0 && Objects[target_objnum].instance < MAX_SHIPS);
+	
 	int target_team = Ships[Objects[target_objnum].instance].team;
 
 	for ( so = GET_FIRST(&Ship_obj_list); so != END_OF_LIST(&Ship_obj_list); so = GET_NEXT(so) )
