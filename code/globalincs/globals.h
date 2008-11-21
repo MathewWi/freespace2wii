@@ -156,8 +156,8 @@
 
 
 // from ship.h
-#define MAX_SHIPS					400			// max number of ship instances there can be.DTP; bumped from 200 to 400
-#define SHIPS_LIMIT					400			// what MAX_SHIPS will be at release time (for error checking in debug mode); dtp Bumped from 200 to 400
+#define MAX_SHIPS					200			// max number of ship instances there can be.DTP; bumped from 200 to 400
+#define SHIPS_LIMIT					200			// what MAX_SHIPS will be at release time (for error checking in debug mode); dtp Bumped from 200 to 400
 
 // ****************************************************************
 // DO NOT CHANGE THIS - IT WILL LIKELY BREAK FREESPACE2 PXO SUPPORT
@@ -166,7 +166,7 @@
 #define MAX_SHIP_CLASSES_MULTI	130
 
 #ifdef INF_BUILD
-#define MAX_SHIP_CLASSES		250
+#define MAX_SHIP_CLASSES		150
 #else
 #define MAX_SHIP_CLASSES		130
 #endif
@@ -174,7 +174,7 @@
 
 
 
-#define MAX_WINGS				75
+#define MAX_WINGS				50
 
 #define MAX_SHIPS_PER_WING			6
 
@@ -198,10 +198,10 @@
 
 // from weapon.h
 // upped 5/6/98 from 200 - DB
-#define MAX_WEAPONS	350
+#define MAX_WEAPONS	200
 
 #ifdef INF_BUILD
-#define MAX_WEAPON_TYPES				300
+#define MAX_WEAPON_TYPES				250
 #else
 #define MAX_WEAPON_TYPES				200
 #endif
