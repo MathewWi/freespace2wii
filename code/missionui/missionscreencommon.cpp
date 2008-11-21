@@ -1519,13 +1519,13 @@ void wss_direct_restore_loadout()
 			// This wing is already created, so directly update the ships
 			for ( j = 0; j < MAX_WING_SLOTS; j++ ) {
 				slot = &Player_loadout.unit_data[i*MAX_WING_SLOTS+j];
+
+				if ( wp->ship_index[j] == -1 ) {
+					continue;
+				}
+				
 				shipp = &Ships[wp->ship_index[j]];
 				if ( shipp->ship_info_index != slot->ship_class ) {
-
-					if ( wp->ship_index[j] == -1 ) {
-						continue;
-					}
-
 					if ( slot->ship_class == -1 ) {
 						cleanup_ship_index[j] = wp->ship_index[j];
 						ship_add_exited_ship( shipp, SEF_PLAYER_DELETED );
