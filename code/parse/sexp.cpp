@@ -4660,7 +4660,7 @@ int rand_internal(int low, int high, int seed = 0)
 	if (diff < 0)
 		diff = 0;
 
-	return (low + rand() % (diff + 1));
+	return (low + rand32() % (diff + 1));
 }
 
 // Goober5000
@@ -6061,7 +6061,7 @@ int sexp_shields_left(int n)
 	}
 
 	// now return the amount of shields left as a percentage of the whole.
-	percent = (int)(get_shield_pct(&Objects[Ships[shipnum].objnum]) * 100.0f);
+	percent = fl2i((get_shield_pct(&Objects[Ships[shipnum].objnum]) * 100.0f) + 0.5f);
 	return percent;
 }
 
@@ -6088,7 +6088,7 @@ int sexp_hits_left(int n)
 	// since we are working with total hit points taken, not total remaining.
 	ship		*shipp = &Ships[shipnum];
 	object	*objp = &Objects[shipp->objnum];
-	percent = (int) (100.0f * get_hull_pct(objp));
+	percent = fl2i((100.0f * get_hull_pct(objp)) + 0.5f);
 	return percent;
 }
 
@@ -6113,7 +6113,7 @@ int sexp_sim_hits_left(int n)
 	// since we are working with total hit points taken, not total remaining.
 	ship		*shipp = &Ships[shipnum];
 	object	*objp = &Objects[shipp->objnum];
-	percent = (int) (100.0f * get_sim_hull_pct(objp));
+	percent = fl2i((100.0f * get_sim_hull_pct(objp)) + 0.5f);
 	return percent;
 }
 
@@ -6278,7 +6278,7 @@ int sexp_hits_left_subsystem(int n)
 			while ( ss != END_OF_LIST( &Ships[shipnum].subsys_list ) ) {
 
 				if ( !subsystem_stricmp(ss->system_info->subobj_name, subsys_name)) {
-					percent = (int) (ss->current_hits / ss->max_hits * 100.0f);
+					percent = fl2i((ss->current_hits / ss->max_hits * 100.0f) + 0.5f);
 					return percent;
 				}
 
@@ -6291,7 +6291,7 @@ int sexp_hits_left_subsystem(int n)
 			return SEXP_NAN;
 
 		} else {
-			percent = (int)(ship_get_subsystem_strength(&Ships[shipnum],type) * 100.0f);
+			percent = fl2i((ship_get_subsystem_strength(&Ships[shipnum],type) * 100.0f) + 0.5f);
 			return percent;
 		}
 	}
@@ -10186,15 +10186,11 @@ void sexp_add_background_bitmap(int n)
 
 	if (Sexp_variables[sexp_var].type & SEXP_VARIABLE_NUMBER)
 	{
-        if (!stars_add_bitmap_entry(&sle))
+        new_number = stars_add_bitmap_entry(&sle);
+        if (new_number < 0)
         {
 		    Warning(LOCATION, "Unable to add starfield bitmap: '%s'!", sle.filename);
             new_number = 0;
-        }
-        else
-        {
-            // get new numerical value
-		    new_number = stars_get_num_bitmaps() - 1;
         }
 
 		sprintf(number_as_str, "%d", new_number);
@@ -10272,14 +10268,12 @@ void sexp_add_sun_bitmap(int n)
 	if (Sexp_variables[sexp_var].type & SEXP_VARIABLE_NUMBER)
 	{
 		// get new numerical value
-        if (!stars_add_sun_entry(&sle))
+        new_number = stars_add_sun_entry(&sle);
+
+        if (new_number < 0)
         {
 		    Warning(LOCATION, "Unable to add sun: '%s'!", sle.filename);
             new_number = 0;
-        }
-        else
-        {
-            new_number = stars_get_num_suns() - 1;
         }
 
 		sprintf(number_as_str, "%d", new_number);
@@ -10552,40 +10546,52 @@ void sexp_tech_reset_to_default()
 // of a mission
 void sexp_allow_ship(int n)
 {
-	int sindex;
-	char *name;
+	int idx;
+	char name[NAME_LENGTH], temp[NAME_LENGTH];
 
 	// this function doesn't mean anything when not in campaign mode
 	if ( !(Game_mode & GM_CAMPAIGN_MODE) )
 		return;
 
-	// get the name of the ship and lookup up the ship_info index for it
-	name = CTEXT(n);
-	sindex = ship_info_lookup( name );
-	if ( sindex == -1 )
-		return;
+	// get the base name of the ship
+	strcpy(name, CTEXT(n));
+	end_string_at_first_hash_symbol(name);
 
-	// now we have a valid index --
-	mission_campaign_save_persistent( CAMPAIGN_PERSISTENT_SHIP, sindex );
+	// add that ship, as well as any # equivalents
+	for (idx = 0; idx < Num_ship_classes; idx++)
+	{
+		strcpy(temp, Ship_info[idx].name);
+		end_string_at_first_hash_symbol(temp);
+
+		// we have a match, so allow this ship
+		if (!strcmp(name, temp))
+			mission_campaign_save_persistent(CAMPAIGN_PERSISTENT_SHIP, idx);
+	}
 }
 
 void sexp_allow_weapon(int n)
 {
-	int sindex;
-	char *name;
+	int idx;
+	char name[NAME_LENGTH], temp[NAME_LENGTH];
 
 	// this function doesn't mean anything when not in campaign mode
 	if ( !(Game_mode & GM_CAMPAIGN_MODE) )
 		return;
 
-	// get the name of the weapon and lookup up the weapon_info index for it
-	name = CTEXT(n);
-	sindex = weapon_info_lookup( name );
-	if ( sindex == -1 )
-		return;
+	// get the base name of the weapon
+	strcpy(name, CTEXT(n));
+	end_string_at_first_hash_symbol(name);
 
-	// now we have a valid index --
-	mission_campaign_save_persistent( CAMPAIGN_PERSISTENT_WEAPON, sindex );
+	// add that weapon, as well as any # equivalents
+	for (idx = 0; idx < Num_weapon_types; idx++)
+	{
+		strcpy(temp, Weapon_info[idx].name);
+		end_string_at_first_hash_symbol(temp);
+
+		// we have a match, so allow this weapon
+		if (!strcmp(name, temp))
+			mission_campaign_save_persistent(CAMPAIGN_PERSISTENT_WEAPON, idx);
+	}
 }
 
 // Goober5000
@@ -14829,8 +14835,10 @@ int sexp_return_player_data(int node, int type)
 		if (p_objp->flags & P_OF_PLAYER_START) { 
 			switch (type) {				
 				case OP_SHIP_DEATHS: 
-					return p_objp->respawn_count;
-
+					// when an AI ship is finally killed its respawn count won't be updated so get the number of deaths 
+					// from the log instead
+					return mission_log_get_count(LOG_SHIP_DESTROYED, CTEXT(node), NULL) + mission_log_get_count(LOG_SELF_DESTRUCTED, CTEXT(node), NULL);
+					
 				case OP_RESPAWNS_LEFT:
 					return Netgame.respawn - p_objp->respawn_count; 
 
@@ -20185,18 +20193,44 @@ int get_index_sexp_variable_name(const char *temp_name)
 // return index of sexp_variable_name, -1 if not found
 int get_index_sexp_variable_name_special(const char *startpos)
 {
-	for (int i=0; i<MAX_SEXP_VARIABLES; i++) {
-		if (Sexp_variables[i].type & SEXP_VARIABLE_SET) {
-			// check case sensitive
-			// check number of chars in variable name
-			if ( !strncmp(startpos, Sexp_variables[i].variable_name, strlen(Sexp_variables[i].variable_name)) ) {
-				return i;
-			}
-		}
-	}
+    const char *pos = NULL;
+    int len;
 
-	// not found
-	return -1;
+    // find where the variable token in the message (whitespace).
+    pos = strchr(startpos, ' ');
+
+    if (!pos)
+    {
+        // if we cant find whitespace, use the rest of the message.
+        len = strlen(startpos);
+        pos = startpos + (len - 1);
+    }
+    else
+    {
+        // go back one character to the end of the variable name
+        pos--;
+    }
+
+    // keep going back if we found punctuation
+    while (*pos == '.' || *pos == ',' || *pos == ';') pos--;
+
+    // get the length of the found variable name
+    len = (pos - startpos) + 1;
+
+    for (int i=0; i<MAX_SEXP_VARIABLES; i++) 
+    {
+        if (Sexp_variables[i].type & SEXP_VARIABLE_SET) 
+        {
+            // check case sensitive
+            // check number of chars in variable name
+            if ( !strncmp(startpos, Sexp_variables[i].variable_name, len) ) {
+                return i;
+            }
+        }
+    }
+
+    // not found
+    return -1;
 }
 
 // Goober5000

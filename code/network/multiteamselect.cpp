@@ -1929,7 +1929,7 @@ void multi_ts_init_objnums()
 // get the proper team and slot index for the given ship name
 void multi_ts_get_team_and_slot(char *ship_name,int *team_index,int *slot_index)
 {
-	int idx, wing_number;//,s_idx;
+	int idx;//,s_idx;
 
 	// set the return values to default values
 	*team_index = -1;
@@ -1938,43 +1938,32 @@ void multi_ts_get_team_and_slot(char *ship_name,int *team_index,int *slot_index)
 	// if we're in team vs. team mode
 	if(Netgame.type_flags & NG_TYPE_TEAM){
 		Assert(MAX_TVT_WINGS == MULTI_TS_MAX_TVT_TEAMS);
-		for(idx=0;idx<MAX_TVT_WINGS;idx++)
-		{
+		for (idx = 0; idx < MAX_TVT_WINGS; idx++) {
 			// get team (wing)
-			if (!strnicmp(ship_name, TVT_wing_names[idx], strlen(TVT_wing_names[idx])))
-			{
-				wing_number = (ship_name[strlen(ship_name)-1] - '1');
+			if ( !strnicmp(ship_name, TVT_wing_names[idx], strlen(TVT_wing_names[idx])) ) {
+				*team_index = idx;
+				*slot_index = (ship_name[strlen(ship_name)-1] - '1');
 
-				// Karajorma - Is this really a ship from the wing? Cause other things may start with the same name
-				if (wing_number >= 0 && wing_number < MAX_SHIPS_PER_WING) 
-				{
-					// get slot (ship in wing)
-					*slot_index = wing_number;
-					*team_index = idx;
-				}
+				// just Assert(), if this is wrong then we're pretty much screwed either way
+				Assert( (*slot_index >= 0) && (*slot_index < MAX_WSS_SLOTS) );
 			}
 		}
 	} 
 	// if we're _not_ in team vs. team mode
 	else {
 		int wing, ship;
-		for(idx=0;idx<MAX_STARTING_WINGS;idx++)
-		{
+		for (idx = 0; idx < MAX_STARTING_WINGS; idx++) {
 			// get wing
-			if (!strnicmp(ship_name, Starting_wing_names[idx], strlen(Starting_wing_names[idx])))
-			{
-				wing_number = (ship_name[strlen(ship_name)-1] - '1');
+			if ( !strnicmp(ship_name, Starting_wing_names[idx], strlen(Starting_wing_names[idx])) ) {
+				wing = idx;
+				ship = (ship_name[strlen(ship_name)-1] - '1');
 
-				// Karajorma - Again we need to check if this is a real member of this wing. 
-				if (wing_number >= 0 && wing_number < MAX_SHIPS_PER_WING) 
-				{
-					wing = idx;
-					ship = wing_number;
+				// just Assert(), if this is wrong then we're pretty much screwed either way
+				Assert( (ship >= 0) && (ship < MULTI_TS_NUM_SHIP_SLOTS_TEAM) );
 
-					// team is 0, slot is the starting slot for all ships
-					*team_index = 0;
-					*slot_index = wing * MULTI_TS_NUM_SHIP_SLOTS_TEAM + ship;
-				}
+				// team is 0, slot is the starting slot for all ships
+				*team_index = 0;
+				*slot_index = wing * MULTI_TS_NUM_SHIP_SLOTS_TEAM + ship;
 			}
 		}
 	}
@@ -2902,9 +2891,13 @@ void multi_ts_select_ship()
 	*/
 }
 
+
+extern void commit_pressed();
 // handle all details when the commit button is pressed (including possibly reporting errors/popups)
 void multi_ts_commit_pressed()
-{					
+{
+    int popup_choice = 0;
+
 	// if my team's slots are still not "locked", we cannot commit unless we're the only player in the game
 	if(!Multi_ts_team[Net_player->p_info.team].multi_players_locked){
 		if(multi_num_players() != 1){
@@ -2919,28 +2912,41 @@ void multi_ts_commit_pressed()
 	switch(multi_ts_ok_to_commit()){
 	// yes, it _is_ ok to commit
 	case 0:
-		extern void commit_pressed();
-		commit_pressed();
+		popup_choice = 1;
 		break;
 
 	// player has not assigned all necessary ships
 	case 1: 	
 		gamesnd_play_iface(SND_GENERAL_FAIL);
-		popup(PF_USE_AFFIRMATIVE_ICON | PF_BODY_BIG,1,POPUP_OK, XSTR("You have not yet assigned all necessary ships",752));
+		popup_choice = popup(PF_USE_AFFIRMATIVE_ICON | PF_BODY_BIG, 1, POPUP_OK,
+                             XSTR("You have not yet assigned all necessary ships",752));
 		break;
 	
 	// there are ships without primary weapons
 	case 2: 
 		gamesnd_play_iface(SND_GENERAL_FAIL);
-		popup(PF_USE_AFFIRMATIVE_ICON | PF_BODY_BIG,1,POPUP_OK, XSTR("There are ships without primary weapons!",753));
+		popup_choice = popup(PF_USE_AFFIRMATIVE_ICON | PF_BODY_BIG, 2, POPUP_CANCEL, POPUP_OK,
+                             XSTR("There are ships without primary weapons!",753));
 		break;
 
 	// there are ships without secondary weapons
 	case 3: 
 		gamesnd_play_iface(SND_GENERAL_FAIL);
-		popup(PF_USE_AFFIRMATIVE_ICON | PF_BODY_BIG,1,POPUP_OK, XSTR("There are ships without secondary weapons!",754));
+		popup_choice = popup(PF_USE_AFFIRMATIVE_ICON | PF_BODY_BIG, 2, POPUP_CANCEL, POPUP_OK, 
+                             XSTR("There are ships without secondary weapons!",754));
 		break;
+
+    case 4:
+        gamesnd_play_iface(SND_GENERAL_FAIL);
+        popup_choice = popup(PF_USE_AFFIRMATIVE_ICON | PF_BODY_BIG, 1, POPUP_OK,
+                             XSTR("There are ships without weapons!",-1));
+        break;
 	}
+
+    if (popup_choice == 1)
+    {
+        commit_pressed();
+    }
 }
 
 // is it ok for this player to commit 
@@ -2996,6 +3002,11 @@ int multi_ts_ok_to_commit()
 					break;
 				}
 			}
+
+            if (!primary_ok && !secondary_ok)
+            {
+                return 4;
+            }
 
 			// if the ship doesn't have primary weapons
 			if(!primary_ok){
