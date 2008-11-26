@@ -776,6 +776,7 @@ void *_vm_malloc( int size, int quiet )
 		if (quiet) {
 			return NULL;
 		}
+		malloc_stats();
 #if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 		Error(filename, line, "Out of memory, %d, total alloc %d.", size,TotalRam);
 #else
