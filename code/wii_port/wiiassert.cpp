@@ -43,6 +43,10 @@ extern "C" void WiiAssert(const char * text,const char *filename, int line)
 
 		if ( (buttonsDown & PAD_BUTTON_A) || (wbuttonsDown & WPAD_BUTTON_HOME) )
 		{
+			// Produce a stack trace
+			u32 *p = (u32 *) 0x1;
+			*p = 0xDEADBEEF;
+			
 			kprintf("Reset\n");
 			throw;
 			exit(0);
@@ -174,6 +178,7 @@ extern "C" void tocInternalMsg(const char *file, int line, const char *msg)
 }
 
 #include <wiitrace.h>
+//#include <custom_assert.h>
 
 void WiiInit()
 {
@@ -192,5 +197,7 @@ void WiiInit()
 	perf_log = fopen("/perf_log.txt","w");
 	
 	initProfiler("/trace_log.txt",1);
+	
+	//set_custom_assert(&WiiAssert);
 }
 
