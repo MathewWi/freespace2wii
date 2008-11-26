@@ -85,7 +85,7 @@ struct decal_system{
 	int n_decal_textures;
 	bool decals_modified;
 	int max_decals;
-	decal_system():decals(NULL),n_decal_textures(0),decals_modified(false){};
+	decal_system():decals(NULL),n_decal_textures(0),decals_modified(false),max_decals(0){};
 };
 
 

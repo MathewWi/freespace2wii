@@ -748,6 +748,7 @@ typedef struct submodel_instance_info {
 	float		turn_accel;
 	int		axis_set;
 	int		step_zero_timestamp;		// timestamp determines when next step is to begin (for stepped rotation)
+	submodel_instance_info();
 } submodel_instance_info;
 
 #define MAX_MODEL_SUBSYSTEMS		200				// used in ships.cpp (only place?) for local stack variable DTP; bumped to 200
@@ -842,7 +843,8 @@ typedef struct model_subsystem {					/* contains rotation rate info */
 
 	int n_triggers;
 	queued_animation *triggers;		//all the triggered animations assosiated with this object
-
+	
+	model_subsystem();
 } model_subsystem;
 
 typedef struct model_special {

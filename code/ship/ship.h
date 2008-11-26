@@ -1203,6 +1203,8 @@ typedef	struct ship_subsys {
 	fix time_subsys_cargo_revealed;	// added by Goober5000
 
 	triggered_rotation trigger;		//the actual currently running animation and assosiated states
+	
+	ship_subsys();
 } ship_subsys;
 
 // structure for subsystems which tells us the total count of a particular type of subsystem (i.e.
@@ -1211,7 +1213,8 @@ typedef	struct ship_subsys {
 typedef struct ship_subsys_info {
 	int	num;				// number of subsystems of type on this ship;
 	float total_hits;		// total number of hits between all subsystems of this type.
-	float current_hits;		// current count of hits for all subsystems of this type.	
+	float current_hits;		// current count of hits for all subsystems of this type.
+	ship_subsys_info();
 } ship_subsys_info;
 
 
