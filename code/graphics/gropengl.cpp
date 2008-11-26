@@ -1236,8 +1236,6 @@ static int GL_mouse_saved_y1 = 0;
 static int GL_mouse_saved_x2 = 0;
 static int GL_mouse_saved_y2 = 0;
 
-void opengl_save_mouse_area(int x, int y, int w, int h);
-
 extern char *Osreg_title;
 
 extern GLfloat GL_anisotropy;
@@ -1478,8 +1476,6 @@ void gr_opengl_flip()
 
 		gr_reset_clip();
 		mouse_get_pos( &mx, &my );
-
-	//	opengl_save_mouse_area(mx, my, Gr_cursor_size, Gr_cursor_size);
 
 		if (Gr_cursor != -1) {
 			gr_set_bitmap(Gr_cursor);
@@ -2005,64 +2001,6 @@ void gr_opengl_get_region(int front, int w, int h, ubyte *data)
 	}
 
 
-}
-
-void opengl_save_mouse_area(int x, int y, int w, int h)
-{
-	int cursor_size;
-
-	GL_CHECK_FOR_ERRORS("start of save_mouse_area()");
-
-	// lazy - taylor
-	cursor_size = (Gr_cursor_size * Gr_cursor_size);
-
-	// no reason to be bigger than the cursor, should never be smaller
-	if (w != Gr_cursor_size)
-		w = Gr_cursor_size;
-	if (h != Gr_cursor_size)
-		h = Gr_cursor_size;
-
-	GL_mouse_saved_x1 = x;
-	GL_mouse_saved_y1 = y;
-	GL_mouse_saved_x2 = x+w-1;
-	GL_mouse_saved_y2 = y+h-1;
-
-	CLAMP(GL_mouse_saved_x1, gr_screen.clip_left, gr_screen.clip_right );
-	CLAMP(GL_mouse_saved_x2, gr_screen.clip_left, gr_screen.clip_right );
-	CLAMP(GL_mouse_saved_y1, gr_screen.clip_top, gr_screen.clip_bottom );
-	CLAMP(GL_mouse_saved_y2, gr_screen.clip_top, gr_screen.clip_bottom );
-
-	GL_state.SetTextureSource(TEXTURE_SOURCE_NO_FILTERING);
-	GL_state.SetAlphaBlendMode(ALPHA_BLEND_NONE);
-	GL_state.SetZbufferType(ZBUFFER_TYPE_NONE);
-
-	if ( Use_PBOs ) {
-		// since this is used a lot, and is pretty small in size, we just create it once and leave it until exit
-		if (!GL_cursor_pbo) {
-			vglGenBuffersARB(1, &GL_cursor_pbo);
-			vglBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_cursor_pbo);
-			vglBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, cursor_size * 4, NULL, GL_STATIC_READ);
-		}
-
-		vglBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_cursor_pbo);
-		glReadBuffer(GL_BACK);
-		glReadPixels(x, gr_screen.max_h-y-1-h, w, h, GL_read_format, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
-		vglBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
-	} else {
-		// this should really only have to be malloc'd once
-		if (GL_saved_mouse_data == NULL)
-			GL_saved_mouse_data = (ubyte*)vm_malloc_q(cursor_size * 4);
-
-		if (GL_saved_mouse_data == NULL)
-			return;
-
-		glReadBuffer(GL_BACK);
-		glReadPixels(x, gr_screen.max_h-y-1-h, w, h, GL_read_format, GL_UNSIGNED_INT_8_8_8_8_REV, GL_saved_mouse_data);
-	}
-
-	GL_CHECK_FOR_ERRORS("end of save_mouse_area()");
-
-	GL_mouse_saved = 1;
 }
 
 int gr_opengl_save_screen()
