@@ -9301,6 +9301,7 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int nCmdSh
 #else
 
 #include <wiitrace.h>
+#include <malloc.h>
 
 // *NIX specific
 int main(int argc, char *argv[])
@@ -9313,6 +9314,8 @@ int main(int argc, char *argv[])
 #ifdef SCP_WII
 	extern void WiiInit(); WiiInit();
 #endif
+
+	malloc_stats();
 
 #ifdef APPLE_APP
 	// Finder sets the working directory to the root of the drive so we have to get a little creative
