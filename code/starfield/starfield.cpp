@@ -856,7 +856,9 @@ static void starfield_create_perspective_bitmap_buffer(angles *a, float scale_x,
 	vi = 1.0f / (float)div_y;	
 
 	// adjust for aspect ratio
-	scale_x *= (gr_screen.clip_aspect + 0.55f);		// fudge factor
+    //scale_x *= (gr_screen.clip_aspect + 0.55f); // fudge factor
+    //scale_x *= (gr_screen.clip_aspect + (0.7333333f/gr_screen.clip_aspect)); // fudge factor
+    scale_x *= 1.883333f; //fudge factor
 
 	float s_phi = 0.5f + (((p_phi * scale_x) / 360.0f) / 2.0f);
 	float s_theta = (((p_theta * scale_y) / 360.0f) / 2.0f);	
@@ -3005,7 +3007,7 @@ int stars_add_sun_entry(starfield_list_entry *sun)
 
 	if (idx == -1) {
 		Warning(LOCATION, "Trying to add a sun that does not exist in stars.tbl!");
-		return 0;
+		return -1;
 	}
 
 	sbi.star_bitmap_index = idx;
@@ -3021,7 +3023,7 @@ int stars_add_sun_entry(starfield_list_entry *sun)
 
 			if (Sun_bitmaps[idx].bitmap_id < 0) {
 				Warning(LOCATION, "Unable to load sun bitmap: '%s'!\n", Sun_bitmaps[idx].filename);
-				return 0;
+				return -1;
 			}
 		}
 
@@ -3062,18 +3064,16 @@ int stars_add_sun_entry(starfield_list_entry *sun)
 		for (i = 0; i < (int)Suns.size(); i++) {
 			if ( Suns[i].star_bitmap_index < 0 ) {
 				Suns[i] = sbi;
-				goto Done;
+                starfield_generate_bitmap_instance_buffers();
+                return i;
 			}
 		}
 	}
 
-	// ... or add a new one
-	Suns.push_back(sbi);
-
-Done:
-	starfield_generate_bitmap_instance_buffers();
-
-	return 1;
+    // ... or add a new one 
+    Suns.push_back(sbi);
+    starfield_generate_bitmap_instance_buffers();
+    return Suns.size() - 1;
 }
 
 // add an instance for a starfield bitmap (something actually used in a mission)
@@ -3114,7 +3114,7 @@ int stars_add_bitmap_entry(starfield_list_entry *sle)
 
 			if (Starfield_bitmaps[idx].bitmap_id < 0) {
 				Warning(LOCATION, "Unable to load starfield bitmap: '%s'!\n", Starfield_bitmaps[idx].filename);
-				return 0;
+				return -1;
 			}
 		}
 	}
@@ -3122,19 +3122,17 @@ int stars_add_bitmap_entry(starfield_list_entry *sle)
 	// now check if we can make use of a previously discarded instance entry
 	for (int i = 0; i < (int)Starfield_bitmap_instances.size(); i++) {
 		if ( Starfield_bitmap_instances[i].star_bitmap_index < 0 ) {
-			starfield_update_index_buffers(i, 0);
-			Starfield_bitmap_instances[i] = sbi;
-			goto Done;
+            starfield_update_index_buffers(i, 0);
+            Starfield_bitmap_instances[i] = sbi;
+            starfield_generate_bitmap_instance_buffers();
+            return i;
 		}
 	}
 
 	// ... or add a new one
 	Starfield_bitmap_instances.push_back(sbi);
-
-Done:
 	starfield_generate_bitmap_instance_buffers();
-
-	return 1;
+    return Starfield_bitmap_instances.size() - 1;
 }
 
 // get the number of entries that each vector contains
@@ -3437,13 +3435,13 @@ void stars_load_background(int background_idx)
 
 		for (j = 0; j < background->suns.size(); j++)
 		{
-			if (!stars_add_sun_entry(&background->suns[j]) && !Fred_running)
+			if ((stars_add_sun_entry(&background->suns[j]) < 0) && !Fred_running)
 				Warning(LOCATION, "Failed to add sun '%s' to the mission!", background->suns[j].filename);
 		}
 
 		for (j = 0; j < background->bitmaps.size(); j++)
 		{
-			if (!stars_add_bitmap_entry(&background->bitmaps[j]) && !Fred_running)
+			if ((stars_add_bitmap_entry(&background->bitmaps[j]) < 0) && !Fred_running)
 				Warning(LOCATION, "Failed to add starfield bitmap '%s' to the mission!", background->bitmaps[j].filename);
 		}
 	}
@@ -3512,4 +3510,9 @@ void stars_pack_backgrounds()
 			}
 		}
 	}
+}
+
+DCF(sgbib, "")
+{
+    starfield_generate_bitmap_instance_buffers();
 }
