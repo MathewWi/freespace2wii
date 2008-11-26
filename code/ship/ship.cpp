@@ -2571,9 +2571,60 @@ static int Ship_cargo_check_timer;
 
 static int Thrust_anim_inited = 0;
 
+#define CLEAR_ARR(x) memset((x), 0, sizeof((x)))
+
+ship_subsys::ship_subsys() {
+	
+	next = NULL;
+	prev = NULL;
+	system_info = NULL;
+
+	CLEAR_ARR(sub_name);
+	current_hits = 0;
+	max_hits = 0;
+
+	flags = 0;
+
+	subsys_guardian_threshold = 0;
+
+	turret_best_weapon = 0;
+	turret_last_fire_direction = vmd_zero_vector;
+	turret_next_enemy_check_stamp = 0;
+	turret_next_fire_stamp = 0;
+	turret_enemy_objnum = 0;
+	turret_enemy_sig = 0;
+	turret_next_fire_pos = 0;
+	turret_time_enemy_in_range = 0;
+	CLEAR_ARR(turret_targeting_order);
+	targeted_subsys = NULL;
+
+	turret_pick_big_attack_point_timestamp = 0;
+	turret_big_attack_point = vmd_zero_vector;
+
+	turret_animation_position = 0;
+	turret_animation_done_time = 0;
+
+	turret_swarm_info_index = 0;
+
+	awacs_intensity = 0;
+	awacs_radius = 0;
+
+	disruption_timestamp = 0;
+
+	subsys_cargo_name = 0;
+	time_subsys_cargo_revealed = 0;
+	
+} ;
+
+ship_subsys_info::ship_subsys_info()
+{
+	num = 0;
+	total_hits = 0;
+	current_hits = 0;
+}
 
 ship::ship() : warpin_effect(NULL), warpout_effect(NULL), shield_integrity(NULL), ship_replacement_textures(NULL)
-{
+{	
 	for(size_t i = 0; i < MAX_PLAYERS; ++i)
 	{
 		this->last_targeted_subobject[i] = NULL;
@@ -2585,10 +2636,197 @@ ship::ship() : warpin_effect(NULL), warpout_effect(NULL), shield_integrity(NULL)
 		this->ABtrail_ptr[i] = NULL;
 	}
 	
+	objnum = -1;
+	ai_index = 0;
+	ship_info_index = 0;
+	hotkey = 0;
+	escort_priority = 0;
+	score = 0;
+	assist_score_pct = 0;
+	respawn_priority = 0;
+	
+	pre_death_explosion_happened = 0;
+	wash_killed = 0;
+	cargo1 = 0;
+
+	wing_status_wing_index = 0;
+	wing_status_wing_pos = 0;
+
+	alt_type_index = 0;
+	callsign_index = 0;
+	
+	num_corkscrew_to_fire = 0;
+	next_corkscrew_fire = 0;
+
+	final_death_time = 0;
+	death_time = 0;
+	really_final_death_time = 0;
+	end_death_time = 0;
+	deathroll_rotvel = vmd_zero_vector;
+	
+	
+	next_fireball = 0;
+
+	next_hit_spark = 0;
+	num_hits = 0;
+	CLEAR_ARR(sparks);
+
+	special_exp_index = 0;
+	special_hitpoint_index = 0;
+	
+	ship_max_shield_strength = 0;
+	ship_max_hull_strength = 0;
+
+	ship_guardian_threshold = 0;
+	
+	CLEAR_ARR(ship_name);
+	
+	team = 0;
+	
+	time_cargo_revealed = 0;
+
+	arrival_location = 0;
+	arrival_distance = 0;
+	arrival_anchor = 0;
+	arrival_path_mask = 0;
+	arrival_cue = 0;
+	arrival_delay = 0;
+
+	departure_location = 0;
+	departure_anchor = 0;
+	departure_path_mask = 0;
+	departure_cue = 0;
+	departure_delay = 0;
+
+	determination = 0;
+	wingnum = 0;
+	orders_accepted = 0;
+	
+	shield_recharge_index = 0;
+	weapon_recharge_index = 0;
+	engine_recharge_index = 0;
+	weapon_energy = 0;
+	current_max_speed = 0;
+	next_manage_ets = 0;
+
+	flags = 0;
+	flags2 = 0;
+	reinforcement_index = 0;
+	
+	afterburner_fuel = 0;
+	cmeasure_count = 0;
+	current_cmeasure = 0;
+
+	cmeasure_fire_stamp = 0;
+
+	target_shields_delta = 0;
+	target_weapon_energy_delta = 0;
+
+	shield_hits = 0;
+
+	wash_intensity = 0;
+	wash_rot_axis = vmd_zero_vector;
+	wash_timestamp = 0;
+	
+	num_swarm_missiles_to_fire = 0;
+	next_swarm_fire = 0;
+	next_swarm_path = 0;
+	num_turret_swarm_info = 0;
+
+	group = 0;
+	death_roll_snd = 0;
+	ship_list_index = 0;
+
+	thruster_bitmap = 0;
+	thruster_frame = 0;
+	
+	
+	thruster_glow_bitmap = 0;
+	thruster_glow_frame = 0;
+	thruster_glow_noise = 0;
+
+	thruster_secondary_glow_bitmap = 0;
+	thruster_tertiary_glow_bitmap = 0;
+
+	next_engine_stutter = 0;
+
+	base_texture_anim_frametime = 0;
+
+	total_damage_received = 0;
+	CLEAR_ARR(damage_ship);
+	CLEAR_ARR(damage_ship_id);
+	persona_index = 0;
+
+	subsys_disrupted_flags = 0;
+	subsys_disrupted_check_timestamp = 0;
+	
+	create_time = 0;
+	
 	wing_status_wing_index = -1;
 	wing_status_wing_pos = -1;
 	targeting_laser_bank = -1;
 	targeting_laser_objnum = -1;
+	
+	ts_index = 0;
+	
+	large_ship_blowup_index = -1;
+	
+	CLEAR_ARR(sub_expl_sound_handle);
+	
+	CLEAR_ARR(arc_pts);
+	CLEAR_ARR(arc_timestamp);
+	CLEAR_ARR(arc_type);
+	arc_next_time = 0;			
+	
+	emp_intensity = 0;
+	emp_decr = 0;
+	
+	tag_total = 0;
+	tag_left = 0;
+	time_first_tagged = 0;
+	level2_tag_total = 0;
+	level2_tag_left = 0;
+	
+	CLEAR_ARR(np_updates);
+	
+	lightning_stamp = 0;
+	awacs_warning_flag = 0;
+	special_warp_objnum = 0;
+	
+	CLEAR_ARR(was_firing_last_frame);
+	
+	primitive_sensor_range = 0;
+	
+	current_viewpoint = 0;
+	
+	CLEAR_ARR(ab_info);
+	
+	ab_count = 0;
+	
+	texture_translation_key = vmd_zero_vector;
+	current_translation = vmd_zero_vector;
+	cloak_stage = 0;
+	time_until_full_cloak = 0;
+	cloak_alpha = 0;
+	time_until_uncloak = 0;
+	
+	CLEAR_ARR(last_fired_point);	
+	
+	bay_doors_anim_done_time = 0;
+	bay_doors_status = 0;
+	bay_doors_wanting_open = 0;
+	
+	bay_doors_launched_from = 0;	// the bay door that I launched from
+	bay_doors_need_open = 0;
+	bay_doors_parent_shipnum = 0;
+	
+	CLEAR_ARR(secondary_point_reload_pct);
+	CLEAR_ARR(reload_time); 
+	CLEAR_ARR(primary_rotate_rate);
+	CLEAR_ARR(primary_rotate_ang);
+	
+	CLEAR_ARR(thrusters_start);
+	CLEAR_ARR(thrusters_sounds);
 }
 
 ship_info::ship_info() : type_str(NULL), maneuverability_str(NULL), armor_str(NULL), manufacturer_str(NULL), 
@@ -2611,6 +2849,9 @@ ship_info::ship_info() : type_str(NULL), maneuverability_str(NULL), armor_str(NU
 
 ship_weapon::ship_weapon()
 {
+	// Only safe if ship_weapon has no non-primative sub-classes
+	memset(this, 0, sizeof(ship_weapon));
+	
 	last_fired_weapon_index = -1;
 	last_fired_weapon_signature = -1;
 }

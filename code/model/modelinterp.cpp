@@ -1199,6 +1199,73 @@ void model_render_buffers(bsp_info *model, polymodel *pm, bool is_child = false)
 void model_render_children_buffers(bsp_info* model, polymodel * pm, int mn, int detail_level);
 int model_interp_get_texture(texture_info *tinfo, fix base_frametime);
 
+submodel_instance_info::submodel_instance_info() {
+	angles za;
+	
+	za.p = 0;
+	za.b = 0;
+	za.h = 0;
+	
+	blown_off = 0;
+	angs = za;
+	prev_angs = za;
+	pt_on_axis = vmd_zero_vector;
+	cur_turn_rate = 0;
+	desired_turn_rate = 0;
+	turn_accel = 0;
+	axis_set = 0;
+	step_zero_timestamp = 0;	
+};
+
+#define CLEAR_ARR(x) memset((x), 0, sizeof((x)))
+
+model_subsystem::model_subsystem() {
+	flags = 0;
+	
+	CLEAR_ARR(name);
+	CLEAR_ARR(subobj_name);
+	CLEAR_ARR(alt_sub_name);
+	subobj_num = 0;
+	model_num = 0;
+	type = 0;
+	pnt = vmd_zero_vector;
+	radius = 0;
+	max_subsys_strength = 0;
+	armor_type_idx = 0;
+
+	CLEAR_ARR(crewspot);
+	turret_norm = vmd_zero_vector;
+	turret_matrix = vmd_identity_matrix;
+	turret_fov = 0;
+	turret_num_firing_points = 0;
+	CLEAR_ARR(turret_firing_point);
+	turret_gun_sobj = 0;
+	turret_turning_rate = 0;
+	turret_rotation_snd = 0;
+
+	alive_snd = 0;
+	dead_snd = 0;
+	rotation_snd = 0;
+	
+	engine_wash_pointer = NULL;
+	
+	turn_rate = 0;
+	weapon_rotation_pbank = 0;
+	stepped_rotation = NULL;
+	
+	awacs_intensity = 0;
+	awacs_radius = 0;
+
+	CLEAR_ARR(primary_banks);
+	CLEAR_ARR(primary_bank_capacity);
+	CLEAR_ARR(secondary_banks);
+	CLEAR_ARR(secondary_bank_capacity);
+	path_num = 0;
+
+	n_triggers = 0;
+	triggers = 0;
+}
+
 
 
 void model_deallocate_interp_data()
