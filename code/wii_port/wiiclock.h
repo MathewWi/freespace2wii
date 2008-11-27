@@ -8,8 +8,6 @@ extern "C" {
 #include <time.h>
 
 clock_t wiiclock();
-void init_wiiclock();
-unsigned int getCount();
 
 void tic();
 void tocInternal(const char *file, int line);
