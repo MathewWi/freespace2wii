@@ -182,7 +182,6 @@ extern "C" void tocInternalMsg(const char *file, int line, const char *msg)
 
 void WiiInit()
 {
-	init_wiiclock();
 	ShowConsole(); 
 	CON_SetStipple(0);
 	
