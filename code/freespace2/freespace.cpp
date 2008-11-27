@@ -3680,7 +3680,7 @@ void game_init()
 	strncpy(whee, full_path, MAX_PATH_LEN-1);
 #elif SCP_WII
 	// Hard code this for now
-	SetCurrentDirectory("/Freespace2");
+	SetCurrentDirectory("fat:/Freespace2");
 	GetCurrentDirectory(MAX_PATH_LEN-1, whee);
 #else
 	GetCurrentDirectory(MAX_PATH_LEN-1, whee);
