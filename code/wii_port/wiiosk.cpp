@@ -295,34 +295,23 @@ int char_to_SDLkey(char c)
 	return key;
 }
 
-bool last_right = false;
+static bool last_right = false;
 
 void process_osk(int mouse_x, int mouse_y, bool mouse_left, bool mouse_right, osk_key_hit callfun)
 {
 	ButtonData * but = kb.getButton(mouse_x, mouse_y);
 	
-	if(last_right && !mouse_right)
-	{
-		kb.setText(callfun(SDLK_BACKSPACE, SDL_KEYUP));
-	} else if(mouse_right)
+	if(mouse_right && !last_right)
 	{
 		kb.setText(callfun(SDLK_BACKSPACE, SDL_KEYDOWN));
 	}
+	
 	last_right = mouse_right;
 	
 	if(but)
 	{	
 		if(mouse_left)
-		{
-			if(but->s == BS_NONE || but->s == BS_OVER)
-			{
-				if(but->text_p)
-				{
-					int key = char_to_SDLkey(but->text_p[0]);
-					if(key != -1) kb.setText(callfun(key, SDL_KEYDOWN));
-				}
-			}
-			
+		{			
 			switch(but->s)
 			{
 			case BS_OVER:
@@ -338,7 +327,10 @@ void process_osk(int mouse_x, int mouse_y, bool mouse_left, bool mouse_right, os
 				if(but->text_p)
 				{
 					int key = char_to_SDLkey(but->text_p[0]);
-					if(key != -1) kb.setText(callfun(key, SDL_KEYUP));				
+					if(key != -1)
+					{
+						kb.setText(callfun(key, SDL_KEYUP));
+					}
 				}
 			}
 			
