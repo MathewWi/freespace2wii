@@ -569,10 +569,10 @@ static const char *osk_buffer;
 
 const char * take_osk(int key, int modifier)
 {
-	if(modifier & SDL_KEYDOWN)
+	if((modifier & SDL_KEYDOWN) == SDL_KEYDOWN)
 	{
 		key_mark(SDLtoFS2[key], 1, 0);
-	} else if(modifier & SDL_KEYUP)
+	} else if((modifier & SDL_KEYUP) == SDL_KEYUP)
 	{
 		key_mark(SDLtoFS2[key], 0, 0);
 	}	
