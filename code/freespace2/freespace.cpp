@@ -9300,7 +9300,10 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int nCmdSh
 
 #else
 
+#ifdef SCP_WII
 #include <wiitrace.h>
+#include <ogc/system.h>
+#endif
 #include <malloc.h>
 
 // *NIX specific
@@ -9364,6 +9367,13 @@ int main(int argc, char *argv[])
 	closeProfiler();
 
 	DBUGFILE_DEINIT();
+#ifdef SCP_WII
+	extern volatile unsigned char power_pressed;	
+	if(power_pressed)
+	{
+		SYS_ResetSystem(SYS_POWEROFF,0,0);
+	}
+#endif
 
 	return result;
 }
