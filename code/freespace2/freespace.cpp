@@ -9302,6 +9302,7 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int nCmdSh
 
 #ifdef SCP_WII
 #include <wiitrace.h>
+#include <memtracer.h>
 #include <ogc/system.h>
 #endif
 #include <malloc.h>
@@ -9365,6 +9366,7 @@ int main(int argc, char *argv[])
 		result = EXIT_FAILURE;
 	}
 	closeProfiler();
+	closeMemtrace();
 
 	DBUGFILE_DEINIT();
 #ifdef SCP_WII

@@ -200,6 +200,8 @@ void Sleep(int mili)
 #endif
 }
 
+#include <memtracer.h>
+#include <wiitrace.h>
 extern void os_deinit();
 // fatal assertion error
 void WinAssert(char * text, char *filename, int line)
@@ -211,7 +213,10 @@ void WinAssert(char * text, char *filename, int line)
 
 	if (Cmdline_nowarn) {
 		return;
-	}
+	}	fflush(stdout);
+	fflush(stderr);
+	closeProfiler();
+	closeMemtrace();
 
 	// we have to call os_deinit() before abort() so we make sure that SDL gets
 	// closed out and we don't lose video/input control
@@ -260,6 +265,7 @@ void Warning( const char * filename, int line, const char * format, ... )
 	mprintf(("WARNING: \"%s\" at %s:%d\n", buffer, strrchr(filename, '/')+1, line));
 #endif
 }
+
 
 // fatal error message
 void Error( const char * filename, int line, const char * format, ... )
@@ -311,7 +317,9 @@ void Error( const char * filename, int line, const char * format, ... )
 	
 	fflush(stdout);
 	fflush(stderr);
-	wiipause();
+	closeProfiler();
+	closeMemtrace();
+	wiipause();	
 	
 	u32 *death = (u32 *) 0x1;
 	*death = 0xDEADBEEF;
@@ -613,10 +621,6 @@ int vm_init(int min_heap_size)
 	return 1;
 }
 
-#define SYSMEM2_SIZE 0x04000000
-#define LIBOGC 0x01000000
-#define SYSMEM2_START 0x90000000
-
 struct point
 {
 	size_t size;
@@ -756,10 +760,17 @@ void checkDEADBEAF(void *ptr, const char *filename, int line, const char *func)
 }
 #endif
 
-void * malloc_start = (void*)(SYSMEM2_START | LIBOGC);
-const void * malloc_end = (void*)(SYSMEM2_START | SYSMEM2_SIZE);
+#ifdef SCP_WII
+
+extern "C" void printTextureStats();
+
+#include <ogc/system.h>
 
 #define AssertLoc(x,a,b) do { if (!(x)){ WiiAssert(#x,a,b); } } while (0)
+#include <memtracer.h>
+
+#endif
+
 
 #if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 void *_vm_malloc( int size, const char *filename, int line, int quiet )
@@ -770,13 +781,22 @@ void *_vm_malloc( int size, int quiet )
 	AssertLoc( size >= 0 , filename, line);
 
 	size += 2*4*MEMCHECK_SIZE;
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
+	void *ptr = memtrace_malloc(filename, line, size);
+#else
 	void *ptr = malloc( size );
+#endif
 
 	if (!ptr)	{
 		if (quiet) {
 			return NULL;
 		}
+		
+#ifdef SCP_WII
 		malloc_stats();
+		printTextureStats();
+		printf("MEM1 %u MEM2 %u\n", (u32)SYS_GetArena1Hi()-(u32)SYS_GetArena1Lo(), (u32)SYS_GetArena2Hi()-(u32)SYS_GetArena2Lo());
+#endif
 #if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 		Error(filename, line, "Out of memory, %d, total alloc %d.", size,TotalRam);
 #else
@@ -819,7 +839,12 @@ void *_vm_realloc( void *ptr, int size, int quiet )
 	if(size != 0) size += 2*4*MEMCHECK_SIZE;
 #endif
 
-	void *ret_ptr = realloc( ptr, size );
+
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
+	void *ret_ptr = memtrace_realloc(filename, line, ptr, size );
+#else
+	void *ret_ptr = realloc(ptr, size );
+#endif
 
 	if (!ret_ptr)	{
 		if (quiet && (size > 0) && (ptr != NULL)) {
@@ -860,7 +885,7 @@ char *_vm_strdup( const char *ptr )
 	char *dst;
 	int len = strlen(ptr);
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 	dst = (char *)_vm_malloc( len+1 , filename, line, 0);
 #else
 	dst = (char *)vm_malloc( len+1 );
@@ -882,7 +907,7 @@ char *_vm_strndup( const char *ptr, int size )
 {
 	char *dst;
 	
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 	dst = (char *)_vm_malloc( size+1 , filename, line, 0);
 #else
 	dst = (char *)vm_malloc( size+1 );
@@ -942,8 +967,11 @@ void _vm_free( void *ptr )
 		item = item->next;
     }
 #endif // !NDEBUG
-
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
+	memtrace_free(filename, line, ptr);
+#else
 	free(ptr);
+#endif
 }
 void vm_free_all()
 {

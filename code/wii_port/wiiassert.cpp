@@ -178,6 +178,7 @@ extern "C" void tocInternalMsg(const char *file, int line, const char *msg)
 }
 
 #include <wiitrace.h>
+#include <memtracer.h>
 //#include <custom_assert.h>
 
 void WiiInit()
@@ -196,6 +197,7 @@ void WiiInit()
 	perf_log = fopen("/perf_log.txt","w");
 	
 	initProfiler("/trace_log.txt",1);
+	initMemtrace("/mem_trace_log.mtr",1);
 	
 	//set_custom_assert(&WiiAssert);
 }
