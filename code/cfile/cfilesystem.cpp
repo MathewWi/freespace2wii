@@ -267,7 +267,11 @@
 
 #ifdef SCP_UNIX
 #include <sys/types.h>
+#ifdef SCP_WII
+#include <sys/dir.h>
+#else
 #include <dirent.h>
+#endif
 #include <fnmatch.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -447,6 +451,24 @@ int cf_get_packfile_count(cf_root *root)
 			continue;
 		}
 		
+#ifdef SCP_WII			
+		DIR_ITER *dirp;
+
+		dirp = diropen(filespec);
+		if ( dirp ) {
+			char d_name[FILENAME_MAX+1];
+			while (dirnext(dirp, d_name, NULL) == 0)
+			{
+				if (!fnmatch ("*.[vV][pP]", d_name, 0))
+				{
+					packfile_count++;
+				}
+			}
+			
+			dirclose(dirp);
+		}
+#else
+		
 		DIR *dirp;
 		struct dirent *dir;
 
@@ -463,6 +485,7 @@ int cf_get_packfile_count(cf_root *root)
 			
 			closedir(dirp);
 		}
+#endif
 #endif
 	}
 
@@ -556,6 +579,31 @@ void cf_build_pack_list( cf_root *root )
 		}	
 #elif defined SCP_UNIX
 		
+#ifdef SCP_WII	
+		DIR_ITER *dirp;
+
+		dirp = diropen(filespec);
+		if ( dirp ) {
+			char d_name[FILENAME_MAX+1];
+			while (dirnext(dirp, d_name, NULL) == 0)
+			{
+				if (!fnmatch ("*.[vV][pP]", d_name, 0))
+				{
+					Assert(root_index < temp_root_count);
+
+					// get a temp pointer
+					rptr_sort = &temp_roots_sort[root_index++];
+
+					// fill in all the proper info
+					strcpy(rptr_sort->path, d_name );
+					rptr_sort->roottype = CF_ROOTTYPE_PACK;
+					rptr_sort->cf_type = i;
+				}
+			}
+			
+			dirclose(dirp);
+		}
+#else
 		DIR *dirp;
 		struct dirent *dir;
 
@@ -580,6 +628,7 @@ void cf_build_pack_list( cf_root *root )
 			
 			closedir(dirp);
 		}
+#endif
 #endif
 	}
 
@@ -821,6 +870,54 @@ void cf_search_root_path(int root_index)
 			_findclose( find_handle );
 		}
 #elif defined SCP_UNIX
+
+#ifdef SCP_WII
+		DIR_ITER *dirp;
+
+		dirp = diropen(search_path);
+		if ( dirp ) {
+			char d_name[FILENAME_MAX+1];
+			while (dirnext(dirp, d_name, NULL) == 0) {
+				if (!fnmatch ("*.*", d_name, 0))
+				{
+					char fn[FILENAME_MAX+1];
+					snprintf(fn, FILENAME_MAX, "%s%s", search_path, d_name);
+					fn[FILENAME_MAX] = 0;
+
+					struct stat buf;
+					if (stat(fn, &buf) == -1) {
+						continue;
+					}
+					
+					if (!S_ISREG(buf.st_mode)) {
+						continue;
+					}
+					
+					char *ext = strrchr( d_name, '.' );
+					if ( ext )	{
+						if ( is_ext_in_list( Pathtypes[i].extensions, ext ) )	{
+							// Found a file!!!!
+							cf_file *file = cf_create_file();
+
+							strcpy( file->name_ext, d_name );
+							file->root_index = root_index;
+							file->pathtype_index = i;
+
+
+							file->write_time = buf.st_mtime;
+							file->size = buf.st_size;
+
+							file->pack_offset = 0;			// Mark as a non-packed file
+
+							num_files++;
+							//mprintf(( "Found file '%s'\n", file->name_ext ));
+						}
+					}
+				}
+			}
+			dirclose(dirp);
+		}
+#else
 		DIR *dirp;
 		struct dirent *dir;
 
@@ -868,6 +965,7 @@ void cf_search_root_path(int root_index)
 			}
 			closedir(dirp);
 		}
+#endif
 #endif
 	}
 
@@ -1687,7 +1785,57 @@ int cf_get_file_list( int max, char **list, int pathtype, char *filter, int sort
 
 #elif defined SCP_UNIX
 	cf_create_default_path_string( filespec, sizeof(filespec)-1, pathtype, NULL );
+	
+#ifdef SCP_WII
+	DIR_ITER *dirp;
 
+	dirp = diropen(filespec);
+	if ( dirp ) {
+		char d_name[FILENAME_MAX+1];
+		while (dirnext(dirp, d_name, NULL) == 0) {
+			if (num_files >= max)
+				break;
+
+			if ( strlen(d_name) >= MAX_FILENAME_LEN ) {
+				continue;
+			}
+
+			if (fnmatch(filter, d_name, 0) != 0)
+				continue;
+
+			char fn[FILENAME_MAX+1];
+			snprintf(fn, FILENAME_MAX, "%s/%s", filespec, d_name);
+			fn[FILENAME_MAX] = 0;
+
+			struct stat buf;
+			if (stat(fn, &buf) == -1) {
+				continue;
+			}
+
+			if (!S_ISREG(buf.st_mode)) {
+				continue;
+			}
+
+			if ( !Get_file_list_filter || (*Get_file_list_filter)(d_name) ) {
+				ptr = strrchr(d_name, '.');
+				if (ptr)
+					l = ptr - d_name;
+				else
+					l = strlen(d_name);
+
+				list[num_files] = (char *)vm_malloc(l + 1);
+				strncpy(list[num_files], d_name, l);
+				list[num_files][l] = 0;
+				if (info)
+					info[num_files].write_time = buf.st_mtime;
+
+				num_files++;
+			}
+		}
+
+		dirclose(dirp);
+	}
+#else
 	DIR *dirp;
 	struct dirent *dir;
 
@@ -1737,6 +1885,7 @@ int cf_get_file_list( int max, char **list, int pathtype, char *filter, int sort
 
 		closedir(dirp);
 	}
+#endif
 #endif
 
 	// Search all the packfiles and CD.
@@ -1894,6 +2043,54 @@ int cf_get_file_list_preallocated( int max, char arr[][MAX_FILENAME_LEN], char *
 #elif defined SCP_UNIX
 	cf_create_default_path_string( filespec, sizeof(filespec)-1, pathtype, NULL );
 
+#ifdef SCP_WII
+	DIR_ITER *dirp;
+
+	dirp = diropen(filespec);
+	if ( dirp ) {
+		char d_name[FILENAME_MAX+1];
+		while (dirnext(dirp, d_name, NULL) == 0) {
+			if (num_files >= max)
+				break;
+
+			if (fnmatch(filter, d_name, 0) != 0)
+				continue;
+
+			char fn[FILENAME_MAX+1];
+			snprintf(fn, FILENAME_MAX, "%s/%s", filespec, d_name);
+			fn[FILENAME_MAX] = 0;
+
+			struct stat buf;
+			if (stat(fn, &buf) == -1) {
+				continue;
+			}
+
+			if (!S_ISREG(buf.st_mode)) {
+				continue;
+			}
+
+			if ( strlen(d_name) >= MAX_FILENAME_LEN ) {
+				continue;
+			}
+
+			if ( !Get_file_list_filter || (*Get_file_list_filter)(d_name) ) {
+
+				strncpy(arr[num_files], d_name, MAX_FILENAME_LEN - 1 );
+				char *ptr = strrchr(arr[num_files], '.');
+				if ( ptr ) {
+					*ptr = 0;
+				}
+
+				if (info)	{
+					info[num_files].write_time = buf.st_mtime;
+				}
+
+				num_files++;
+			}
+		}
+		dirclose(dirp);
+	}
+#else
 	DIR *dirp;
 	struct dirent *dir;
 
@@ -1941,6 +2138,7 @@ int cf_get_file_list_preallocated( int max, char arr[][MAX_FILENAME_LEN], char *
 		}
 		closedir(dirp);
 	}
+#endif
 #endif
 
 	// Search all the packfiles and CD.

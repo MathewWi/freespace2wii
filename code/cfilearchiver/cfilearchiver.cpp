@@ -50,7 +50,11 @@
 #include <io.h>
 #include <conio.h>
 #else
+#ifdef SCP_WII
+#include <sys/dir.h>
+#else
 #include <dirent.h>
+#endif
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -280,6 +284,42 @@ void pack_directory( char * filespec)
 		}
 	}
 #else
+#ifdef SCP_WII
+	DIR_ITER *dirp;
+
+	dirp = diropen(filespec);
+	if ( dirp ) {
+		char d_name[FILENAME_MAX+1];
+		while (dirnext(dirp, d_name, NULL) == 0) {
+			char fn[FILENAME_MAX+1];
+			snprintf(fn, FILENAME_MAX, "%s/%s", filespec, fn1);
+			fn[FILENAME_MAX] = 0;
+			
+			struct stat buf;
+			if (stat(fn, &buf) == -1) {
+				continue;
+			}
+
+			if ( (strcmp(d_name, ".") == 0) || (strcmp(d_name, "..") == 0) ) {
+				continue;
+			}
+
+			if ( (strcmp(d_name, ".svn") == 0) ) {
+				continue;
+			}
+
+			if (S_ISDIR(buf.st_mode)) {
+				pack_directory(fn);
+			} else {
+				pack_file( filespec, d_name, buf.st_size, buf.st_mtime );
+			}
+		}
+		dirclose(dirp);
+	} else {
+		printf("Error: Source directory does not exist!\n");
+		no_dir = 1;
+	}
+#else
 	DIR *dirp;
 	struct dirent *dir;
 
@@ -318,6 +358,7 @@ void pack_directory( char * filespec)
 		printf("Error: Source directory does not exist!\n");
 		no_dir = 1;
 	}
+#endif
 #endif
 	add_directory("..");
 }
