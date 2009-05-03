@@ -2718,6 +2718,10 @@ void game_level_close()
 		}
 
 		gr_set_ambient_light(120, 120, 120);
+#ifdef SCP_WII
+		model_free_all();
+		extern void opengl_tcache_flush(); opengl_tcache_flush();
+#endif
 
 		ENVMAP = Default_env_map;
 	}
