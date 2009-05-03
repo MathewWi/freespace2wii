@@ -521,6 +521,8 @@ extern char	*Object_type_names[MAX_OBJECT_TYPES];
 struct dock_instance;
 
 typedef struct object {
+	object() : mem_guard1(0xDEADBEEF), mem_guard2(0xBEEFDEAD) {};
+	unsigned int mem_guard1;
 	struct object	*next, *prev;	// for linked lists of objects
 	int				signature;		// Every object ever has a unique signature...
 	char				type;				// what type of object this is... robot, weapon, hostage, powerup, fireball
@@ -551,6 +553,12 @@ typedef struct object {
 
 	dock_instance	*dock_list;			// Goober5000 - objects this object is docked to
 	dock_instance	*dead_dock_list;	// Goober5000 - objects this object was docked to when destroyed; replaces dock_objnum_when_dead
+	
+	unsigned int mem_guard2;
+	
+	int good() { return mem_guard1 == 0xDEADBEEF && mem_guard2 == 0xBEEFDEAD; };
+	void setguard() { mem_guard1 = 0xDEADBEEF; mem_guard2 = 0xBEEFDEAD; };
+	
 } object;
 
 struct object_h {
