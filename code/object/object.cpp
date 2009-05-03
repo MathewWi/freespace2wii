@@ -975,6 +975,7 @@ void obj_init()
 	// Link all object slots into the free list
 	objp = Objects;
 	for (i=0; i<MAX_OBJECTS; i++)	{
+		objp->setguard();
 		objp->type = OBJ_NONE;
 		objp->signature = i + 100;
 
