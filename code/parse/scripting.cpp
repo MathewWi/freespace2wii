@@ -981,7 +981,7 @@ bool script_state::EvalString(char* string, char *format, void *rtn, char *debug
 		return false;
 	}
 
-	char *s = new char[strlen(string) + 8];
+	char *s = (char*)vm_malloc(sizeof(char)*(strlen(string) + 8));
 	if(string[0] != '[')
 	{
 		if(rtn != NULL)
@@ -1010,7 +1010,7 @@ bool script_state::EvalString(char* string, char *format, void *rtn, char *debug
 	//Parse string
 	int rval = luaL_loadbuffer(LuaState, s, strlen(s), debug_str);
 	//We don't need s anymore.
-	delete[] s;
+	vm_free(s);
 	//Call function
 	if(!rval)
 	{

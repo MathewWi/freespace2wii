@@ -886,7 +886,8 @@ void cam_close()
 	{
 		if(Cameras[i] != NULL)
 		{
-			delete Cameras[i];
+			Cameras[i]->~camera();
+			vm_free(Cameras[i]);
 			Cameras[i] = NULL;
 		}
 	}
@@ -926,22 +927,23 @@ camid cam_create(char *n_name, vec3d *n_pos, matrix *n_ori, object *n_object, in
 	{
 		if(Cameras[i] == NULL)
 		{
-			cam = new camera(buf, sig);
+			cam = new (vm_malloc(sizeof(camera))) camera(buf, sig);
 			cid = camid(i, sig);
 			Cameras[i] = cam;
 			break;
 		}
 		else if(Cameras[i]->is_empty())
 		{
-			delete Cameras[i];
-			cam = new camera(buf, sig);
+			Cameras[i]->~camera();
+			vm_free(Cameras[i]);
+			cam = new (vm_malloc(sizeof(camera))) camera(buf, sig);
 			cid = camid(i, sig);
 			Cameras[i] = cam;
 		}
 	}
 	if(cam == NULL)
 	{
-		cam = new camera(buf, sig);
+		cam = new (vm_malloc(sizeof(camera))) camera(buf, sig);
 		cid = camid(Cameras.size(), sig);
 		Cameras.push_back(cam);
 	}

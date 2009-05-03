@@ -11,6 +11,8 @@
 
 #include "physics/physics.h"
 
+#define BLANK_GEO_ALLOC 24
+
 
 class geometry_batcher
 {
@@ -27,10 +29,13 @@ private:
 	void clone(const geometry_batcher &geo);
 
 public:
-	geometry_batcher(): n_to_render(0), n_allocated(0), vert(NULL), vert_list(NULL) {};
+	geometry_batcher(): n_to_render(0), n_allocated(0), vert(NULL), vert_list(NULL)
+	{
+		allocate_internal(BLANK_GEO_ALLOC);	
+	};
 	~geometry_batcher();
 
-    geometry_batcher(const geometry_batcher &geo) { clone(geo); }
+    geometry_batcher(const geometry_batcher &geo) : n_to_render(0), n_allocated(0), vert(NULL), vert_list(NULL) { clone(geo); }
     const geometry_batcher &operator=(const geometry_batcher &geo);
 
 	// initial memory space needed

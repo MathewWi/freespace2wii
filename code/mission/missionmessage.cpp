@@ -2111,7 +2111,7 @@ void message_queue_message( int message_num, int priority, int timing, char *who
 int message_get_persona( ship *shipp )
 {
 	int i = 0, ship_type, count;
-	int *slist = new int[Num_personas];
+	int *slist = (int*)vm_malloc(sizeof(int)*Num_personas);
 	memset( slist, 0, sizeof(int) * Num_personas );
 
 	if ( shipp != NULL ) {
@@ -2185,7 +2185,7 @@ int message_get_persona( ship *shipp )
 //	return 0;
 
 I_Done:
-	delete[] slist;
+	vm_free(slist);
 
 	return i;
 }

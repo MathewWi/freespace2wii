@@ -245,7 +245,8 @@ void trail_level_close()
 		nextp = trailp->next;
 
 		//Now we can delete it
-		delete trailp;
+		trailp->~trail();
+		vm_free(trailp);
 	}
 
 	Num_trails=0;
@@ -261,7 +262,7 @@ trail *trail_create(trail_info *info)
 		return NULL;
 
 	// Make a new trail
-	trail *trailp = new trail;
+	trail *trailp = new (vm_malloc(sizeof(trail))) trail;
 
 	// increment counter
 	Num_trails++;
@@ -585,7 +586,8 @@ void trail_move_all(float frametime)
 		if ( (num_alive_segments < 1) && trailp->object_died)
 		{
 			prev_trail->next = trailp->next;
-			delete trailp;
+			trailp->~trail();
+			vm_free(trailp);
 
 			// decrement counter
 			Num_trails--;

@@ -557,8 +557,8 @@ void gamesnd_parse_soundstbl()
 	// parse flyby sound section	
 	required_string("#Flyby Sounds Start");
 
-	missing_species_names = new char[Species_info.size() * (NAME_LENGTH+2)];
-	missing_species = new ubyte[Species_info.size()];
+	missing_species_names = (char*)vm_malloc(sizeof(char)*(Species_info.size() * (NAME_LENGTH+2)));
+	missing_species = (ubyte*)vm_malloc(sizeof(ubyte)*(Species_info.size()));
 
 	memset( missing_species_names, 0, Species_info.size() * (NAME_LENGTH+2) );
 	memset( missing_species, 1, Species_info.size() );	// assume they are all missing
@@ -593,8 +593,8 @@ void gamesnd_parse_soundstbl()
 		Error( LOCATION, "The following species are missing flyby sounds in sounds.tbl:\n%s", missing_species_names );
 	}
 
-	delete[] missing_species_names;
-	delete[] missing_species;
+	vm_free(missing_species_names);
+	vm_free(missing_species);
 
 	required_string("#Flyby Sounds End");
 

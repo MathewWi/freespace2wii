@@ -238,7 +238,7 @@ void GUISystem::ParseClassInfo(char* filename)
 	bool flag;
 	do
 	{
-		ScreenClassInfoEntry* sciep = new ScreenClassInfoEntry;
+		ScreenClassInfoEntry* sciep = new (vm_malloc(sizeof(ScreenClassInfoEntry))) ScreenClassInfoEntry;
 		flag = sciep->Parse();
 		if(flag)
 			list_append(&ScreenClassInfo, sciep);
@@ -463,7 +463,8 @@ GUIScreen::~GUIScreen()
 	for(; cgp != END_OF_LIST(&Guiobjects); cgp = cgp_next)
 	{
 		cgp_next = (GUIObject*)GET_NEXT(cgp);
-		delete cgp;
+		cgp->~GUIObject();
+		vm_free(cgp);
 	}
 
 	//Get it out of the system
@@ -563,13 +564,15 @@ GUIObject* GUIScreen::Add(GUIObject* new_gauge)
 		{
 			//Get rid of the new gauge
 			//We don't want it; breaks skinning
-			delete new_gauge;
+			new_gauge->~GUIObject();
+			vm_free(new_gauge);
 
 			if(tgp->Type == new_gauge->Type)
 			{
 				//If the type of the existing object is the same
 				//as the new one, we can safely pass this one off
-				delete new_gauge;
+				new_gauge->~GUIObject();
+				vm_free(new_gauge);
 				return tgp;
 			}
 			else
@@ -577,7 +580,8 @@ GUIObject* GUIScreen::Add(GUIObject* new_gauge)
 				//This is icky; we might cast a pointer after this.
 				//So return NULL with a warning
 				Warning(LOCATION, "Attempt to create another object with name '%s'; new object type was %d, existing object type was %d. This may cause null pointer issues.", tgp->Name.c_str(), new_gauge->Type, tgp->Type);
-				delete new_gauge;
+				new_gauge->~GUIObject();
+				vm_free(new_gauge);
 				return NULL;
 			}
 		}
@@ -726,7 +730,8 @@ int GUIScreen::OnFrame(float frametime, bool doevents)
 
 	for(uint i = DeletionCache.size(); i > 0; i--)
 	{
-		delete DeletionCache[i-1];
+		DeletionCache[i-1]->~GUIObject();
+		vm_free(DeletionCache[i-1]);
 		DeletionCache.pop_back();
 	}
 
@@ -792,7 +797,8 @@ GUISystem::~GUISystem()
 	for(; csp != END_OF_LIST(&Screens); csp = csp_next)
 	{
 		csp_next = (GUIScreen*)GET_NEXT(csp);
-		delete csp;
+		csp->~GUIScreen();
+		vm_free(csp);
 	}
 	DestroyClassInfo();
 }
@@ -954,7 +960,8 @@ void GUISystem::DestroyClassInfo()
 	for(sciep = (ScreenClassInfoEntry*)GET_FIRST(&ScreenClassInfo); sciep != END_OF_LIST(&ScreenClassInfo); sciep = next_sciep)
 	{
 		next_sciep = (ScreenClassInfoEntry*)GET_NEXT(sciep);
-		delete sciep;
+		sciep->~ScreenClassInfoEntry();
+		vm_free(sciep);
 	}
 	ClassInfoParsed = false;
 }
@@ -1023,7 +1030,8 @@ void GUIObject::DeleteChildren(GUIObject* exception)
 		cgp_temp = cgp;
 		cgp = (GUIObject*)GET_NEXT(cgp);
 
-		delete cgp_temp;
+		cgp_temp->~GUIObject();
+		vm_free(cgp_temp);
 	}
 
 	list_init(&Children);
@@ -1094,9 +1102,14 @@ GUIObject* GUIObject::AddChild(GUIObject* cgp)
 void GUIObject::Delete()
 {
 	if(OwnerScreen != NULL)
+	{
 		OwnerScreen->DeleteObject(this);
+	}
 	else
-		delete this;
+	{
+		this->~GUIObject();
+		vm_free(this);
+	}
 }
 
 void GUIObject::OnDraw(float frametime)
@@ -1851,7 +1864,8 @@ void Window::ClearContent()
 
 	while ( cgp && (cgp != END_OF_LIST(&Children)) ) {
 		cgp_next = GET_NEXT(cgp);
-		delete cgp;
+		cgp->~LinkedList();
+		vm_free(cgp);
 		cgp = cgp_next;
 	}
 }
@@ -2001,7 +2015,8 @@ void TreeItem::ClearAllItems()
 	for(; cgp != END_OF_LIST(&Children); cgp = cgp_next)
 	{
 		cgp_next = GET_NEXT(cgp);
-		delete cgp;
+		cgp->~LinkedList();
+		vm_free(cgp);
 	}
 }
 
@@ -2241,7 +2256,7 @@ void Tree::DoMove(int dx, int dy)
 
 TreeItem* Tree::AddItem(TreeItem *parent, std::string in_name, int in_data, bool in_delete_data, void (*in_function)(Tree* caller))
 {
-	TreeItem *ni = new TreeItem;
+	TreeItem *ni = new (vm_malloc(sizeof(TreeItem))) TreeItem;
 
 	ni->Parent = parent;
 	ni->Name = in_name;
@@ -2268,7 +2283,8 @@ void Tree::ClearItems()
 	for(; cgp != END_OF_LIST(&Items); cgp = cgp_next)
 	{
 		cgp_next = GET_NEXT(cgp);
-		delete cgp;
+		cgp->~LinkedList();
+		vm_free(cgp);
 	}
 }
 

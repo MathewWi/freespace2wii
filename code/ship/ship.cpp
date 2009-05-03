@@ -6091,45 +6091,53 @@ void ship_set_warp_effects(object *objp, ship_info *sip)
 
 	
 	if(shipp->warpin_effect != NULL)
-		delete shipp->warpin_effect;
+	{
+		shipp->warpin_effect->~WarpEffect();
+		vm_free(shipp->warpin_effect);
+		shipp->warpin_effect = NULL;
+	}
 
 	switch(sip->warpin_type)
 	{
 		case WT_DEFAULT:
-			shipp->warpin_effect = new WE_Default(objp, WD_WARP_IN);
+			shipp->warpin_effect = new (vm_malloc(sizeof(WE_Default))) WE_Default(objp, WD_WARP_IN);
 			break;
 		case WT_IN_PLACE_ANIM:
-			shipp->warpin_effect = new WE_BTRL(objp, WD_WARP_IN);
+			shipp->warpin_effect = new (vm_malloc(sizeof(WE_BTRL))) WE_BTRL(objp, WD_WARP_IN);
 			break;
 		case WT_SWEEPER:
-			shipp->warpin_effect = new WE_Homeworld(objp, WD_WARP_IN);
+			shipp->warpin_effect = new (vm_malloc(sizeof(WE_Homeworld))) WE_Homeworld(objp, WD_WARP_IN);
 			break;
 		case WT_HYPERSPACE:
-			shipp->warpin_effect = new WE_Hyperspace(objp, WD_WARP_IN);
+			shipp->warpin_effect = new (vm_malloc(sizeof(WE_Hyperspace))) WE_Hyperspace(objp, WD_WARP_IN);
 			break;
 		default:
-			shipp->warpin_effect = new WarpEffect();
+			shipp->warpin_effect = new (vm_malloc(sizeof(WarpEffect))) WarpEffect();
 	}
 
 	if(shipp->warpout_effect != NULL)
-		delete shipp->warpout_effect;
+	{
+		shipp->warpout_effect->~WarpEffect();
+		vm_free(shipp->warpout_effect);
+		shipp->warpout_effect = NULL;
+	}
 
 	switch(sip->warpout_type)
 	{
 		case WT_DEFAULT:
-			shipp->warpout_effect = new WE_Default(objp, WD_WARP_OUT);
+			shipp->warpout_effect = new (vm_malloc(sizeof(WE_Default))) WE_Default(objp, WD_WARP_OUT);
 			break;
 		case WT_IN_PLACE_ANIM:
-			shipp->warpout_effect = new WE_BTRL(objp, WD_WARP_OUT);
+			shipp->warpout_effect = new (vm_malloc(sizeof(WE_BTRL))) WE_BTRL(objp, WD_WARP_OUT);
 			break;
 		case WT_SWEEPER:
-			shipp->warpout_effect = new WE_Homeworld(objp, WD_WARP_OUT);
+			shipp->warpout_effect = new (vm_malloc(sizeof(WE_Homeworld))) WE_Homeworld(objp, WD_WARP_OUT);
 			break;
 		case WT_HYPERSPACE:
-			shipp->warpout_effect = new WE_Hyperspace(objp, WD_WARP_OUT);
+			shipp->warpout_effect = new (vm_malloc(sizeof(WE_Hyperspace))) WE_Hyperspace(objp, WD_WARP_OUT);
 			break;
 		default:
-			shipp->warpout_effect = new WarpEffect();
+			shipp->warpout_effect = new (vm_malloc(sizeof(WarpEffect))) WarpEffect();
 	}
 }
 
@@ -6233,7 +6241,17 @@ void ship_set(int ship_index, int objnum, int ship_type)
 	if ( !Fred_running ) {
 		//shipp->start_warp_time = timestamp(-1);
 		//shipp->final_warp_time = timestamp(-1);
+		if(shipp->warpin_effect != NULL)
+		{
+			shipp->warpin_effect->~WarpEffect();
+			vm_free(shipp->warpin_effect);
+		}
 		shipp->warpin_effect = NULL;
+		if(shipp->warpout_effect != NULL)
+		{
+			shipp->warpout_effect->~WarpEffect();
+			vm_free(shipp->warpout_effect);
+		}
 		shipp->warpout_effect = NULL;
 		ship_set_warp_effects(objp, sip);
 		shipp->final_death_time = timestamp(-1);	// There death sequence ain't start et.
@@ -15790,7 +15808,7 @@ void ship_page_in()
 
 	int *ship_class_used = NULL;
 
-	ship_class_used = new int[Num_ship_classes];
+	ship_class_used = (int*)	vm_malloc(sizeof(int)*Num_ship_classes);
 
 	Verify( ship_class_used != NULL );
 
@@ -16064,7 +16082,7 @@ void ship_page_in()
 	}
 
 	// should never be NULL, this entire function wouldn't work
-	delete[] ship_class_used;
+	vm_free(ship_class_used);
 	ship_class_used = NULL;
 
 }

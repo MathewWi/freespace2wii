@@ -2662,27 +2662,58 @@ int g3_draw_2d_poly_bitmap(float x, float y, float w, float h, uint additional_t
 	return ret;
 }
 
-vertex *bitmap_2d_poly_list=NULL;
-vertex **bitmap_2d_poly_vertlist=NULL;
-int bitmap_2d_poly_list_size=0;
+static vertex *bitmap_2d_poly_list=NULL;
+static vertex **bitmap_2d_poly_vertlist=NULL;
+static int bitmap_2d_poly_list_size=0;
+
+static void free_bm_list(){
+	size_t i = 6*bitmap_2d_poly_list_size;
+	if(bitmap_2d_poly_list)
+	{
+		while(i)
+		{
+			bitmap_2d_poly_list[--i].~vertex();
+		}
+		vm_free(bitmap_2d_poly_list);
+		bitmap_2d_poly_list = NULL;
+	}
+	
+	i = 6*bitmap_2d_poly_list_size;	
+	if(bitmap_2d_poly_vertlist)
+	{
+		vm_free(bitmap_2d_poly_vertlist);
+		bitmap_2d_poly_vertlist = NULL;
+	}
+	bitmap_2d_poly_list_size = 0;
+}
+
+static void alloc_bm_list(size_t n_bm)
+{
+	if(n_bm>bitmap_2d_poly_list_size){
+		free_bm_list();
+		bitmap_2d_poly_list = new (vm_malloc(sizeof(vertex)*6*n_bm)) vertex[6* n_bm];
+		bitmap_2d_poly_vertlist = new (vm_malloc(sizeof(vertex*)*6*n_bm)) vertex*[6*n_bm];
+		bitmap_2d_poly_list_size = n_bm;
+		
+		for(int i = 0; i<6*n_bm; i++)
+		{
+			bitmap_2d_poly_vertlist[i] = &bitmap_2d_poly_list[i];
+		}
+		memset(bitmap_2d_poly_list,0,sizeof(vertex)*6*n_bm);
+	}
+}
+
+
 
 void bm_list_shutdown(){
-	if(bitmap_2d_poly_list)delete[]bitmap_2d_poly_list;
-	if(bitmap_2d_poly_vertlist)delete[]bitmap_2d_poly_vertlist;
+	free_bm_list();
 }
 
 int g3_draw_2d_poly_bitmap_list(bitmap_2d_list* b_list, int n_bm, uint additional_tmap_flags)
 {
 	int ret;
 	int saved_zbuffer_mode;
-	if(n_bm>bitmap_2d_poly_list_size){
-		if(bitmap_2d_poly_list)delete[]bitmap_2d_poly_list;
-		if(bitmap_2d_poly_vertlist)delete[]bitmap_2d_poly_vertlist;
-		bitmap_2d_poly_list = new vertex[6* n_bm];
-		bitmap_2d_poly_vertlist = new vertex*[6*n_bm];
-		for(int i = 0; i<6*n_bm; i++)bitmap_2d_poly_vertlist[i] = &bitmap_2d_poly_list[i];
-		memset(bitmap_2d_poly_list,0,sizeof(vertex)*6*n_bm);
-	}
+	alloc_bm_list(n_bm);
 
 	g3_start_frame(1);
 
@@ -2767,14 +2798,7 @@ int g3_draw_2d_poly_bitmap_rect_list(bitmap_rect_list* b_list, int n_bm, uint ad
 {
 	int ret;
 	int saved_zbuffer_mode;
-	if(n_bm>bitmap_2d_poly_list_size){
-		if(bitmap_2d_poly_list)delete[]bitmap_2d_poly_list;
-		if(bitmap_2d_poly_vertlist)delete[]bitmap_2d_poly_vertlist;
-		bitmap_2d_poly_list = new vertex[6* n_bm];
-		bitmap_2d_poly_vertlist = new vertex*[6*n_bm];
-		for(int i = 0; i<6*n_bm; i++)bitmap_2d_poly_vertlist[i] = &bitmap_2d_poly_list[i];
-	//	memset(bitmap_2d_poly_list,0,sizeof(vertex)*6*n_bm);
-	}
+	alloc_bm_list(n_bm);
 
 	g3_start_frame(1);
 

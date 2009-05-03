@@ -316,7 +316,7 @@ void particle_init()
 
 	if ( (Anim_bitmap_id_fire > -1) && (PARTICLE_FIRE_batcher == NULL) ) {
 		Assert( Anim_num_frames_fire > 0 );
-		PARTICLE_FIRE_batcher = new geometry_batcher[Anim_num_frames_fire];
+		PARTICLE_FIRE_batcher = new (vm_malloc(sizeof(geometry_batcher)*Anim_num_frames_fire)) geometry_batcher[Anim_num_frames_fire];
 		Verify( PARTICLE_FIRE_batcher != NULL );
 	}
 
@@ -327,7 +327,7 @@ void particle_init()
 
 	if ( (Anim_bitmap_id_smoke > -1) && (PARTICLE_SMOKE_batcher == NULL) ) {
 		Assert( Anim_num_frames_smoke > 0 );
-		PARTICLE_SMOKE_batcher = new geometry_batcher[Anim_num_frames_smoke];
+		PARTICLE_SMOKE_batcher = new (vm_malloc(sizeof(geometry_batcher)*Anim_num_frames_smoke)) geometry_batcher[Anim_num_frames_smoke];
 		Verify( PARTICLE_SMOKE_batcher != NULL );
 	}
 
@@ -338,7 +338,7 @@ void particle_init()
 
 	if ( (Anim_bitmap_id_smoke2 > -1) && (PARTICLE_SMOKE2_batcher == NULL) ) {
 		Assert( Anim_num_frames_smoke2 > 0 );
-		PARTICLE_SMOKE2_batcher = new geometry_batcher[Anim_num_frames_smoke2];
+		PARTICLE_SMOKE2_batcher = new (vm_malloc(sizeof(geometry_batcher)*Anim_num_frames_smoke2)) geometry_batcher[Anim_num_frames_smoke2];
 		Verify( PARTICLE_SMOKE2_batcher != NULL );
 	}
 }
@@ -346,18 +346,34 @@ void particle_init()
 // only call from game_shutdown()!!!
 void particle_close()
 {
+	size_t i;
 	if ( PARTICLE_FIRE_batcher != NULL ) {
-		delete[] PARTICLE_FIRE_batcher;
+		i = Anim_num_frames_fire;
+		while(i)
+		{
+			PARTICLE_FIRE_batcher[--i].~geometry_batcher();
+		}
+		vm_free(PARTICLE_FIRE_batcher);
 		PARTICLE_FIRE_batcher = NULL;
 	}
 
 	if ( PARTICLE_SMOKE_batcher != NULL ) {
-		delete[] PARTICLE_SMOKE_batcher;
+		i = Anim_num_frames_smoke;
+		while(i)
+		{
+			PARTICLE_SMOKE_batcher[--i].~geometry_batcher();
+		}
+		vm_free(PARTICLE_SMOKE_batcher);
 		PARTICLE_SMOKE_batcher = NULL;
 	}
 
 	if ( PARTICLE_SMOKE2_batcher != NULL ) {
-		delete[] PARTICLE_SMOKE2_batcher;
+		i = Anim_num_frames_smoke2;
+		while(i)
+		{	
+			PARTICLE_SMOKE2_batcher[--i].~geometry_batcher();
+		}
+		vm_free(PARTICLE_SMOKE2_batcher);
 		PARTICLE_SMOKE2_batcher = NULL;
 	}
 }

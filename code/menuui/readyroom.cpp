@@ -487,7 +487,7 @@ int hash_insert(char *filename) {
 
 	// Check if table empty
 	if (Campaign_mission_hash_table[hash_val] == NULL) {
-		Campaign_mission_hash_table[hash_val] = new hash_node;
+		Campaign_mission_hash_table[hash_val] = new (vm_malloc(sizeof(hash_node))) hash_node;
 
 		cur_node = Campaign_mission_hash_table[hash_val];
 
@@ -503,7 +503,7 @@ int hash_insert(char *filename) {
 		}
 
 		// Create new node
-		cur_node->next = new hash_node;
+		cur_node->next = new (vm_malloc(sizeof(hash_node))) hash_node;
 
 		if (cur_node->next == NULL) {
 			// unable to allocate memory
@@ -577,12 +577,14 @@ void campaign_mission_hash_table_delete()
 			// Walk down the list deleting self
 			while (cur_node->next != NULL) {
 				hash_node *temp = cur_node->next;
-				delete cur_node;
+				cur_node->~hash_node();
+				vm_free(cur_node);
 				cur_node = temp;
 			}
 
 			// Delete last node
-			delete cur_node;
+			cur_node->~hash_node();
+			vm_free(cur_node);
 			Campaign_mission_hash_table[i] = NULL;
 		}
 	}

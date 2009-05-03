@@ -1091,12 +1091,12 @@ void labviewer_close_class_window(GUIObject *caller)
 void labviewer_set_class_window(int mode)
 {
 	if (Lab_class_window == NULL) {
-		Lab_class_window = (Window*)Lab_screen->Add(new Window("Class Window", 50, 50));
+		Lab_class_window = (Window*)Lab_screen->Add(new (vm_malloc(sizeof(Window))) Window("Class Window", 50, 50));
 		Lab_class_window->SetCloseFunction(labviewer_close_class_window);
 	}
 
 	if (Lab_class_toolbar == NULL) {
-		Lab_class_toolbar = (Window*)Lab_screen->Add(new Window("Class Toolbar", 0, Lab_toolbar->GetHeight(), -1, -1, WS_NOTITLEBAR | WS_NONMOVEABLE));
+		Lab_class_toolbar = (Window*)Lab_screen->Add(new (vm_malloc(sizeof(Window))) Window("Class Toolbar", 0, Lab_toolbar->GetHeight(), -1, -1, WS_NOTITLEBAR | WS_NONMOVEABLE));
 	}
 
 	// clear out all existing children
@@ -1150,7 +1150,7 @@ void labviewer_flags_add(int *X, int *Y, char *flag_name, int flag, bool flags2 
 		y = *Y;
 	}
 
-	new_flag.cb = (Checkbox*) Lab_flags_window->AddChild(new Checkbox(flag_name, x, y));
+	new_flag.cb = (Checkbox*) Lab_flags_window->AddChild(new (vm_malloc(sizeof(Checkbox))) Checkbox(flag_name, x, y));
 	new_flag.flag = flag;
 	new_flag.second = flags2;
 
@@ -1287,7 +1287,7 @@ void labviewer_close_flags_window(GUIObject *caller)
 void labviewer_make_flags_window(Button *caller)
 {
 	if (Lab_flags_window == NULL) {
-		Lab_flags_window = (Window*) Lab_screen->Add(new Window("Flags Window", gr_screen.max_w - 205, 200));
+		Lab_flags_window = (Window*) Lab_screen->Add(new (vm_malloc(sizeof(Window))) Window("Flags Window", gr_screen.max_w - 205, 200));
 		Lab_flags_window->SetCloseFunction(labviewer_close_flags_window);
 	}
 
@@ -1311,7 +1311,7 @@ void labviewer_make_flags_window(Button *caller)
 #define VAR_POS_RIGHTX			160
 
 #define VAR_ADD_HEADER(name) {	\
-	ntp = (Text*)Lab_variables_window->AddChild(new Text((name), (name), VAR_POS_RIGHTX/2, y + 8, VAR_POS_RIGHTWIDTH));	\
+	ntp = (Text*)Lab_variables_window->AddChild(new (vm_malloc(sizeof(Text))) Text((name), (name), VAR_POS_RIGHTX/2, y + 8, VAR_POS_RIGHTWIDTH));	\
 	y += ntp->GetHeight() + 10;	\
 }
 
@@ -1345,9 +1345,9 @@ void labviewer_variables_add(int *Y, char *var_name)
 	}
 
 	// variable
-	Lab_variables_window->AddChild(new Text((var_name), (var_name), 0, y, VAR_POS_LEFTWIDTH));
+	Lab_variables_window->AddChild(new (vm_malloc(sizeof(Text))) Text((var_name), (var_name), 0, y, VAR_POS_LEFTWIDTH));
 	// edit box
-	new_text = (Text*)Lab_variables_window->AddChild(new Text(std::string((var_name)) + std::string("Editbox"), "", VAR_POS_RIGHTX, y, VAR_POS_RIGHTWIDTH, 12, T_EDITTABLE));
+	new_text = (Text*)Lab_variables_window->AddChild(new (vm_malloc(sizeof(Text))) Text(std::string((var_name)) + std::string("Editbox"), "", VAR_POS_RIGHTX, y, VAR_POS_RIGHTWIDTH, 12, T_EDITTABLE));
 
 	if (Y) {
 		*Y += new_text->GetHeight() + 2;
@@ -1590,7 +1590,7 @@ void labviewer_make_variables_window(Button *caller)
 		return;
 	}
 
-	Lab_variables_window = (Window*)Lab_screen->Add(new Window("Class Variables", gr_screen.max_w - (VAR_POS_RIGHTX + VAR_POS_RIGHTWIDTH + 25), 200));
+	Lab_variables_window = (Window*)Lab_screen->Add(new (vm_malloc(sizeof(Window))) Window("Class Variables", gr_screen.max_w - (VAR_POS_RIGHTX + VAR_POS_RIGHTWIDTH + 25), 200));
 
 	// set our new title
 	if (Lab_mode == LAB_MODE_SHIP) {
@@ -1623,13 +1623,13 @@ void labviewer_close_render_options_window(GUIObject *caller)
 }
 
 #define ADD_RENDER_FLAG(text, flag, var) {	\
-	cbp = (Checkbox*)Lab_render_options_window->AddChild(new Checkbox((text), 2, y));	\
+	cbp = (Checkbox*)Lab_render_options_window->AddChild(new (vm_malloc(sizeof(Checkbox))) Checkbox((text), 2, y));	\
 	cbp->SetFlag(&(flag), (var));	\
 	y += cbp->GetHeight() + 2;	\
 }
 
 #define ADD_RENDER_BOOL(text, flag) {	\
-	cbp = (Checkbox*)Lab_render_options_window->AddChild(new Checkbox((text), 2, y));	\
+	cbp = (Checkbox*)Lab_render_options_window->AddChild(new (vm_malloc(sizeof(Checkbox))) Checkbox((text), 2, y));	\
 	cbp->SetBool(&(flag));	\
 	y += cbp->GetHeight() + 1;	\
 }
@@ -1647,7 +1647,7 @@ void labviewer_make_render_options_window(Button *caller)
 		return;
 	}
 
-	Lab_render_options_window = (Window*)Lab_screen->Add(new Window("Render Options", gr_screen.max_w - 300, 200));
+	Lab_render_options_window = (Window*)Lab_screen->Add(new (vm_malloc(sizeof(Window))) Window("Render Options", gr_screen.max_w - 300, 200));
 	Assert( Lab_render_options_window != NULL );
 
 	// add all of the flags that we want/need...
@@ -1694,7 +1694,7 @@ void labviewer_make_render_options_window(Button *caller)
 
 
 	// start tree
-	cmp = (Tree*)Lab_render_options_window->AddChild(new Tree("Detail Options Tree", 0, y + 2, NULL, Lab_render_options_window->GetWidth()));
+	cmp = (Tree*)Lab_render_options_window->AddChild(new (vm_malloc(sizeof(Tree))) Tree("Detail Options Tree", 0, y + 2, NULL, Lab_render_options_window->GetWidth()));
 
 	// 3d hardware texture slider options
 	ctip = cmp->AddItem(NULL, "3D Hardware Textures", 0, false);
@@ -1749,10 +1749,10 @@ void labviewer_make_desc_window(Button *caller)
 		return;
 	}
 
-	Lab_description_window = (Window*)Lab_screen->Add(new Window("Description", gr_screen.max_w - gr_screen.max_w/3 - 50,
+	Lab_description_window = (Window*)Lab_screen->Add(new (vm_malloc(sizeof(Window))) Window("Description", gr_screen.max_w - gr_screen.max_w/3 - 50,
 														gr_screen.max_h - gr_screen.max_h/6 - 50, gr_screen.max_w/3,
 														gr_screen.max_h/6));
-	Lab_description_text = (Text*)Lab_description_window->AddChild(new Text("Description Text", "No ship selected.", 0, 0));
+	Lab_description_text = (Text*)Lab_description_window->AddChild(new (vm_malloc(sizeof(Text))) Text("Description Text", "No ship selected.", 0, 0));
 
 	labviewer_update_desc_window();
 
@@ -1783,28 +1783,28 @@ void labviewer_make_ship_window(Button *caller)
 
 	// populate the class toolbar
 	x = 0;
-	cbp = Lab_class_toolbar->AddChild(new Button("Class Description", x, 0, labviewer_make_desc_window));
+	cbp = Lab_class_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Class Description", x, 0, labviewer_make_desc_window));
 
 	x += cbp->GetWidth() + 10;
-	cbp = Lab_class_toolbar->AddChild(new Button("Class Options", x, 0, labviewer_make_flags_window));
+	cbp = Lab_class_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Class Options", x, 0, labviewer_make_flags_window));
 
 	x += cbp->GetWidth() + 10;
-	cbp = Lab_class_toolbar->AddChild(new Button("Class Variables", x, 0, labviewer_make_variables_window));
+	cbp = Lab_class_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Class Variables", x, 0, labviewer_make_variables_window));
 
 
 	// populate ship class window
-	Tree *cmp = (Tree*)Lab_class_window->AddChild(new Tree("Ship Tree", 0, 0));
+	Tree *cmp = (Tree*)Lab_class_window->AddChild(new (vm_malloc(sizeof(Tree))) Tree("Ship Tree", 0, 0));
 
 	if (Lab_species_nodes != NULL) {
 		for (idx = 0; idx < (int)Species_info.size(); idx++) {
 			Lab_species_nodes[idx]->ClearAllItems();
 		}
 
-		delete Lab_species_nodes;
+		vm_free(Lab_species_nodes);
 		Lab_species_nodes = NULL;
 	}
 
-	Lab_species_nodes = new TreeItem*[Species_info.size()+1];
+	Lab_species_nodes = (TreeItem **) vm_malloc(sizeof(TreeItem*)*(Species_info.size()+1));
 
 	// Add species nodes
 	for (idx = 0; idx < (int)Species_info.size(); idx++) {
@@ -1850,7 +1850,8 @@ void labviewer_make_ship_window(Button *caller)
 
 	// if the "Other" entry doesn't contain anything then just delete it
 	if ( !Lab_species_nodes[Species_info.size()]->HasChildren() ) {
-		delete Lab_species_nodes[Species_info.size()];
+		Lab_species_nodes[Species_info.size()]->~TreeItem();
+		vm_free(Lab_species_nodes[Species_info.size()]);
 	}
 
 
@@ -1976,20 +1977,20 @@ void labviewer_make_weap_window(Button* caller)
 
 	// populate the weapons toolbar
 	x = 0;
-	cbp = Lab_class_toolbar->AddChild(new Button("Class Description", x, 0, labviewer_make_desc_window));
+	cbp = Lab_class_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Class Description", x, 0, labviewer_make_desc_window));
 
 	x += cbp->GetWidth() + 10;
-	cbp = Lab_class_toolbar->AddChild(new Button("Class Options", x, 0, labviewer_make_flags_window));
+	cbp = Lab_class_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Class Options", x, 0, labviewer_make_flags_window));
 
 	x += cbp->GetWidth() + 10;
-	cbp = Lab_class_toolbar->AddChild(new Button("Class Variables", x, 0, labviewer_make_variables_window));
+	cbp = Lab_class_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Class Variables", x, 0, labviewer_make_variables_window));
 
 
 	// populate the weapons window
-	Tree *cmp = (Tree*)Lab_class_window->AddChild(new Tree("Weapon Tree", 0, 0));
+	Tree *cmp = (Tree*)Lab_class_window->AddChild(new (vm_malloc(sizeof(Tree))) Tree("Weapon Tree", 0, 0));
 	
 	// Unfortunately these are hardcoded
-	TreeItem **type_nodes = new TreeItem*[Num_weapon_subtypes];
+	TreeItem **type_nodes = (TreeItem**)vm_malloc(sizeof(TreeItem*)*Num_weapon_subtypes);
 	int i;
 
 	// Add type nodes
@@ -2022,9 +2023,12 @@ void labviewer_make_weap_window(Button* caller)
 	// Get rid of any empty nodes
 	for (i = 0; i < Num_weapon_subtypes; i++) {
 		if ( !type_nodes[i]->HasChildren() ) {
-			delete type_nodes[i];
+			type_nodes[i]->~TreeItem();
+			vm_free(type_nodes[i]);
 		}
 	}
+	
+	vm_free(type_nodes);
 
 	Lab_mode = LAB_MODE_WEAPON;
 
@@ -2075,24 +2079,24 @@ void lab_init()
 
 
 	//We start by creating the screen/toolbar
-	Lab_screen = GUI_system.PushScreen(new GUIScreen("Lab"));
+	Lab_screen = GUI_system.PushScreen(new (vm_malloc(sizeof(GUIScreen))) GUIScreen("Lab"));
 
-	Lab_toolbar = (Window*)Lab_screen->Add(new Window("Toolbar", 0, 0, -1, -1, WS_NOTITLEBAR | WS_NONMOVEABLE));
+	Lab_toolbar = (Window*)Lab_screen->Add(new (vm_malloc(sizeof(Window))) Window("Toolbar", 0, 0, -1, -1, WS_NOTITLEBAR | WS_NONMOVEABLE));
 
 	// start filling the main toolbar
 	x = 0;
-	cbp = Lab_toolbar->AddChild(new Button("Ships", x, 0, labviewer_make_ship_window));
+	cbp = Lab_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Ships", x, 0, labviewer_make_ship_window));
 
 	x += cbp->GetWidth() + 10;
-	cbp = Lab_toolbar->AddChild(new Button("Weapons", x, 0, labviewer_make_weap_window));
+	cbp = Lab_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Weapons", x, 0, labviewer_make_weap_window));
 
 	if ( !Lab_in_mission ) {
 		x += cbp->GetWidth() + 10;
-		cbp = Lab_toolbar->AddChild(new Button("Render Options", x, 0, labviewer_make_render_options_window));
+		cbp = Lab_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Render Options", x, 0, labviewer_make_render_options_window));
 	}
 
 	x += cbp->GetWidth() + 20;
-	cbp = Lab_toolbar->AddChild(new Button("Exit", x, 0, labviewer_exit));
+	cbp = Lab_toolbar->AddChild(new (vm_malloc(sizeof(Button))) Button("Exit", x, 0, labviewer_exit));
 
 
 	// reset some defaults, just to be sure
@@ -2221,17 +2225,19 @@ void lab_close()
 	Lab_flags_window = NULL;
 	Lab_render_options_window = NULL;
 
-	delete Lab_screen;
+	Lab_screen->~GUIScreen();
+	vm_free(Lab_screen);
 
 	Lab_screen = NULL;
 
 
 	if (Lab_species_nodes != NULL) {
 		for (i = 0; i < (int)Species_info.size(); i++) {
-			delete Lab_species_nodes[i];
+			Lab_species_nodes[i]->~TreeItem();
+			vm_free(Lab_species_nodes[i]);
 		}
 
-		delete[] Lab_species_nodes;
+		vm_free(Lab_species_nodes);
 		Lab_species_nodes = NULL;
 	}
 

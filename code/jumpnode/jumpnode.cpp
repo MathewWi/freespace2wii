@@ -145,7 +145,8 @@ void jumpnode_level_close()
 
 	for ( jnp = Jump_nodes.get_first(); !Jump_nodes.is_end(jnp); jnp = next_node ) {	
 		next_node = jnp->get_next();
-		delete jnp;
+		jnp->~jump_node();
+		vm_free(jnp);
 	}
 
 	//This could mean a memory leak

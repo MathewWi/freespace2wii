@@ -1380,7 +1380,7 @@ void parm_stuff_args(cmdline_parm *parm, char *cmdline)
 		if (parm->stacks) {
 			saved_args = parm->args;
 		} else {
-			delete[] parm->args;
+			vm_free(parm->args);
 		}
 
 		parm->args = NULL;
@@ -1392,7 +1392,7 @@ void parm_stuff_args(cmdline_parm *parm, char *cmdline)
 		size += (strlen(saved_args) + 1);	// an ',' is used as a separator when combining, so be sure to account for it
 
 	if (size > 0) {
-		parm->args = new char[size];
+		parm->args = (char*)vm_malloc(sizeof(char)*size);
 		memset(parm->args, 0, size);
 
 		if (saved_args != NULL) {
@@ -1408,7 +1408,7 @@ void parm_stuff_args(cmdline_parm *parm, char *cmdline)
 	}
 
 	if (saved_args != NULL)
-		delete[] saved_args;
+		vm_free(saved_args);
 }
 
 
@@ -1643,7 +1643,7 @@ cmdline_parm::~cmdline_parm()
 {
 #ifndef FRED
 	if (args) {
-		delete [] args;
+		vm_free(args);
 		args = NULL;
 	}
 #endif
@@ -1932,7 +1932,7 @@ bool SetCmdlineParams()
 
 		// Ok - mod stacking support
 		int len = strlen(Cmdline_mod);
-		char *modlist = new char[len+2];
+		char *modlist = (char*)vm_malloc(sizeof(char)*(len+2));
 		memset(modlist, 0, len+2);
 		strcpy(modlist, Cmdline_mod);
 
@@ -2253,7 +2253,7 @@ int fred2_parse_cmdline(int argc, char *argv[])
 			arglen += strlen(argv[i]);
 		if (argc > 2)
 			arglen += argc + 2; // leave room for the separators
-		cmdline = new char [arglen+1];
+		cmdline = (char*)vm_malloc(sizeof(char)*(arglen+1));
 		i = 1;
 		memset(cmdline, 0, arglen+1); // clear it out
 
@@ -2263,7 +2263,7 @@ int fred2_parse_cmdline(int argc, char *argv[])
 			strcat(cmdline, argv[i]);
 		}
 		os_init_cmdline(cmdline);
-		delete [] cmdline;
+		vm_free(cmdline);
 	} else {
 		// no cmdline args
 		os_init_cmdline("");

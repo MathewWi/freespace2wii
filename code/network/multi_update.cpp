@@ -155,6 +155,7 @@
 #include "globalincs/version.h"
 #include "inetfile/inetgetfile.h"
 #include "cfile/cfile.h"
+#include <new>
 
 
 
@@ -190,7 +191,7 @@ int multi_update_http_init()
 	strcat(local_file, VERSION_LOC_FNAME);
 
 	// new file	
-	Multi_update_get = new InetGetFile(url_file, local_file);
+	Multi_update_get = new (vm_malloc(sizeof(InetGetFile))) InetGetFile(url_file, local_file);
 	if(Multi_update_get == NULL){
 		// error string
 		strcpy(Multi_update_error_string, XSTR("Could not get data from website", 977));
@@ -213,8 +214,9 @@ int multi_update_http_do()
 	}
 
 	// error
-	if(Multi_update_get->IsFileError()){			
-		delete Multi_update_get;
+	if(Multi_update_get->IsFileError()){
+		Multi_update_get->~InetGetFile();
+		vm_free(Multi_update_get);
 		Multi_update_get = NULL;
 
 		// error string
@@ -225,7 +227,8 @@ int multi_update_http_do()
 
 	// done!
 	if(Multi_update_get->IsFileReceived()){
-		delete Multi_update_get;
+		Multi_update_get->~InetGetFile();
+		vm_free(Multi_update_get);
 		Multi_update_get = NULL;
 		return 1;
 	}

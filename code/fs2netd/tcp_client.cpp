@@ -939,7 +939,7 @@ void FS2NetD_CheckDuplicateLogin()
 	int buffer_size;
 	char buffer[BASE_PACKET_SIZE + sizeof(int) + sizeof(ubyte) + (MAX_PLAYERS * sizeof(int)) + 10];
 	int ids_count = 0;
-	int *ids = new int[MAX_PLAYERS];
+	int *ids = (int*)vm_malloc(sizeof(int)*MAX_PLAYERS);
 	int idx;
 
 	if ( !ids ) {
@@ -956,7 +956,7 @@ void FS2NetD_CheckDuplicateLogin()
 	}
 
 	if ( !ids_count ) {
-		delete [] ids;
+		vm_free(ids);
 		return;
 	}
 
@@ -977,6 +977,6 @@ void FS2NetD_CheckDuplicateLogin()
 
 	FS2NetD_SendData(buffer, buffer_size);
 
-	delete [] ids;
+	vm_free(ids);
 }
 

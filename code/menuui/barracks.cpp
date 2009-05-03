@@ -505,15 +505,15 @@ void barracks_init_stats(scoring_struct *stats)
 	//Set up variables
 	if(Stat_labels != NULL)
 	{
-		delete[] Stat_labels;
+		vm_free(Stat_labels);
 	}
 	if(Stats != NULL)
 	{
-		delete[] Stats;
+		vm_free(Stats);
 	}
 
-	Stat_labels = (char (*)[STAT_COLUMN1_W]) new char[Max_stat_lines * STAT_COLUMN1_W];
-	Stats = (char (*)[STAT_COLUMN2_W]) new char[Max_stat_lines * STAT_COLUMN2_W];
+	Stat_labels = (char (*)[STAT_COLUMN1_W]) vm_malloc(sizeof(char)*(Max_stat_lines * STAT_COLUMN1_W));
+	Stats = (char (*)[STAT_COLUMN2_W]) vm_malloc(sizeof(char)*(Max_stat_lines * STAT_COLUMN2_W));
 
 	//Now start throwing stuff in
 	Num_stat_lines = 0;
@@ -1926,12 +1926,12 @@ void barracks_close()
 
 	if(Stat_labels != NULL)
 	{
-		delete[] Stat_labels;
+		vm_free(Stat_labels);
 		Stat_labels = NULL;
 	}
 	if(Stats != NULL)
 	{
-		delete[] Stats;
+		vm_free(Stats);
 		Stats = NULL;
 	}
 
