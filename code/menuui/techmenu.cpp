@@ -1178,7 +1178,7 @@ void techroom_change_tab(int num)
 			// load ship info if necessary
 			if ( Ships_loaded == 0 ) {
 				if (Ship_list == NULL) {
-					Ship_list = new tech_list_entry[Num_ship_classes];
+					Ship_list = new (vm_malloc(sizeof(tech_list_entry)*Num_ship_classes)) tech_list_entry[Num_ship_classes];
 
 					if (Ship_list == NULL)
 						Error(LOCATION, "Couldn't init ships list!");
@@ -1234,7 +1234,7 @@ void techroom_change_tab(int num)
 			// load weapon info & anims if necessary
 			if ( Weapons_loaded == 0 ) {
 				if (Weapon_list == NULL) {
-					Weapon_list = new tech_list_entry[Num_weapon_types];
+					Weapon_list = new (vm_malloc(sizeof(tech_list_entry)*Num_weapon_types)) tech_list_entry[Num_weapon_types];
 
 					if (Weapon_list == NULL)
 						Error(LOCATION, "Couldn't init ships list!");
@@ -1706,7 +1706,12 @@ void techroom_lists_reset()
 	model_free_all();
 
 	if (Ship_list != NULL) {
-		delete[] Ship_list;
+		size_t i = Num_ship_classes;
+		while(i)
+		{
+			Ship_list[--i].~tech_list_entry();
+		}
+		vm_free(Ship_list);
 		Ship_list = NULL;
 	}
 
@@ -1726,7 +1731,12 @@ void techroom_lists_reset()
 			}
 		}
 
-		delete[] Weapon_list;
+		size_t i = Num_weapon_types;
+		while(i)
+		{
+			Weapon_list[--i].~tech_list_entry();
+		}
+		vm_free(Weapon_list);
 		Weapon_list = NULL;
 	}
 

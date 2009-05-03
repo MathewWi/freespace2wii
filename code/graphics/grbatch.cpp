@@ -119,23 +119,14 @@ void geometry_batcher::add_allocate(int quad, int n_tri)
 }
 
 void geometry_batcher::clone(const geometry_batcher &geo)
-{
-	n_to_render = geo.n_to_render;
-	n_allocated = geo.n_allocated;
+{	
+	allocate_internal(geo.n_allocated);
 
 	if (n_allocated > 0) {
-		vert = (vertex *) vm_malloc( sizeof(vertex) * n_allocated );
-		vert_list = (vertex **) vm_malloc( sizeof(vertex*) * n_allocated );
-
 		memcpy( vert, geo.vert, sizeof(vertex) * n_allocated );
-
-		for (int i = 0; i < n_allocated; i++) {
-			vert_list[i] = &vert[i];
-		}
-	} else {
-		vert = NULL;
-		vert_list = NULL;
 	}
+	
+	n_to_render = geo.n_to_render;
 }
 
 const geometry_batcher &geometry_batcher::operator=(const geometry_batcher &geo)

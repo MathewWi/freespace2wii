@@ -2254,12 +2254,32 @@ class star_point_list{
 	star_point *point_list;
 public:
 	star_point_list():n_points(0),point_list(NULL){};
-	~star_point_list(){if(point_list)delete[]point_list;};
+	~star_point_list()
+	{
+		size_t i = n_points;
+		if(point_list)
+		{
+			while(i)
+			{
+				point_list[--i].~start_point();
+			}
+			vm_free(point_list);
+			point_list = NULL;
+		}
+	};
 
 	void allocate(int size){
 		if(size<=n_points)return;
-		if(point_list)delete[]point_list;
-		point_list = new star_point[size];
+		if(point_list)
+		{
+			while(i)
+			{
+				point_list[--i].~start_point();
+			}
+			vm_free(point_list);
+			point_list = NULL;
+		}
+		point_list = new (vm_malloc(sizeof(star_point)*size)) star_point[size];
 		n_points = size;
 	}
 	star_point* operator[] (int idx){

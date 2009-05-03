@@ -5306,7 +5306,7 @@ void parse_waypoints(mission *pm)
 
 	while (optional_string("$Jump Node:")) {
 		stuff_vector(&pos);
-		jnp = new jump_node(&pos);
+		jnp = new (vm_malloc(sizeof(jump_node))) jump_node(&pos);
 		Assert(jnp != NULL);
 
 		if (optional_string("$Jump Node Name:") || optional_string("+Jump Node Name:")) {

@@ -3491,37 +3491,37 @@ void weapon_sort_by_type()
 
 	// allocate the buckets
 	if (num_lasers) {
-		lasers = new weapon_info[num_lasers];
+		lasers = new (vm_malloc(sizeof(weapon_info)*num_lasers)) weapon_info[num_lasers];
 		Verify( lasers != NULL );
 		num_lasers = 0;
 	}
 
 	if (num_big_lasers) {
-		big_lasers = new weapon_info[num_big_lasers];
+		big_lasers = new (vm_malloc(sizeof(weapon_info)*num_big_lasers)) weapon_info[num_big_lasers];
 		Verify( big_lasers != NULL );
 		num_big_lasers = 0;
 	}
 
 	if (num_beams) {
-		beams = new weapon_info[num_beams];
+		beams = new (vm_malloc(sizeof(weapon_info)*num_beams)) weapon_info[num_beams];
 		Verify( beams != NULL );
 		num_beams = 0;
 	}
 
 	if (num_missiles) {
-		missiles = new weapon_info[num_missiles];
+		missiles = new (vm_malloc(sizeof(weapon_info)*num_missiles)) weapon_info[num_missiles];
 		Verify( missiles != NULL );
 		num_missiles = 0;
 	}
 
 	if (num_big_missiles) {
-		big_missiles = new weapon_info[num_big_missiles];
+		big_missiles = new (vm_malloc(sizeof(weapon_info)*num_big_missiles)) weapon_info[num_big_missiles];
 		Verify( big_missiles != NULL );
 		num_big_missiles = 0;
 	}
 
 	if (num_child) {
-		child_weapons = new weapon_info[num_child];
+		child_weapons = new (vm_malloc(sizeof(weapon_info)*num_child)) weapon_info[num_child];
 		Verify( child_weapons != NULL );
 		num_child = 0;
 	}
@@ -3583,12 +3583,49 @@ void weapon_sort_by_type()
 		Weapon_info[weapon_index] = child_weapons[i];
 
 
-	delete [] lasers;
-	delete [] big_lasers;
-	delete [] beams;
-	delete [] missiles;
-	delete [] big_missiles;
-	delete [] child_weapons;
+	{
+	size_t i = num_lasers;
+	while(i)
+	{
+		lasers[--i].~weapon_info();
+	}
+	vm_free(lasers);
+	
+	i = num_big_lasers;
+	while(i)
+	{
+		big_lasers[--i].~weapon_info();
+	}
+	vm_free(big_lasers);
+	
+	i = num_beams;
+	while(i)
+	{
+		beams[--i].~weapon_info();
+	}
+	vm_free(beams);
+	
+	i = num_missiles;
+	while(i)
+	{
+		missiles[--i].~weapon_info();
+	}
+	vm_free(missiles);
+	
+	i = num_big_missiles;
+	while(i)
+	{
+		big_missiles[--i].~weapon_info();
+	}
+	vm_free(big_missiles);
+	
+	i = num_child;
+	while(i)
+	{
+		child_weapons[--i].~weapon_info();
+	}
+	vm_free(child_weapons);
+	}
 }
 
 // do any post-parse cleaning on weapon entries
@@ -3982,7 +4019,7 @@ void weapon_close()
 	}
 
 	if (used_weapons != NULL) {
-		delete[] used_weapons;
+		vm_free(used_weapons);
 		used_weapons = NULL;
 	}
 
@@ -4022,7 +4059,7 @@ void weapon_level_init()
 	emp_level_init();
 
 	if (used_weapons == NULL)
-		used_weapons = new int[Num_weapon_types];
+		used_weapons = (int*)vm_malloc(sizeof(int)*Num_weapon_types);
 
 	Assert( used_weapons != NULL );
 
@@ -6130,7 +6167,7 @@ int weapon_area_calc_damage(object *objp, vec3d *pos, float inner_rad, float out
 	if ( (objp->type != OBJ_SHIP) && (objp->type != OBJ_ASTEROID)) {
 		return -1;
 	}
-
+	
 	max_dist = objp->radius + outer_rad;
 	dist = vm_vec_dist_quick(&objp->pos, pos);	
 	if ( (dist > max_dist) || (dist > (limit+objp->radius)) ) {

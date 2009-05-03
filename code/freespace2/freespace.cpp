@@ -2851,6 +2851,9 @@ void game_level_init(int seed)
 	subtitles_init();
 
 
+#ifdef SCP_WII
+	extern void WiiTexMemInit(); WiiTexMemInit();
+#endif
 
 	// multiplayer dogfight hack
 	dogfight_blown = 0;
@@ -3684,7 +3687,7 @@ void game_init()
 	strncpy(whee, full_path, MAX_PATH_LEN-1);
 #elif SCP_WII
 	// Hard code this for now
-	SetCurrentDirectory("fat:/Freespace2");
+	SetCurrentDirectory("sd:/Freespace2");
 	GetCurrentDirectory(MAX_PATH_LEN-1, whee);
 #else
 	GetCurrentDirectory(MAX_PATH_LEN-1, whee);

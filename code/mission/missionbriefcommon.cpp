@@ -657,9 +657,9 @@ void brief_parse_icon_tbl()
 	const int max_icons = Species_info.size() * MAX_BRIEF_ICONS;
 	Assert( max_icons > 0 );
 
-	generic_anim *temp_icon_bitmaps = new generic_anim[max_icons];
-	hud_anim *temp_icon_fade_anims = new hud_anim[max_icons];
-	hud_anim *temp_icon_highlight_anims = new hud_anim[max_icons];
+	generic_anim *temp_icon_bitmaps = new (vm_malloc(sizeof(generic_anim)*max_icons)) generic_anim[max_icons];
+	hud_anim *temp_icon_fade_anims = new (vm_malloc(sizeof(hud_anim)*max_icons)) hud_anim[max_icons];
+	hud_anim *temp_icon_highlight_anims = new (vm_malloc(sizeof(hud_anim)*max_icons)) hud_anim[max_icons];
 
 	// open localization
 	lcl_ext_open();
@@ -729,7 +729,7 @@ void brief_parse_icon_tbl()
 	// error check
 	if (num_species_covered < (int)Species_info.size())
 	{
-		char *errormsg = new char[70 + (Species_info.size() * (NAME_LENGTH))];
+		char *errormsg = (char*)vm_malloc(sizeof(char)*(70 + (Species_info.size() * (NAME_LENGTH))));
 
 		strcpy(errormsg, "The following species are missing icon info in icons.tbl:\n");
 		for (species = num_species_covered; species < (int)Species_info.size(); species++)
@@ -742,12 +742,29 @@ void brief_parse_icon_tbl()
 		Error(LOCATION, errormsg);
 
 		// probably won't get here, but just so we know about it
-		delete[] errormsg;
+		vm_free(errormsg);
 	}
 
-	delete[] temp_icon_bitmaps;
-	delete[] temp_icon_fade_anims;
-	delete[] temp_icon_highlight_anims;
+	size_t i = max_icons;
+	while(i)
+	{
+		temp_icon_bitmaps[--i].~generic_anim();
+	}
+	vm_free(temp_icon_bitmaps);
+	
+	i = max_icons;
+	while(i)
+	{
+		temp_icon_fade_anims[--i].~hud_anim();
+	}
+	vm_free(temp_icon_fade_anims);
+	
+	i = max_icons;
+	while(i)
+	{
+		temp_icon_highlight_anims[--i].~hud_anim();
+	}
+	vm_free(temp_icon_highlight_anims);
 }
 
 

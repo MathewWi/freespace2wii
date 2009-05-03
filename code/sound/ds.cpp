@@ -1591,8 +1591,7 @@ void ds_init_channels()
 {
 #ifdef USE_OPENAL
 	int i, n;
-	ALuint *sids;
-	sids = new ALuint[MAX_CHANNELS];
+	ALuint *sids = (ALuint*)vm_malloc(sizeof(ALuint)*MAX_CHANNELS);
 
 	// -------------------------------------------------------------------------
 	// Begin crazy little error check...  This will try and generate up to MAX_CHANNELS worth
@@ -1626,9 +1625,8 @@ void ds_init_channels()
 		if ( (sids[i] != 0) && alIsSource(sids[i]) )
 			OpenAL_ErrorPrint( alDeleteSources(1, &sids[i]) );
 	}
-
-	// cleanup
-	delete[] sids;
+	
+	vm_free(sids);
 
 	// ... End crazy little error check
 	// -------------------------------------------------------------------------

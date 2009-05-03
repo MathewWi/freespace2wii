@@ -835,7 +835,7 @@ int lcl_add_dir_to_path_with_filename(char *current_path, uint path_max)
 
 	int str_size = path_max + 1;
 
-	char *temp = new char[str_size];
+	char *temp = (char*)vm_malloc(sizeof(char)*str_size);
 
 	// find position of last slash and copy rest of filename (not counting slash) to temp
 	// mark end of current path with '\0', so strcat will work
@@ -855,7 +855,7 @@ int lcl_add_dir_to_path_with_filename(char *current_path, uint path_max)
 	// copy rest of filename from temp
 	SAFE_STRCAT(current_path, temp, path_max);
 
-	delete temp;
+	vm_free(temp);
 	return 1;
 }
 

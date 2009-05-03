@@ -266,6 +266,17 @@ void Warning( const char * filename, int line, const char * format, ... )
 #endif
 }
 
+#ifdef SCP_WII
+
+extern "C" void printTextureStats();
+
+#include <ogc/system.h>
+
+#define AssertLoc(x,a,b) do { if (!(x)){ WiiAssert(#x,a,b); } } while (0)
+#include <memtracer.h>
+
+#endif
+
 
 // fatal error message
 void Error( const char * filename, int line, const char * format, ... )
@@ -317,6 +328,7 @@ void Error( const char * filename, int line, const char * format, ... )
 	
 	fflush(stdout);
 	fflush(stderr);
+	printTextureStats();
 	closeProfiler();
 	closeMemtrace();
 	wiipause();	
@@ -758,17 +770,6 @@ void checkDEADBEAF(void *ptr, const char *filename, int line, const char *func)
 		wiipause();
 	}
 }
-#endif
-
-#ifdef SCP_WII
-
-extern "C" void printTextureStats();
-
-#include <ogc/system.h>
-
-#define AssertLoc(x,a,b) do { if (!(x)){ WiiAssert(#x,a,b); } } while (0)
-#include <memtracer.h>
-
 #endif
 
 

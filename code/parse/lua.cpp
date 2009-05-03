@@ -8109,8 +8109,8 @@ ADE_FUNC(drawString, l_Graphics, "string Message, [number X1, number Y1, number 
 	}
 	else
 	{
-		int *linelengths = new int[MAX_TEXT_LINES];
-		char **linestarts = new char*[MAX_TEXT_LINES];
+		int *linelengths = (int*)vm_malloc(sizeof(int)*MAX_TEXT_LINES);
+		char **linestarts = (char**)vm_malloc(sizeof(char*)*MAX_TEXT_LINES);
 
 		int num_lines = split_str(s, x2-x, linelengths, linestarts, MAX_TEXT_LINES);
 
@@ -8140,8 +8140,8 @@ ADE_FUNC(drawString, l_Graphics, "string Message, [number X1, number Y1, number 
 			*reptr = rep;
 		}
 
-		delete[] linelengths;
-		delete[] linestarts;
+		vm_free(linelengths);
+		vm_free(linestarts);
 		NextDrawStringPos[1] = y2+gr_get_font_height();
 	}
 	return ade_set_error(L, "i", num_lines);

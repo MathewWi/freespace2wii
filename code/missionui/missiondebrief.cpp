@@ -2327,7 +2327,7 @@ void debrief_setup_ship_kill_stats(int stage_num)
 
 	if(Debrief_stats_kills == NULL)
 	{
-		Debrief_stats_kills = new debrief_stats_kill_info[Num_ship_classes];
+		Debrief_stats_kills = new (vm_malloc(sizeof(debrief_stats_kill_info)*Num_ship_classes)) debrief_stats_kill_info[Num_ship_classes];
 	}
 
 	Assert(Debrief_player != NULL);
@@ -2768,7 +2768,12 @@ void debrief_close()
 
 	if(Debrief_stats_kills != NULL)
 	{
-		delete[] Debrief_stats_kills;
+		size_t i = Num_ship_classes;
+		while(i)
+		{
+			Debrief_stats_kills[--i].~debrief_stats_kill_info();
+		}
+		vm_free(Debrief_stats_kills);
 		Debrief_stats_kills = NULL;
 	}
 	game_flush();

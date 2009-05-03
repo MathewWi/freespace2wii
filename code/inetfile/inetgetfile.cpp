@@ -125,9 +125,9 @@ printf("using http!\n");
 		extern ushort Multi_options_proxy_port;
 
 		if ( strlen(Multi_options_proxy) > 0 ) {
-			http = new ChttpGet(URL, localfile, Multi_options_proxy, Multi_options_proxy_port);
+			http = new (vm_malloc(sizeof(ChttpGet))) ChttpGet(URL, localfile, Multi_options_proxy, Multi_options_proxy_port);
 		} else {
-			http = new ChttpGet(URL, localfile);
+			http = new (vm_malloc(sizeof(ChttpGet))) ChttpGet(URL, localfile);
 		}
 
 		if (http == NULL) {
@@ -136,7 +136,7 @@ printf("using http!\n");
 	} else if ( strstr(URL, "ftp:") ) {
 		m_bUseHTTP = FALSE;
 printf("using ftp! (%s)\n", URL);
-		ftp = new CFtpGet(URL,localfile);
+		ftp = new (vm_malloc(sizeof(CFtpGet))) CFtpGet(URL,localfile);
 
 		if (ftp == NULL) {
 			m_HardError = INET_ERROR_NO_MEMORY;
@@ -152,10 +152,16 @@ printf("using ftp! (%s)\n", URL);
 InetGetFile::~InetGetFile()
 {
 	if (http != NULL)
-		delete http;
+	{
+		http->~ChttpGet();
+		vm_free(http);
+	}
 
 	if (ftp != NULL)
-		delete ftp;
+	{
+		ftp->~CFtpGet();
+		vm_free(ftp);
+	}
 }
 
 bool InetGetFile::IsConnecting()

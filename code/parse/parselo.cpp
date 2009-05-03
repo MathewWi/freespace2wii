@@ -2386,7 +2386,7 @@ int parse_string_flag_list(int *dest, flag_def_list defs[], int defs_size)
 {
 	Assert(dest!=NULL);	//wtf?
 
-	char (*slp)[NAME_LENGTH] = (char(*)[32])new char[defs_size*NAME_LENGTH];
+	char (*slp)[NAME_LENGTH] = (char(*)[32])vm_malloc(sizeof(char)*defs_size*NAME_LENGTH);
 	int num_strings = stuff_string_list(slp, defs_size);
 	int i, j;
 
@@ -2400,7 +2400,7 @@ int parse_string_flag_list(int *dest, flag_def_list defs[], int defs_size)
 		}
 	}
 
-	delete[] slp;	//>_>
+	vm_free(slp);
 	//nobody saw that right
 
 	return num_strings;

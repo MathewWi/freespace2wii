@@ -1220,7 +1220,8 @@ hud::~hud()
 	while(cg != NULL)
 	{
 		first_gauge = cg->next;
-		delete cg;
+		cg->~gauge_data();
+		vm_free(cg);
 		cg = first_gauge;
 	}
 }
@@ -1252,7 +1253,7 @@ int hud::copy(hud* dest_hud)
 	gauge_data **dcg = &dest_hud->first_gauge;
 	while(cg != NULL)
 	{
-		(*dcg) = new gauge_data;
+		(*dcg) = new (vm_malloc(sizeof(gauge_data))) gauge_data;
 
 		Assert((*dcg) != NULL);
 
@@ -1321,7 +1322,7 @@ gauge_data *gauge_data::get_gauge(char *name)
 gauge_data *hud::add_gauge(char* name, int def_x_coord, int def_y_coord, gauge_data* new_gauge_parent, int priority)
 {
 	//If no gauges exist, add them.
-	gauge_data *new_gauge = new gauge_data;
+	gauge_data *new_gauge = new (vm_malloc(sizeof(gauge_data))) gauge_data;
 	if(new_gauge == NULL)
 	{
 		Warning(LOCATION, "Could not allocate memory for gauge \"%s\"", name);
@@ -1596,7 +1597,8 @@ gauge_data::~gauge_data()
 	while(cg != NULL)
 	{
 		cg = cg->next;
-		delete first_child;
+		first_child->~gauge_data();
+		vm_free(first_child);
 		first_child = cg;
 	}
 }
@@ -1615,7 +1617,7 @@ int gauge_data::copy(gauge_data *dest_gauge)
 	while(cg != NULL)
 	{
 		//Create the new child gauge (Also setting the next or first_child pointer)
-		(*cdgp) = new gauge_data;
+		(*cdgp) = new (vm_malloc(sizeof(gauge_data))) gauge_data;
 
 		//This is bad.
 		Assert((*cdgp) != NULL);
@@ -1640,11 +1642,11 @@ void gauge_data::draw_text()
 {
 	if(max_text_width > 0 && max_text_lines <= 1)
 	{
-		char *short_str = new char[strlen(text) + 1];
+		char *short_str = vm_malloc(sizeof(char)*(strlen(text) + 1));
 		strcpy(short_str, text);
 		gr_force_fit_string(short_str, sizeof(text), max_text_width);
 		gr_string(draw_coords[0], draw_coords[1], short_str);
-		delete[] short_str;
+		vm_free(short_str);
 	}
 	else
 	{
@@ -1949,7 +1951,7 @@ int gauge_var::Evaluate(int* result)
 		{
 			prev_data_type = GV_INTVAR;
 			DeallocPrevVars();
-			prev_int_result = new int;
+			prev_int_result = vm_malloc(sizeof(int));
 		}
 		(*prev_int_result) = (*result);
 
@@ -2019,7 +2021,7 @@ int gauge_var::Evaluate(float* result)
 		{
 			prev_data_type = GV_FLOATVAR;
 			DeallocPrevVars();
-			prev_float_result = new float;
+			prev_float_result = vm_malloc(sizeof(float));
 		}
 		(*prev_float_result) = (*result);
 
@@ -2035,8 +2037,8 @@ int gauge_var::Evaluate(float* result)
 int gauge_var::Evaluate(char** result)
 {
 	//This should be big enough.
-	(*result) = new char[33];
-	char* temp_result = new char[33];
+	(*result) = vm_malloc(sizeof(char)*33);
+	char* temp_result[33];
 
 	gauge_var* cv = this;
 
@@ -2046,22 +2048,24 @@ int gauge_var::Evaluate(char** result)
 		{
 			case GV_INTPTR:
 			case GV_INTVAR:
-				sprintf(temp_result, "%d", *int_variable);
+				snprintf(temp_result, sizeof(temp_result)-1, "%d", *int_variable);
 				break;
 			case GV_CHARPTR:
-				strcpy(temp_result, *char_pointer);
+				snprintf(temp_result, sizeof(temp_result)-1, "%s", *char_pointer);
 				break;
 			case GV_CHARVAR:
-				strcpy(temp_result, char_variable);
+				snprintf(temp_result, sizeof(temp_result)-1, "%s", char_variable);
 				break;
 			case GV_FLOATPTR:
 			case GV_FLOATVAR:
-				sprintf(temp_result, "%d%%", *float_variable);
+				snprintf(temp_result, sizeof(temp_result)-1, "%d%%", *float_variable);
 				break;
 			default:
 				Error(LOCATION, "Unknown data type handed to gauge_var::Evaluate(char** result)!");
 				return HG_RETURNNODRAW;
 		}
+		
+		temp_result[sizeof(temp_result)-1] = 0;
 
 		switch(var_operator)
 		{
@@ -2087,7 +2091,7 @@ int gauge_var::Evaluate(char** result)
 		{
 			prev_data_type = GV_CHARVAR;
 			DeallocPrevVars();
-			prev_char_result = new char[new_char_size];
+			prev_char_result = vm_malloc(sizeof(char)*(new_char_size));
 		}
 		strcpy(prev_char_result, (*result));
 
@@ -2106,19 +2110,20 @@ void gauge_var::DeallocVars()
 			case GV_NOVAR:
 				break;
 			case GV_INTVAR:
-				delete int_variable;
+				vm_free(int_variable);
 				break;
 			case GV_CHARVAR:
-				delete[] char_variable;
+				vm_free(char_variable);
 				break;
 			case GV_FLOATVAR:
-				delete float_variable;
+				vm_free(float_variable);
 				break;
 			case GV_GAUGEVAR:
-				delete gv_variable;
+				gv_variable->~gauge_var();
+				vm_free(gv_variable);
 				break;
 			default:
-				delete[] char_variable;
+				vm_free(char_variable);
 				break;
 		}
 	}
@@ -2131,16 +2136,16 @@ void gauge_var::DeallocPrevVars()
 		case GV_NOVAR:
 			break;
 		case GV_INTVAR:
-			delete prev_int_result;
+			vm_free(prev_int_result);
 			break;
 		case GV_CHARVAR:
-			delete[] prev_char_result;
+			vm_free(prev_char_result);
 			break;
 		case GV_FLOATVAR:
-			delete prev_float_result;
+			vm_free(prev_float_result);
 			break;
 		default:
-			delete[] prev_char_result;
+			vm_free(prev_char_result);
 			break;
 	}
 }
@@ -2173,7 +2178,7 @@ void gauge_var::operator=(int value)
 	{
 		data_type = GV_INTVAR;
 		DeallocVars();
-		int_variable = new int;
+		int_variable = vm_malloc(int);
 	}
 	
 	(*int_variable) = value;
@@ -2186,7 +2191,7 @@ void gauge_var::operator=(char* value)
 	{
 		data_type = GV_CHARVAR;
 		DeallocVars();
-		char_variable = new char[new_size];
+		char_variable = vm_malloc(sizeof(char)*new_size);
 		char_size = new_size;
 	}
 
@@ -2199,7 +2204,7 @@ void gauge_var::operator=(float value)
 	{
 		data_type = GV_FLOATVAR;
 		DeallocVars();
-		float_variable = new float;
+		float_variable = vm_malloc(sizeof(float));
 	}
 	
 	(*float_variable) = value;
@@ -2306,7 +2311,10 @@ public:
 gauge_object::~gauge_object()
 {
 	if(next != NULL)
-		delete next;
+	{
+		next->~gauge_object();
+		vm_free(next);
+	}
 }
 
 //OK, so true object derivation and that crap is out. This lets you quickly copy children.
@@ -2379,7 +2387,7 @@ gauge_object* add(char* in_name, bool in_has_value, int in_flags)
 	}
 
 	//OK, apparently nothing has the same name...we're clear to go
-	gop = new gauge_object;
+	gop = new (vm_malloc(sizeof(gauge_object))) gauge_object;
 
 	//Set the values
 	gop->prev = this;

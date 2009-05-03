@@ -32,8 +32,16 @@ public:
 	virtual float value(variable_call_data*data=NULL) = 0;
 	operate(variable*op1, variable*op2):variable(VAR_OPP){operand1 = op1; operand2 = op2;}
 	virtual ~operate(){
-		if(operand1)delete operand1; 
-		if(operand2)delete operand2;
+		if(operand1)
+		{
+			operand1->~variable();
+			vm_free(operand1);
+		}
+		if(operand2)
+		{
+			operand2->~variable();
+			vm_free(operand2);
+		}
 	}
 };
 
@@ -118,7 +126,11 @@ public:
 	virtual float value(variable_call_data*data=NULL) = 0;
 	unary(variable*op):variable(VAR_OPP){operand = op;}
 	virtual~unary(){
-		if(operand)delete operand;
+		if(operand)
+		{
+			operand->~variable();
+			vm_free(operand);
+		}
 	}
 };
 
@@ -321,13 +333,13 @@ expression::expression(char* in_str):variable(VAR_EXP),head(NULL){
 	string str = in_str;
 	//first step involves converting the input string from infix notation to prefix notation
 	postfix(str);
-	char* is = new char[str.length()+1];
+	char* is = (char*)vm_malloc(sizeof(char)*(str.length()+1));
 	char* os = is;
 	strcpy(is, str.c_str());
 	//second step is makeing a tree from the prefix expression
 	//in infix the operator precededs the operands
 	head = parse_next(is);
-	delete[]os;
+	vm_free(os);
 }
 
 int expression::wich_unary(char*c){
@@ -396,23 +408,26 @@ variable* expression::parse_next(char*&in_str){
 			variable*c;
 
 			switch(o){
-			case '+':c =  new add(a,b);break;
-			case '-':c =  new sub(a,b);break;
-			case '*':c =  new mult(a,b);break;
-			case '%':c =  new mod(a,b);break;
-			case '/':c =  new divide(a,b);break;
-			case '^':c =  new power(a,b);break;
-			case '#':c =  new root(a,b);break;
-			case '~':c =  new logb(a,b);break;
-			case '=':c =  new comp_equal(a,b);break;
-			case '>':c =  new comp_greater(a,b);break;
-			case '<':c =  new comp_less(a,b);break;
+			case '+':c =  new (vm_malloc(sizeof(add))) add(a,b);break;
+			case '-':c =  new (vm_malloc(sizeof(sub))) sub(a,b);break;
+			case '*':c =  new (vm_malloc(sizeof(mult))) mult(a,b);break;
+			case '%':c =  new (vm_malloc(sizeof(mod))) mod(a,b);break;
+			case '/':c =  new (vm_malloc(sizeof(divide))) divide(a,b);break;
+			case '^':c =  new (vm_malloc(sizeof(power))) power(a,b);break;
+			case '#':c =  new (vm_malloc(sizeof(root))) root(a,b);break;
+			case '~':c =  new (vm_malloc(sizeof(logb))) logb(a,b);break;
+			case '=':c =  new (vm_malloc(sizeof(comp_equal))) comp_equal(a,b);break;
+			case '>':c =  new (vm_malloc(sizeof(comp_greater))) comp_greater(a,b);break;
+			case '<':c =  new (vm_malloc(sizeof(comp_less))) comp_less(a,b);break;
 			}
 
 			if(a->get_type() == VAR_CONSTANT && b->get_type() == VAR_CONSTANT){
 				//if both operands are constants then perform the operation get the constant result and set this as a constant
-				variable*con = new constant(c->value());
-				delete c;
+				variable*con = new (vm_malloc(sizeof(constant))) constant(c->value());
+				
+				c->~variable();
+				vm_free(c);
+				
 				c = con;
 			}
 			
@@ -429,32 +444,35 @@ variable* expression::parse_next(char*&in_str){
 			variable*c;
 			//instasiate the variable as a unary while recersively grabing it's operand
 			switch(un){
-			case 0:c = new hypsin_op(a);break;
-			case 1:c = new hypcos_op(a);break;
-			case 2:c = new hyptan_op(a);break;
-			case 3:c = new arcsin_op(a);break;
-			case 4:c = new arccos_op(a);break;
-			case 5:c = new arctan_op(a);break;
-			case 6:c = new sin_op(a);break;
-			case 7:c = new cos_op(a);break;
-			case 8:c = new tan_op(a);break;
-			case 9:c = new log_op(a);break;
-			case 10:c = new ln_op(a);break;
-			case 11:c = new sqrt_op(a);break;
-			case 12:c = new radian_op(a);break;
-			case 13:c = new degree_op(a);break;
-			case 14:c = new factorial_op(a);break;
-			case 15:c = new abs_op(a);break;
-			case 16:c = new ipart_op(a);break;;
-			case 17:c = new fpart_op(a);break;
-			case 18:c = new sign_op(a);break;
-			case 19:c = new not(a);break;
+			case 0:c = new (vm_malloc(sizeof(hypsin_op))) hypsin_op(a);break;
+			case 1:c = new (vm_malloc(sizeof(hypcos_op))) hypcos_op(a);break;
+			case 2:c = new (vm_malloc(sizeof(hyptan_op))) hyptan_op(a);break;
+			case 3:c = new (vm_malloc(sizeof(arcsin_op))) arcsin_op(a);break;
+			case 4:c = new (vm_malloc(sizeof(arccos_op))) arccos_op(a);break;
+			case 5:c = new (vm_malloc(sizeof(arctan_op))) arctan_op(a);break;
+			case 6:c = new (vm_malloc(sizeof(sin_op))) sin_op(a);break;
+			case 7:c = new (vm_malloc(sizeof(cos_op))) cos_op(a);break;
+			case 8:c = new (vm_malloc(sizeof( tan_op))) tan_op(a);break;
+			case 9:c = new (vm_malloc(sizeof(log_op))) log_op(a);break;
+			case 10:c = new (vm_malloc(sizeof(ln_op))) ln_op(a);break;
+			case 11:c = new (vm_malloc(sizeof(sqrt_op))) sqrt_op(a);break;
+			case 12:c = new (vm_malloc(sizeof(radian_op))) radian_op(a);break;
+			case 13:c = new (vm_malloc(sizeof(degree_op))) degree_op(a);break;
+			case 14:c = new (vm_malloc(sizeof(factorial_op))) factorial_op(a);break;
+			case 15:c = new (vm_malloc(sizeof(abs_op))) abs_op(a);break;
+			case 16:c = new (vm_malloc(sizeof(ipart_op))) ipart_op(a);break;;
+			case 17:c = new (vm_malloc(sizeof(fpart_op))) fpart_op(a);break;
+			case 18:c = new (vm_malloc(sizeof(sign_op))) sign_op(a);break;
+			case 19:c = new (vm_malloc(sizeof(not))) not(a);break;
 			}
 
 			if(a->get_type() == VAR_CONSTANT){
 				//if the operand is a constant then perform the operation get the constant result and set this as a constant
-				variable*con = new constant(c->value());
-				delete c;
+				variable*con = new (vm_malloc(sizeof(constant))) constant(c->value());
+				
+				c->~variable();
+				vm_free(c);
+				
 				c = con;
 			}
 			
@@ -491,16 +509,16 @@ variable* expression::get_object_variable(char**str){
 		//the variable cascade
 		if(!strncmp(*str,engine_output_id,strlen(engine_output_id))){
 			*str+=strlen(engine_output_id);
-			ret = new engine_output();
+			ret = new (vm_malloc(sizeof(engine_output))) engine_output();
 		}else
 		if(!strncmp(*str,shield_id,strlen(shield_id))){
 			*str+=strlen(shield_id);
-			ret = new shields();
+			ret = new (vm_malloc(sizeof(shields))) shields();
 		}else
 		{
 			//unsuported object variable
 			while(**str!='}')(*str)++;
-			ret = new constant(0.0f);
+			ret = new (vm_malloc(sizeof(constant))) constant(0.0f);
 		}
 
 		(*str)++;
@@ -518,12 +536,12 @@ variable* expression::get_object_variable(char**str){
 
 		if(!strncmp(*str,time_id,strlen(time_id))){
 			*str+=strlen(time_id);
-			ret = new global_time();
+			ret = new (vm_malloc(sizeof(global_time))) global_time();
 		}else
 		{
 			//unsuported object variable
 			while(**str!='}')(*str)++;
-			ret = new constant(0.0f);
+			ret = new (vm_malloc(sizeof(constant))) constant(0.0f);
 		}
 
 		(*str)++;
@@ -542,16 +560,16 @@ variable* expression::get_object_variable(char**str){
 
 		if(!strncmp(*str,nframe_id,strlen(nframe_id))){
 			*str+=strlen(nframe_id);
-			ret = new n_frames_op();
+			ret = new (vm_malloc(sizeof(n_frames_op))) n_frames_op();
 		}else
 		if(!strncmp(*str,fps_id,strlen(fps_id))){
 			*str+=strlen(fps_id);
-			ret = new fps_op();
+			ret = new (vm_malloc(sizeof(fps_op))) fps_op();
 		}else
 		{
 			//unsuported object variable
 			while(**str!='}')(*str)++;
-			ret = new constant(0.0f);
+			ret = new (vm_malloc(sizeof(constant))) constant(0.0f);
 		}
 
 		(*str)++;
@@ -563,7 +581,7 @@ variable* expression::get_object_variable(char**str){
 	while(**str!='}')(*str)++;
 	(*str)++;
 	if(**str == ',')(*str)++;//move the input string to the next item
-	return new constant(0.0f);
+	return new (vm_malloc(sizeof(constant))) constant(0.0f);
 }
 
 inline int get_value(char c){

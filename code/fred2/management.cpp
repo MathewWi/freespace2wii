@@ -1268,7 +1268,7 @@ int create_object(vec3d *pos, int list)
 			obj = create_player(Player_starts, pos, NULL, Default_player_model);
 
 	} else if (cur_model_index == Id_select_type_jump_node) {
-		obj = (new jump_node(pos))->get_objnum();
+		obj = (new (vm_malloc(sizeof(jump_node))) jump_node(pos))->get_objnum();
 	} else if(Ship_info[cur_model_index].flags & SIF_NO_FRED){		
 		obj = -1;
 	} else {  // creating a ship

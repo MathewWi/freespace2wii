@@ -2252,8 +2252,6 @@ void ship_select_close()
 									// select screen has been closed and memory freed.  This flag
 									// is needed so we can know if ship_select_close() needs to called if
 									// restoring a game from the Options screen invoked from ship select
-
-//	delete[] SS_active_items;
 }
 
 //	ss_unload_icons() frees the bitmaps used for ship icons 

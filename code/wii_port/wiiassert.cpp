@@ -11,11 +11,29 @@
 
 #include <ogc/audio.h>
 
+#ifdef SCP_WII
+
+extern "C" void printTextureStats();
+
+#include <ogc/system.h>
+
+#define AssertLoc(x,a,b) do { if (!(x)){ WiiAssert(#x,a,b); } } while (0)
+#include <memtracer.h>
+#include <wiitrace.h>
+
+#endif
+
 static void *exception_xfb = (void*)0xC1710000;			//we use a static address above ArenaHi.
 extern "C" void __console_init(void *framebuffer,int xstart,int ystart,int xres,int yres,int stride);
 
 extern "C" void WiiAssert(const char * text,const char *filename, int line)
 {
+	fflush(stdout);
+	fflush(stderr);
+	printTextureStats();
+	closeProfiler();
+	closeMemtrace();
+	
 	ShowConsole();
 	CON_SetStipple(0);
 	AUDIO_StopDMA();
@@ -179,7 +197,22 @@ extern "C" void tocInternalMsg(const char *file, int line, const char *msg)
 
 #include <wiitrace.h>
 #include <memtracer.h>
+#include <GL/GLwii.h>
 //#include <custom_assert.h>
+
+static size_t prealloc_size[] = { 736, 1440, 2784, 2848, 5536, 5664, 10976, 11040, 11296, 21920, 22048, 43744, 43808, 87456, 88064, 174816, 174880, 349600, 1398144};
+static size_t prealloc_count[] = {124,   14,  116,    6,   12,    4,   346,    12,    15,     7,     2,   149,     9,    10,     2,     45,      1,      4,       1};
+
+void WiiTexMemInit()
+{
+	for(size_t i = 0; i < sizeof(prealloc_size)/sizeof(prealloc_size[0]); ++i)
+	{
+		for(size_t j = 0; j < prealloc_count[i]; ++j)
+		{
+			PreallocTexMem(prealloc_size[i]);
+		}
+	}
+}
 
 void WiiInit()
 {

@@ -23231,7 +23231,7 @@ static void output_sexp_html(int sexp_idx, FILE *fp)
 	{
 		if(Sexp_help[i].id == Operators[sexp_idx].value)
 		{
-			char* new_buf = new char[2*strlen(Sexp_help[i].help)];
+			char* new_buf = (char*)vm_malloc(sizeof(char)*2*strlen(Sexp_help[i].help));
 			char* dest_ptr = new_buf;
 			char* curr_ptr = Sexp_help[i].help;
 			char* end_ptr = curr_ptr + strlen(Sexp_help[i].help);
@@ -23251,7 +23251,7 @@ static void output_sexp_html(int sexp_idx, FILE *fp)
 			*dest_ptr = '\0';
 
 			fprintf(fp, "<dt><b>%s</b></dt>\n<dd>%s</dd>\n", Operators[sexp_idx].text, new_buf);
-			delete[] new_buf;
+			vm_free(new_buf);
 
 			printed = true;
 		}

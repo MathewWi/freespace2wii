@@ -1125,7 +1125,12 @@ void bm_clean_slot(int n)
 }
 
 
-void *bm_malloc( int n, int size )
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
+#define bm_malloc(n, size) _bm_malloc((n),(size),__FILE__,__LINE__)
+static void *_bm_malloc( int n, int size, const char * file, int line)
+#else
+static void *bm_malloc( int n, int size )
+#endif
 {
 	Assert( (n >= 0) && (n < MAX_BITMAPS) );
 
@@ -1139,7 +1144,7 @@ void *bm_malloc( int n, int size )
 #endif
 
 //	mprintf(( "Bitmap %d allocated %d bytes\n", n, size ));
-	return vm_malloc(size);
+	return _vm_malloc(size, file, line, 0);
 }
 
 // kinda like bm_malloc but only keeps track of how much memory is getting used
@@ -3394,7 +3399,7 @@ int bm_convert_color_index_to_BGR(int num, ubyte **out_data)
 	int n = num % MAX_BITMAPS;
 	bitmap_entry *be;
 	bitmap *bmp;
-	ubyte *datap, *bgr_data = NULL, *palette = NULL;
+	ubyte *datap, *bgr_data = NULL;
 	char filename[MAX_FILENAME_LEN];
 	int i, j, bpp = 0, size = 0;
 	int index = 0, mult = 3;
@@ -3424,7 +3429,7 @@ int bm_convert_color_index_to_BGR(int num, ubyte **out_data)
 
 	memset( bgr_data, 0, bmp->w * bmp->h * 3 );
 
-	palette = new ubyte[1024]; // 256*4, largest size we should have to process
+	ubyte palette[1024]; // 256*4, largest size we should have to process
 	Assert( palette != NULL );
 
 	// make sure we are using the correct filename in the case of an EFF.
@@ -3439,7 +3444,6 @@ int bm_convert_color_index_to_BGR(int num, ubyte **out_data)
 		mult = 4; // DDS has RGBX for 256 entries, 'X' being an alpha setting that we don't need
 	} else {
 		// we really shouldn't be here at this point but give it another check anyway
-		delete[] palette;
 		vm_free(bgr_data);
 		return 1;
 	}
@@ -3448,7 +3452,6 @@ int bm_convert_color_index_to_BGR(int num, ubyte **out_data)
 
 	// we can only accept 8bits obviously, but this is actually a read error check
 	if ( bpp != 8 ) {
-		delete[] palette;
 		vm_free(bgr_data);
 		return 1;
 	}
@@ -3465,8 +3468,6 @@ int bm_convert_color_index_to_BGR(int num, ubyte **out_data)
 	}
 
 	*out_data = bgr_data;
-
-	delete[] palette;
 
 	// no errors
 	return 0;

@@ -365,8 +365,6 @@ static ubyte Neb2_fog_color_r = 0;
 static ubyte Neb2_fog_color_g = 0;
 static ubyte Neb2_fog_color_b = 0;
 
-static ubyte *Neb2_htl_fog_data = NULL;
-
 // #define NEB2_THUMBNAIL
 
 /*
@@ -706,7 +704,7 @@ void neb2_post_level_init()
 
 		// OK, lets try something a bit more interesting
 		if (strlen(Neb2_texture_name)) {
-			Neb2_htl_fog_data = new ubyte[768];
+			ubyte Neb2_htl_fog_data[768];
 
 			if ( pcx_read_header(Neb2_texture_name, NULL, NULL, NULL, NULL, Neb2_htl_fog_data) == PCX_ERROR_NONE ) {
 				// based on the palette, get an average color value (this doesn't really account for actual pixel usage though)
@@ -727,12 +725,6 @@ void neb2_post_level_init()
 				} else {
 					// it's just black
 					Neb2_fog_color_r = Neb2_fog_color_g = Neb2_fog_color_b = 0;
-				}
-
-				// done, now free up the palette data
-				if ( Neb2_htl_fog_data != NULL ) {
-					delete[] Neb2_htl_fog_data;
-					Neb2_htl_fog_data = NULL;
 				}
 			}
 		}
@@ -792,11 +784,6 @@ void neb2_level_close()
 
 	// unflag the mission as being fullneb so stuff doesn't fog in the techdata room :D
 	The_mission.flags &= ~MISSION_FLAG_FULLNEB;
-
-	if (Neb2_htl_fog_data) {
-		delete[] Neb2_htl_fog_data;
-		Neb2_htl_fog_data = NULL;
-	}
 }
 
 // call before beginning all rendering

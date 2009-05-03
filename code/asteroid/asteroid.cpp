@@ -2169,7 +2169,7 @@ void asteroid_parse_tbl()
 
 	required_string("#Asteroid Types");
 
-	asteroid_tally = new int[Species_info.size() + 1];
+	asteroid_tally = (int*)vm_malloc(sizeof(int)*(Species_info.size() + 1));
 
 	memset(asteroid_tally, 0, sizeof(int) * (Species_info.size()+1));
 
@@ -2225,7 +2225,7 @@ void asteroid_parse_tbl()
 
 
 	// check for any missing info
-	char *errormsg = new char[75 + (Species_info.size() * (NAME_LENGTH))];
+	char *errormsg = (char*)vm_malloc(sizeof(char)*(75 + (Species_info.size() * (NAME_LENGTH))));
 	bool species_missing = false;
 	strcpy(errormsg, "The following species are missing debris types in asteroids.tbl:\n");
 	for (i = 0; i < (int)Species_info.size(); i++)
@@ -2246,8 +2246,8 @@ void asteroid_parse_tbl()
 		Error(LOCATION, errormsg);
 	}
 
-	delete[] asteroid_tally;
-	delete[] errormsg;
+	vm_free(asteroid_tally);
+	vm_free(errormsg);
 }
 
 //	Return number of asteroids expected to collide with a ship.

@@ -507,8 +507,6 @@ int bm_get_cache_slot( int bitmap_id, int separate_ani_frames );
 
 int bm_get_next_handle();
 
-void *bm_malloc(int n, int size);
-
 void bm_update_memory_used(int n, int size);
 
 // how many bytes of textures are used.
