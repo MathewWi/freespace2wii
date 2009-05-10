@@ -155,6 +155,10 @@ extern "C" void __stack_chk_fail(void)
 }
 
 volatile unsigned char power_pressed = 0;
+
+
+extern "C" void fs2_power_off(void)
+	__attribute__ ((no_instrument_function));
 	
 extern "C" void fs2_power_off()
 {
@@ -166,6 +170,8 @@ static volatile u32 perf_count;
 #include "SDL_Timer.h"
 
 extern "C" unsigned int getCount()
+	__attribute__ ((no_instrument_function));
+extern "C" unsigned int getCount()
 {
 	return SDL_GetTicks();
 }
@@ -174,11 +180,16 @@ syswd_t perf_timer;
 FILE * perf_log;
 
 static u32 perf_counter;
+
+extern "C" void tic()
+	__attribute__ ((no_instrument_function));
 extern "C" void tic()
 {
 	perf_counter = getCount();
 }
 
+extern "C" void tocInternal(const char *file, int line)
+	__attribute__ ((no_instrument_function));
 extern "C" void tocInternal(const char *file, int line)
 {
 	u32 c = getCount() - perf_counter;
@@ -187,6 +198,8 @@ extern "C" void tocInternal(const char *file, int line)
 	perf_counter = getCount();
 }
 
+extern "C" void tocInternalMsg(const char *file, int line, const char *msg)
+	__attribute__ ((no_instrument_function));
 extern "C" void tocInternalMsg(const char *file, int line, const char *msg)
 {
 	u32 c = getCount() - perf_counter;
@@ -214,6 +227,9 @@ void WiiTexMemInit()
 	}
 }
 
+
+void WiiInit()
+	__attribute__ ((no_instrument_function));
 void WiiInit()
 {
 	ShowConsole(); 
@@ -229,9 +245,23 @@ void WiiInit()
 	
 	perf_log = fopen("/perf_log.txt","w");
 	
-	initProfiler("/trace_log.txt",1);
-	initMemtrace("/mem_trace_log.mtr",1);
+	//initProfiler("/trace_log.txt",0);
+	//initMemtrace("/mem_trace_log.mtr",1);
 	
 	//set_custom_assert(&WiiAssert);
 }
 
+void WiiClose()
+	__attribute__ ((no_instrument_function));
+void WiiClose()
+{
+	//closeMemtrace();
+	closeProfiler();
+	
+	fclose(perf_log);
+	
+	if(power_pressed)
+	{
+		SYS_ResetSystem(SYS_POWEROFF,0,0);
+	}
+}
