@@ -779,7 +779,11 @@ void *_vm_malloc( int size, const char *filename, int line, int quiet )
 void *_vm_malloc( int size, int quiet )
 #endif
 {
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 	AssertLoc( size >= 0 , filename, line);
+#else
+	Assert( size >= 0 );
+#endif
 
 	size += 2*4*MEMCHECK_SIZE;
 #if !defined(NDEBUG) || defined(DEBUG_MALLOC)

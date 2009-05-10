@@ -338,7 +338,7 @@ void process_osk(int mouse_x, int mouse_y, bool mouse_left, bool mouse_right, os
 		}	
 	}
 	
-	ButtonState b_s;
+	ButtonState b_s = BS_NONE;
 	if(but) b_s = but->s;
 	kb.clearState();
 	if(but) but->s = b_s;

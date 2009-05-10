@@ -9,6 +9,8 @@ endif
 
 include $(DEVKITPPC)/wii_rules
 
+PROFILE_ON = 0
+
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
 # BUILD is the directory where object files & intermediate files will be placed
@@ -44,9 +46,13 @@ INCLUDE_DIR := /i/setup/SDL-Port/include /i/setup/libogg-1.1.3/include /i/setup/
 CFLAGS	= -Wall -g -finline-functions -save-temps -Os $(MACHDEP) $(INCLUDE) -DSCP_WII -DUSE_OPENAL -DSCP_UNIX -D_POSIX_SOURCE -DNO_DIRECT3D \
 		-D_POSIX_TIMERS -DNDEBUG -DDEBUG_MALLOC -fsigned-char -DHAVE_MALLOC_H
 		
+ifeq ($(PROFILE_ON),1)
+CFLAGS += -finstrument-functions
+endif
+		
 CXXFLAGS	=	$(CFLAGS)
 
-LDFLAGS	= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map -fstack-protector-all -fbounds-check -fstack-limit-symbol=__stack_end -finstrument-functions
+LDFLAGS	= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map -finstrument-functions
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
@@ -58,7 +64,9 @@ LIBS	:=	-ltheora -lvorbis -logg -lopenal -lgl2gx -lmemtrace -ltrace -lz -lgnu -l
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= /i/setup/gl2gx/libogc/lib/wii /i/setup/SDL-Port/lib /i/libogc/lib/wii /i/gnulib/lib /i/setup/libogg-1.1.3/lib /i/setup/libtheora-1.0beta3/lib /i/setup/libvorbis-1.2.0/lib /i/setup/openal-soft-1.5.304/lib /i/netport/lib /i/profile_tools/wiitrace/tracer/lib /i/setup/memtracer/lib /i/setup/libfat/libogc/lib/wii
+LIBDIRS	:= /i/setup/gl2gx/libogc/lib/wii /i/setup/SDL-Port/lib /i/libogc/lib/wii /i/gnulib/lib /i/setup/libogg-1.1.3/lib \
+	/i/setup/libtheora-1.0beta3/lib /i/setup/libvorbis-1.2.0/lib /i/setup/openal-soft-1.5.304/lib /i/netport/lib \
+	/i/profile_tools/wiitrace/tracer/lib /i/setup/memtracer/lib /i/libfat/libogc/lib/wii
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional

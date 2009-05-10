@@ -9372,16 +9372,10 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Caught exception in main()!\n");
 		result = EXIT_FAILURE;
 	}
-	closeProfiler();
-	closeMemtrace();
 
 	DBUGFILE_DEINIT();
 #ifdef SCP_WII
-	extern volatile unsigned char power_pressed;	
-	if(power_pressed)
-	{
-		SYS_ResetSystem(SYS_POWEROFF,0,0);
-	}
+	extern void WiiClose(); WiiClose();
 #endif
 
 	return result;
