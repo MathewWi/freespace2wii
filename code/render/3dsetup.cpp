@@ -251,7 +251,11 @@ int g3_in_frame()
 
 //start the frame
 // Pass true for zbuffer_flag to turn on zbuffering
+#ifndef NDEBUG
 void g3_start_frame_func(int zbuffer_flag, char * filename, int lineno)
+#else
+void g3_start_frame_func(int zbuffer_flag)
+#endif
 {
 	float s;
 	int width, height;
@@ -308,7 +312,11 @@ void g3_start_frame_func(int zbuffer_flag, char * filename, int lineno)
 }
 
 //this doesn't do anything, but is here for completeness
+#ifndef NDEBUG
 void g3_end_frame_func(char *filename, int lineno)
+#else
+void g3_end_frame_func()
+#endif
 {
 //	mprintf(( "g3_end_frame called from %s, line %d\n", filename, lineno ));
 

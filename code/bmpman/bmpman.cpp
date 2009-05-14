@@ -1144,7 +1144,11 @@ static void *bm_malloc( int n, int size )
 #endif
 
 //	mprintf(( "Bitmap %d allocated %d bytes\n", n, size ));
+#if !defined(NDEBUG) || defined(DEBUG_MALLOC)
 	return _vm_malloc(size, file, line, 0);
+#else
+	return vm_malloc(size);
+#endif
 }
 
 // kinda like bm_malloc but only keeps track of how much memory is getting used
