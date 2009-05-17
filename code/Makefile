@@ -11,6 +11,17 @@ include $(DEVKITPPC)/wii_rules
 
 PROFILE_ON = 0
 
+GL2GX_DIR = $(CURDIR)/../../gl2gx
+LIBOGG_DIR = $(CURDIR)/../../libogg
+LIBTHEORA_DIR = $(CURDIR)/../../libtheora
+LIBVORBIS_DIR = $(CURDIR)/../../libvorbis
+OPENAL_DIR = $(CURDIR)/../../openal-soft
+NETPORT_DIR = $(CURDIR)/../../netport
+GNULIB_DIR = $(CURDIR)/../../gnulib
+PROFILE_TOOLS_DIR = $(CURDIR)/../../profile_tools
+SDLPORT_DIR = $(CURDIR)/../../SDL-Port
+MEMTRACER_DIR = $(CURDIR)/../../memtracer
+
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
 # BUILD is the directory where object files & intermediate files will be placed
@@ -33,7 +44,7 @@ LIBSOURCES	:= ../libjpeg ../lua
 SOURCES		:= $(FSSOURCES) $(LIBSOURCES)
 DATA		:=	data  
 INCLUDES	:=  . ../lua ../libjpeg
-INCLUDE_DIR := /i/setup/SDL-Port/include /i/setup/libogg-1.1.3/include /i/setup/libtheora-1.0beta3/include /i/setup/libvorbis-1.2.0/include /i/setup/openal-soft-1.5.304/include /i/netport/include /i/gnulib/include /i/setup/gl2gx/include /i/profile_tools/wiitrace/tracer/include/
+DEPENDENCY_DIRS := $(SDLPORT_DIR) $(LIBOGG_DIR) $(LIBTHEORA_DIR) $(LIBVORBIS_DIR) $(OPENAL_DIR) $(NETPORT_DIR) $(GNULIB_DIR) $(PROFILE_TOOLS_DIR)/wiitrace/tracer/ $(MEMTRACER_DIR)
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -64,9 +75,7 @@ LIBS	:=	-ltheora -lvorbis -logg -lopenal -lgl2gx -lmemtrace -ltrace -lz -lgnu -l
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= /i/setup/gl2gx/libogc/lib/wii /i/setup/SDL-Port/lib /i/libogc/lib/wii /i/gnulib/lib /i/setup/libogg-1.1.3/lib \
-	/i/setup/libtheora-1.0beta3/lib /i/setup/libvorbis-1.2.0/lib /i/setup/openal-soft-1.5.304/lib /i/netport/lib \
-	/i/profile_tools/wiitrace/tracer/lib /i/setup/memtracer/lib /i/libfat/libogc/lib/wii
+LIBDIRS	:= /i/libogc/lib/wii /i/libfat/libogc/lib/wii
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -111,7 +120,8 @@ export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 # build a list of include paths
 #---------------------------------------------------------------------------------
 export INCLUDE	:=	-I$(BUILD) $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-					-I$(BUILD) $(foreach dir,$(INCLUDE_DIR),-I$(dir)) \
+					-I$(BUILD) $(foreach dir,$(DEPENDENCY_DIRS),-I$(dir)/include) \
+					-I$(GL2GX_DIR)/libogc/include \
 					-I$(CURDIR)/$(BUILD) \
 					-I$(LIBOGC_INC)
 
@@ -119,6 +129,8 @@ export INCLUDE	:=	-I$(BUILD) $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 # build a list of library paths
 #---------------------------------------------------------------------------------
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)) \
+					$(foreach dir,$(DEPENDENCY_DIRS),-L$(dir)/lib) \
+					-L$(GL2GX_DIR)/libogc/lib/wii \
 					-L$(LIBOGC_LIB)
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
