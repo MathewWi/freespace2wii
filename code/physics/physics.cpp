@@ -1236,6 +1236,10 @@ float velocity_ramp (float v_in, float v_goal, float ramp_time_const, float t)
 	float delta_v;
 	float decay_factor;
 	float dist;
+	
+	Assert(!_isnan(v_in));
+	Assert(!_isnan(v_goal));
+	Assert(!_isnan(ramp_time_const));
 
 	// JAS: If no time elapsed, change nothing
 	if ( t==0.0f )
@@ -1252,11 +1256,20 @@ float velocity_ramp (float v_in, float v_goal, float ramp_time_const, float t)
 	if ( ramp_time_const < 0.0001f )	{
 		return v_goal;
 	}
+	
+	Assert(!_isnan(t));
+	Assert(!_isnan(ramp_time_const));
 
 	// determine decay factor  (ranges from 0 for short times to 1 for long times)
 	// when decay factor is near 0, the velocity in nearly unchanged
 	// when decay factor in near 1, the velocity approaches goal
 	decay_factor = (float)exp(- t / ramp_time_const);
+		
+	if(_isnan(decay_factor))
+	{
+		decay_factor = 0.f;
+	}
+	Assert(!_isnan(delta_v));
 
 	return (v_in + delta_v * (1.0f - decay_factor) );
 }
