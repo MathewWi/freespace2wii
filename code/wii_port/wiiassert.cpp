@@ -264,4 +264,8 @@ void WiiClose()
 	{
 		SYS_ResetSystem(SYS_POWEROFF,0,0);
 	}
+	else
+	{
+		SYS_ResetSystem(SYS_SHUTDOWN,0,0);
+	}
 }
