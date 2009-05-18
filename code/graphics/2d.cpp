@@ -1294,6 +1294,10 @@ static bool gr_init_sub(int mode, int width, int height, int depth)
 	return true;
 }
 
+#ifdef SCP_WII
+#include <GL/glut.h>
+#endif
+
 bool gr_init(int d_mode, int d_width, int d_height, int d_depth)
 {
 	int width = 1024, height = 768, depth = 16, mode = GR_OPENGL;
@@ -1399,8 +1403,8 @@ bool gr_init(int d_mode, int d_width, int d_height, int d_depth)
 	}
 	
 #ifdef SCP_WII
-	width = 640;
-	height = 480;
+	width = glutGet(GLUT_SCREEN_WIDTH);
+	height = glutGet(GLUT_SCREEN_HEIGHT);
 #endif
 
 // These compiler macros will force windowed mode at the specified resolution if
