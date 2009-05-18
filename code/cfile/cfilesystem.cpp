@@ -2049,11 +2049,27 @@ int cf_get_file_list_preallocated( int max, char arr[][MAX_FILENAME_LEN], char *
 	dirp = diropen(filespec);
 	if ( dirp ) {
 		char d_name[FILENAME_MAX+1];
+		char d_lower_name[FILENAME_MAX+1];
 		while (dirnext(dirp, d_name, NULL) == 0) {
 			if (num_files >= max)
 				break;
+			
+			// fnmatch is case-sensitive, but this undesirable
+			// Change the name to lower case to fix the problem
+			for(int i = 0; i < FILENAME_MAX; ++i)
+			{
+				if(d_name[i] != 0)
+				{
+					d_lower_name[i] = tolower(d_name[i]);
+				}
+				else
+				{
+					d_lower_name[i] = 0;
+					break;
+				}
+			}
 
-			if (fnmatch(filter, d_name, 0) != 0)
+			if (fnmatch(filter, d_lower_name, 0) != 0)
 				continue;
 
 			char fn[FILENAME_MAX+1];
