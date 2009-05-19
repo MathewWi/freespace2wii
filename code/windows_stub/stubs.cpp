@@ -492,6 +492,10 @@ int _getcwd(char *out_buf, unsigned int len)
 	return 1;
 }
 
+#ifdef SCP_WII
+#include <sys/dir.h>
+#endif
+
 // change directory to specified path
 int _chdir(const char *path)
 {
@@ -502,6 +506,22 @@ int _chdir(const char *path)
 
 	if (status) {
 		Warning(__FILE__, __LINE__, "Cannot chdir to %s: %s", path, strerror(m_error));
+	}
+#endif
+
+#ifdef SCP_WII
+	if(!status)
+	{
+		struct stat st;
+		status = stat(path, &st);
+		
+		if(!status)
+		{
+			if(!S_ISREG(st.st_mode) && !S_ISDIR(st.st_mode))
+			{
+				status = -1;
+			}			
+		}		
 	}
 #endif
 

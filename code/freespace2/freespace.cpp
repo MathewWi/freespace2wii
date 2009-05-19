@@ -3687,7 +3687,13 @@ void game_init()
 	strncpy(whee, full_path, MAX_PATH_LEN-1);
 #elif SCP_WII
 	// Hard code this for now
-	SetCurrentDirectory("sd:/Freespace2");
+	if(SetCurrentDirectory("usb2:/Freespace2"))
+	{
+		if(SetCurrentDirectory("sd:/Freespace2"))
+		{
+			WiiAssert("Could not find Freespace2 directory on sd:/ or usb2:/",__FILE__,__LINE__);
+		}
+	}
 	GetCurrentDirectory(MAX_PATH_LEN-1, whee);
 #else
 	GetCurrentDirectory(MAX_PATH_LEN-1, whee);
